@@ -1,0 +1,27 @@
+{
+  "name": "moysklad",
+  "version": "0.0.0",
+  "description": "Библиотека для работы с API сервиса МойСклад",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wmakeev/moysklad.git"
+  },
+  "keywords": [
+    "moysklad",
+    "warehouse",
+    "client",
+    "wms",
+    "crm",
+    "api"
+  ],
+  "author": "Vitaliy V. Makeev",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/wmakeev/moysklad/issues"
+  },
+  "homepage": "https://github.com/wmakeev/moysklad#readme"
+}

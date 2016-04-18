@@ -2,9 +2,12 @@
   "name": "moysklad",
   "version": "0.0.0",
   "description": "Библиотека для работы с API сервиса МойСклад",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
-    "test": "npm test"
+    "test": "babel-tape-runner \"src/**/__tests__/*-test.js\"",
+    "lint": "eslint src",
+    "clean": "rm -rf dist || :",
+    "build": "npm run clean && cp -rf src dist && babel --source-maps --optional runtime --out-dir dist ./src"
   },
   "repository": {
     "type": "git",
@@ -18,10 +21,23 @@
     "crm",
     "api"
   ],
-  "author": "Vitaliy V. Makeev",
+  "author": {
+    "name": "Vitaliy V. Makeev",
+    "email": "w.makeev@gmail.com"
+  },
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/wmakeev/moysklad/issues"
   },
-  "homepage": "https://github.com/wmakeev/moysklad#readme"
+  "homepage": "https://github.com/wmakeev/moysklad#readme",
+  "dependencies": {
+    "babel-runtime": "^5.8.0",
+    "dotenv": "^1.2.0",
+    "have": "^0.4.0",
+    "js-csp": "^0.5.0"
+  },
+  "devDependencies": {
+    "babel-tape-runner": "^1.2.0",
+    "blue-tape": "^0.1.0"
+  }
 }

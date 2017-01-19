@@ -13,6 +13,6 @@ export default function mediatorPlugin (options) {
     let forward = () => {
     }
 
-    return {...instance, emit, send, on, pipe, forward}
+    return { ...instance, emit, send, on, pipe, forward }
   }
 }

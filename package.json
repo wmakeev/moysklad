@@ -1,6 +1,6 @@
 {
   "name": "moysklad",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Библиотека для работы с API сервиса МойСклад",
   "main": "dist/index.js",
   "scripts": {
@@ -31,13 +31,24 @@
   },
   "homepage": "https://github.com/wmakeev/moysklad#readme",
   "dependencies": {
-    "babel-runtime": "^5.8.0",
-    "dotenv": "^1.2.0",
+    "babel-runtime": "^6.11",
+    "dotenv": "^2.0.0",
     "have": "^0.4.0",
-    "js-csp": "^0.5.0"
+    "js-csp": "^0.7.4",
+    "scaleflow": "github:wmakeev/scaleflow#1233b5b1c339c2611cc47696ad53922f1a910ca1"
   },
   "devDependencies": {
-    "babel-tape-runner": "^1.2.0",
-    "blue-tape": "^0.1.0"
+    "babel-eslint": "^7.0.0",
+    "babel-plugin-transform-object-rest-spread": "^6.16.0",
+    "babel-preset-es2015": "^6.16.0",
+    "babel-preset-es2016": "^6.16.0",
+    "babel-preset-es2017": "^6.16.0",
+    "babel-tape-runner": "^2.0.1",
+    "blue-tape": "^1.0.0",
+    "eslint": "^3.8.0",
+    "eslint-config-standard": "6.2.0",
+    "eslint-plugin-promise": "^3.0.0",
+    "eslint-plugin-standard": "^2.0.1",
+    "tap-spec": "^4.1.1"
   }
 }

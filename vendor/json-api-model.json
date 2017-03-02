@@ -1,0 +1,2552 @@
+{
+  "name": "Moysklad",
+  "types": {
+    "AbstractCashIn": {
+      "baseType": ".FinanceIn"
+    },
+    "AbstractCashOut": {
+      "baseType": ".FinanceOut"
+    },
+    "AbstractConnectorSetting": {
+      "baseType": ".LegendEntity",
+      "properties": {
+        "active": {
+          "type": "Boolean"
+        },
+        "login": {
+          "type": "String"
+        },
+        "organization": {
+          "reference": true,
+          "type": ".Organization"
+        },
+        "password": {
+          "type": "String"
+        },
+        "pollPeriod": {
+          "type": "Int"
+        }
+      }
+    },
+    "AbstractDemand": {
+      "baseType": ".ComingOutOperation",
+      "properties": {
+        "customerOrder": {
+          "reference": true,
+          "type": ".CustomerOrder"
+        },
+        "facture": {
+          "reference": true,
+          "type": ".FactureOut"
+        },
+        "invoicesOut": {
+          "collection": true,
+          "reference": true,
+          "type": ".InvoiceOut"
+        },
+        "payments": {
+          "collection": true,
+          "reference": true,
+          "type": ".FinanceIn"
+        },
+        "salesReturns": {
+          "collection": true,
+          "reference": true,
+          "type": ".SalesReturn"
+        },
+        "shipmentOut": {
+          "collection": true,
+          "type": ".ShipmentOut"
+        }
+      }
+    },
+    "AbstractGood": {
+      "baseType": ".GoodFolder",
+      "properties": {
+        "barcode": {
+          "collection": true,
+          "type": ".Barcode"
+        },
+        "buyCurrency": {
+          "reference": true,
+          "type": ".Currency"
+        },
+        "buyPrice": {
+          "type": "Double"
+        },
+        "country": {
+          "reference": true,
+          "type": ".Country"
+        },
+        "minPrice": {
+          "type": "Double"
+        },
+        "saleCurrency": {
+          "reference": true,
+          "type": ".Currency"
+        },
+        "salePrice": {
+          "type": "Double"
+        },
+        "salePrices": {
+          "type": ".Prices"
+        },
+        "supplier": {
+          "reference": true,
+          "type": ".Agent"
+        },
+        "uom": {
+          "reference": true,
+          "type": ".Uom"
+        }
+      }
+    },
+    "AbstractSalesReturn": {
+      "baseType": ".ComingInOperation",
+      "properties": {
+        "demand": {
+          "reference": true,
+          "type": ".Demand"
+        },
+        "losses": {
+          "collection": true,
+          "reference": true,
+          "type": ".Loss"
+        },
+        "payments": {
+          "collection": true,
+          "reference": true,
+          "type": ".FinanceOut"
+        },
+        "positions": {
+          "collection": true,
+          "type": ".SalesReturnPosition"
+        }
+      }
+    },
+    "AbstractShipmentOut": {
+      "baseType": ".ComingOut"
+    },
+    "AccessMode": {
+      "baseType": "Enum",
+      "values": [
+        "NONE",
+        "SELF",
+        "PARENT",
+        "NEIGHBOUR",
+        "ALL"
+      ]
+    },
+    "AccountEntity": {
+      "baseType": "Object",
+      "properties": {
+        "accountId": {
+          "type": "String"
+        },
+        "id": {
+          "type": "ID"
+        }
+      }
+    },
+    "AccumulationDiscount": {
+      "baseType": ".Discount"
+    },
+    "Agent": {
+      "baseType": ".LegendEntity",
+      "properties": {
+        "archived": {
+          "type": "Boolean"
+        },
+        "created": {
+          "type": "DateTime"
+        }
+      }
+    },
+    "AgentAccount": {
+      "baseType": ".InfoEntity",
+      "properties": {
+        "accountNumber": {
+          "type": "String"
+        },
+        "bankLocation": {
+          "type": "String"
+        },
+        "bankName": {
+          "type": "String"
+        },
+        "bic": {
+          "type": "String"
+        },
+        "correspondentAccount": {
+          "type": "String"
+        },
+        "isDefault": {
+          "type": "Boolean"
+        }
+      }
+    },
+    "AgentAttributeValue": {
+      "baseType": ".AttributeValue",
+      "properties": {
+        "agent": {
+          "reference": true,
+          "type": ".Agent"
+        }
+      }
+    },
+    "AgentDiscount": {
+      "baseType": ".Entity",
+      "properties": {
+        "agent": {
+          "reference": true,
+          "type": ".Agent"
+        },
+        "demandSumCorrection": {
+          "type": "Double"
+        },
+        "discount": {
+          "reference": true,
+          "type": ".Discount"
+        },
+        "personalDiscount": {
+          "type": "Double"
+        }
+      }
+    },
+    "AgentNewsItem": {
+      "baseType": ".InfoEntity",
+      "properties": {
+        "moment": {
+          "type": "DateTime"
+        },
+        "text": {
+          "type": "String"
+        }
+      }
+    },
+    "AgentPictureDocument": {
+      "baseType": ".AttachableDocument"
+    },
+    "AmiroConnectorSettings": {
+      "baseType": ".OperationConnectorSetting",
+      "properties": {
+        "commentsColumnNum": {
+          "type": "Int"
+        },
+        "customAttribute": {
+          "collection": true,
+          "type": ".AmiroCustomAttributeInfo"
+        },
+        "customerAddressColumnNum": {
+          "type": "Int"
+        },
+        "customerCodeColumnNum": {
+          "type": "Int"
+        },
+        "customerEmailColumnNum": {
+          "type": "Int"
+        },
+        "customerFirstNameColumnNum": {
+          "type": "Int"
+        },
+        "customerLastNameColumnNum": {
+          "type": "Int"
+        },
+        "customerNickColumnNum": {
+          "type": "Int"
+        },
+        "customerPhoneColumnNum": {
+          "type": "Int"
+        },
+        "goodIdColumnNum": {
+          "type": "Int"
+        },
+        "goodNameColumnNum": {
+          "type": "Int"
+        },
+        "orderDateColumnNum": {
+          "type": "Int"
+        },
+        "orderIdColumnNum": {
+          "type": "Int"
+        },
+        "prefixForAgent": {
+          "type": "Boolean"
+        },
+        "prefixForGood": {
+          "type": "Boolean"
+        },
+        "prefixForOperation": {
+          "type": "Boolean"
+        },
+        "priceColumnNum": {
+          "type": "Int"
+        },
+        "quantityColumnNum": {
+          "type": "Int"
+        },
+        "shippingAmountColumnNum": {
+          "type": "Int"
+        },
+        "stateColumnNum": {
+          "type": "Int"
+        },
+        "taxColumnNum": {
+          "type": "Int"
+        }
+      }
+    },
+    "AmiroCustomAttributeInfo": {
+      "baseType": ".Entity",
+      "properties": {
+        "columnNumber": {
+          "type": "Int"
+        },
+        "name": {
+          "type": "String"
+        },
+        "settings": {
+          "reference": true,
+          "type": ".Settings"
+        }
+      }
+    },
+    "AttachableDocument": {
+      "baseType": ".Document"
+    },
+    "AttachmentDocument": {
+      "baseType": ".AttachableDocument"
+    },
+    "AttributeMetadata": {
+      "baseType": ".LegendEntity",
+      "properties": {
+        "attrType": {
+          "type": ".AttributeType"
+        },
+        "dictionaryMetadata": {
+          "reference": true,
+          "type": ".EntityMetadata"
+        },
+        "entityMetadata": {
+          "reference": true,
+          "type": ".EmbeddedEntityMetadata"
+        },
+        "feature": {
+          "type": "Boolean"
+        },
+        "position": {
+          "type": "Int"
+        },
+        "required": {
+          "type": "Boolean"
+        }
+      }
+    },
+    "AttributeType": {
+      "baseType": "Enum",
+      "values": [
+        "STRING",
+        "LONG",
+        "TIME",
+        "ID_CUSTOM",
+        "FILE",
+        "DOUBLE",
+        "BOOLEAN",
+        "ID_EMBEDDED",
+        "TEXT",
+        "LINK"
+      ]
+    },
+    "AttributeValue": {
+      "baseType": ".InfoEntity",
+      "properties": {
+        "agentValue": {
+          "reference": true,
+          "type": ".Agent"
+        },
+        "booleanValue": {
+          "type": "Boolean"
+        },
+        "consignmentValue": {
+          "reference": true,
+          "type": ".Consignment"
+        },
+        "contractValue": {
+          "reference": true,
+          "type": ".Contract"
+        },
+        "doubleValue": {
+          "type": "Double"
+        },
+        "employeeValue": {
+          "reference": true,
+          "type": ".Employee"
+        },
+        "entityValue": {
+          "reference": true,
+          "type": ".CustomEntity"
+        },
+        "file": {
+          "type": ".AttachmentDocument"
+        },
+        "goodValue": {
+          "reference": true,
+          "type": ".Good"
+        },
+        "longValue": {
+          "type": "Long"
+        },
+        "metadata": {
+          "reference": true,
+          "type": ".AttributeMetadata"
+        },
+        "placeValue": {
+          "reference": true,
+          "type": ".Store"
+        },
+        "projectValue": {
+          "reference": true,
+          "type": ".Project"
+        },
+        "timeValue": {
+          "type": "DateTime"
+        },
+        "valueString": {
+          "type": "String"
+        },
+        "valueText": {
+          "type": "String"
+        }
+      }
+    },
+    "Barcode": {
+      "baseType": ".Entity",
+      "properties": {
+        "barcode": {
+          "type": "String"
+        },
+        "barcodeType": {
+          "type": ".BarcodeType"
+        }
+      }
+    },
+    "BarcodeType": {
+      "baseType": "Enum",
+      "values": [
+        "EAN8",
+        "EAN13",
+        "Code128"
+      ]
+    },
+    "CashIn": {
+      "baseType": ".AbstractCashIn",
+      "external": "true"
+    },
+    "CashOut": {
+      "baseType": ".AbstractCashOut",
+      "external": "true"
+    },
+    "Cashier": {
+      "baseType": ".Entity",
+      "external": "true",
+      "properties": {
+        "createAndPrintRetailCashOut": {
+          "type": "Boolean"
+        },
+        "employee": {
+          "reference": true,
+          "type": ".Employee"
+        },
+        "printCashin": {
+          "type": "Boolean"
+        },
+        "printCashout": {
+          "type": "Boolean"
+        },
+        "printCheck": {
+          "type": "Boolean"
+        },
+        "printCheckFR": {
+          "type": "Boolean"
+        },
+        "printReturnCheck": {
+          "type": "Boolean"
+        },
+        "printZ": {
+          "type": "Boolean"
+        },
+        "retailStore": {
+          "reference": true,
+          "type": ".RetailStore"
+        }
+      }
+    },
+    "Classifier": {
+      "baseType": ".LegendEntity"
+    },
+    "CmlConnectorSettings": {
+      "baseType": ".OperationConnectorSetting",
+      "properties": {
+        "features": {
+          "type": "Boolean"
+        },
+        "goodFolder": {
+          "reference": true,
+          "type": ".GoodFolder"
+        },
+        "shopType": {
+          "type": ".CmlType"
+        },
+        "stockActive": {
+          "type": "Boolean"
+        },
+        "stockPollPeriod": {
+          "type": "Int"
+        },
+        "syncOrderState": {
+          "type": "Boolean"
+        }
+      }
+    },
+    "CmlType": {
+      "baseType": "Enum",
+      "values": [
+        "BITRIX",
+        "UMICMS",
+        "HOSTCMS",
+        "INSALES",
+        "WEBASYST",
+        "SIMPLA",
+        "UMIRU",
+        "PRESTASHOP",
+        "SITEEDIT",
+        "BITRIXSMB",
+        "FASTSALES",
+        "MAGENTO",
+        "DIAFAN",
+        "SHOPIUM",
+        "VIRTUEMART",
+        "ADVANTSHOP",
+        "AGORAPLATFORM",
+        "CSCART",
+        "WEBASYST5",
+        "GENERIC_CML",
+        "NETHOUSE"
+      ]
+    },
+    "CollectionContainer": {
+      "baseType": "Object",
+      "properties": {
+        "items": {
+          "collection": true
+        }
+      }
+    },
+    "ComingIn": {
+      "baseType": ".StockMotion"
+    },
+    "ComingInOperation": {
+      "baseType": ".StockOperation"
+    },
+    "ComingOut": {
+      "baseType": ".StockMotion"
+    },
+    "ComingOutOperation": {
+      "baseType": ".StockOperation"
+    },
+    "CommissionReport": {
+      "baseType": ".OperationWithPositions",
+      "properties": {
+        "endCommissionPeriod": {
+          "type": "DateTime"
+        },
+        "rewardPercent": {
+          "type": "Double"
+        },
+        "rewardType": {
+          "type": ".RewardType"
+        },
+        "startCommissionPeriod": {
+          "type": "DateTime"
+        }
+      }
+    },
+    "CommissionReportIn": {
+      "baseType": ".CommissionReport",
+      "external": "true",
+      "properties": {
+        "commissionReportInPositions": {
+          "collection": true,
+          "type": ".CommissionReportInPosition"
+        },
+        "incomingDate": {
+          "type": "DateTime"
+        },
+        "incomingNumber": {
+          "type": "String"
+        },
+        "payments": {
+          "collection": true,
+          "reference": true,
+          "type": ".FinanceIn"
+        }
+      }
+    },
+    "CommissionReportInPosition": {
+      "baseType": ".CommissionReportPosition"
+    },
+    "CommissionReportOut": {
+      "baseType": ".CommissionReport",
+      "external": "true",
+      "properties": {
+        "commissionReportOutPositions": {
+          "collection": true,
+          "type": ".CommissionReportOutPosition"
+        },
+        "payments": {
+          "collection": true,
+          "reference": true,
+          "type": ".FinanceOut"
+        }
+      }
+    },
+    "CommissionReportOutPosition": {
+      "baseType": ".CommissionReportPosition"
+    },
+    "CommissionReportPosition": {
+      "baseType": ".Motion",
+      "properties": {
+        "reward": {
+          "type": ".MoneyAmount"
+        }
+      }
+    },
+    "Company": {
+      "baseType": ".Agent",
+      "properties": {
+        "agentNewsItem": {
+          "collection": true,
+          "type": ".AgentNewsItem"
+        },
+        "attributes": {
+          "collection": true,
+          "type": ".AgentAttributeValue"
+        },
+        "bankAccount": {
+          "collection": true,
+          "type": ".AgentAccount"
+        },
+        "chiefAccountant": {
+          "type": "String"
+        },
+        "companyType": {
+          "type": ".CompanyType"
+        },
+        "contact": {
+          "type": ".Contact"
+        },
+        "contactPerson": {
+          "collection": true,
+          "type": ".ContactPerson"
+        },
+        "director": {
+          "type": "String"
+        },
+        "directorSign": {
+          "type": ".AgentPictureDocument"
+        },
+        "discountCardNumber": {
+          "type": "String"
+        },
+        "payerVat": {
+          "type": "Boolean"
+        },
+        "priceType": {
+          "reference": true,
+          "type": ".PriceType"
+        },
+        "requisite": {
+          "type": ".Requisite"
+        },
+        "stamp": {
+          "type": ".AgentPictureDocument"
+        },
+        "state": {
+          "reference": true,
+          "type": ".State"
+        },
+        "tags": {
+          "collection": true,
+          "type": "String"
+        }
+      }
+    },
+    "CompanyType": {
+      "baseType": "Enum",
+      "values": [
+        "URLI",
+        "INPR",
+        "FILI"
+      ]
+    },
+    "Consignment": {
+      "baseType": ".LegendEntity",
+      "properties": {
+        "attributes": {
+          "collection": true,
+          "type": ".ConsignmentAttributeValue"
+        },
+        "barcode": {
+          "collection": true,
+          "type": ".Barcode"
+        },
+        "feature": {
+          "type": ".Variant"
+        },
+        "good": {
+          "reference": true,
+          "type": ".Good"
+        },
+        "isDefault": {
+          "type": "Boolean"
+        }
+      }
+    },
+    "ConsignmentAttributeValue": {
+      "baseType": ".AttributeValue",
+      "properties": {
+        "consignment": {
+          "reference": true,
+          "type": ".Consignment"
+        }
+      }
+    },
+    "Contact": {
+      "baseType": "Object",
+      "properties": {
+        "address": {
+          "type": "String"
+        },
+        "email": {
+          "type": "String"
+        },
+        "faxes": {
+          "type": "String"
+        },
+        "mobiles": {
+          "type": "String"
+        },
+        "phones": {
+          "type": "String"
+        }
+      }
+    },
+    "ContactPerson": {
+      "baseType": ".LegendEntity",
+      "properties": {
+        "email": {
+          "type": "String"
+        },
+        "phone": {
+          "type": "String"
+        },
+        "position": {
+          "type": "String"
+        }
+      }
+    },
+    "Contract": {
+      "baseType": ".LegendEntity",
+      "external": "true",
+      "properties": {
+        "agent": {
+          "reference": true,
+          "type": ".Agent"
+        },
+        "agentAccount": {
+          "reference": true,
+          "type": ".AgentAccount"
+        },
+        "archived": {
+          "type": "Boolean"
+        },
+        "attributes": {
+          "collection": true,
+          "type": ".ContractAttributeValue"
+        },
+        "contractType": {
+          "type": ".ContractType"
+        },
+        "currency": {
+          "reference": true,
+          "type": ".Currency"
+        },
+        "documents": {
+          "collection": true,
+          "type": ".ContractDocument"
+        },
+        "moment": {
+          "type": "DateTime"
+        },
+        "ownCompany": {
+          "reference": true,
+          "type": ".Organization"
+        },
+        "ownCompanyAccount": {
+          "reference": true,
+          "type": ".AgentAccount"
+        },
+        "rewardPercent": {
+          "type": "Double"
+        },
+        "rewardType": {
+          "type": ".RewardType"
+        },
+        "state": {
+          "reference": true,
+          "type": ".State"
+        },
+        "sum": {
+          "type": ".MoneyAmount"
+        }
+      }
+    },
+    "ContractAttributeValue": {
+      "baseType": ".AttributeValue",
+      "properties": {
+        "contract": {
+          "reference": true,
+          "type": ".Contract"
+        }
+      }
+    },
+    "ContractDocument": {
+      "baseType": ".PrintedDocument",
+      "properties": {
+        "contract": {
+          "reference": true,
+          "type": ".Contract"
+        }
+      }
+    },
+    "ContractType": {
+      "baseType": "Enum",
+      "values": [
+        "Sales",
+        "Commission"
+      ]
+    },
+    "Counterparty": {
+      "baseType": ".Company",
+      "external": "true",
+      "properties": {}
+    },
+    "Country": {
+      "baseType": ".PredefinedLegendEntity",
+      "external": "true"
+    },
+    "Currency": {
+      "baseType": ".LegendEntity",
+      "external": "true",
+      "properties": {
+        "enteredRate": {
+          "type": "Double"
+        },
+        "invertRate": {
+          "type": "Boolean"
+        },
+        "isoCode": {
+          "type": "String"
+        },
+        "major": {
+          "type": ".Unit"
+        },
+        "minor": {
+          "type": ".Unit"
+        },
+        "rate": {
+          "type": "Double"
+        }
+      }
+    },
+    "CustomEntity": {
+      "baseType": ".LegendEntity",
+      "external": "true",
+      "properties": {
+        "entityMetadata": {
+          "reference": true,
+          "type": ".CustomEntityMetadata"
+        }
+      }
+    },
+    "CustomEntityMetadata": {
+      "baseType": ".EntityMetadata"
+    },
+    "CustomerOrder": {
+      "baseType": ".Order",
+      "external": "true",
+      "properties": {
+        "demands": {
+          "collection": true,
+          "reference": true,
+          "type": ".Demand"
+        },
+        "invoicesOut": {
+          "collection": true,
+          "reference": true,
+          "type": ".InvoiceOut"
+        },
+        "payments": {
+          "collection": true,
+          "reference": true,
+          "type": ".FinanceIn"
+        },
+        "positions": {
+          "collection": true,
+          "type": ".CustomerOrderPosition"
+        },
+        "purchaseOrders": {
+          "collection": true,
+          "reference": true,
+          "type": ".PurchaseOrder"
+        }
+      }
+    },
+    "CustomerOrderPosition": {
+      "baseType": ".OrderPosition"
+    },
+    "Demand": {
+      "baseType": ".AbstractDemand",
+      "external": "true",
+      "properties": {
+        "extension": {
+          "type": ".DemandExtension"
+        },
+        "overhead": {
+          "type": ".MoneyAmount"
+        },
+        "overheadDistribution": {
+          "type": ".OverheadDistribution"
+        }
+      }
+    },
+    "DemandExtension": {
+      "baseType": ".OperationExtension",
+      "properties": {
+        "carNumber": {
+          "type": "String"
+        },
+        "carrier": {
+          "reference": true,
+          "type": ".Agent"
+        },
+        "consignorIndication": {
+          "type": "String"
+        },
+        "goodPackQuantity": {
+          "type": "Int"
+        },
+        "loadName": {
+          "type": "String"
+        },
+        "opened": {
+          "type": "Boolean"
+        },
+        "transportFacility": {
+          "type": "String"
+        }
+      }
+    },
+    "Discount": {
+      "baseType": ".Entity",
+      "external": "true",
+      "properties": {
+        "active": {
+          "type": "Boolean"
+        },
+        "name": {
+          "type": "String"
+        }
+      }
+    },
+    "Document": {
+      "baseType": ".LegendEntity",
+      "properties": {
+        "contents": {
+          "type": "Base64Binary"
+        },
+        "created": {
+          "type": "DateTime"
+        },
+        "filename": {
+          "type": "String"
+        },
+        "miniature": {
+          "reference": true,
+          "type": ".Miniature"
+        }
+      }
+    },
+    "DocumentMiniature": {
+      "baseType": ".Document"
+    },
+    "EditablePeriodType": {
+      "baseType": "Enum",
+      "values": [
+        "ALL",
+        "CALENDAR_DAYS",
+        "WORK_DAYS",
+        "DATE"
+      ]
+    },
+    "EmbeddedEntityMetadata": {
+      "baseType": ".EntityMetadata"
+    },
+    "Employee": {
+      "baseType": ".Agent",
+      "external": "true",
+      "properties": {
+        "attributes": {
+          "collection": true,
+          "type": ".EmployeeAttributeValue"
+        },
+        "city": {
+          "type": "String"
+        },
+        "email": {
+          "type": "String"
+        },
+        "fax": {
+          "type": "String"
+        },
+        "firstName": {
+          "type": "String"
+        },
+        "icqNumber": {
+          "type": "String"
+        },
+        "lastName": {
+          "type": "String"
+        },
+        "middleName": {
+          "type": "String"
+        },
+        "mobile": {
+          "type": "String"
+        },
+        "phone": {
+          "type": "String"
+        },
+        "postalAddress": {
+          "type": "String"
+        },
+        "postalCode": {
+          "type": "String"
+        },
+        "pzInternalNumber": {
+          "type": "String"
+        },
+        "skypeName": {
+          "type": "String"
+        },
+        "uid": {
+          "type": "String"
+        }
+      }
+    },
+    "EmployeeAttributeValue": {
+      "baseType": ".AttributeValue",
+      "properties": {
+        "employee": {
+          "reference": true,
+          "type": ".Employee"
+        }
+      }
+    },
+    "Enter": {
+      "baseType": ".ComingInOperation",
+      "external": "true",
+      "properties": {
+        "inventory": {
+          "reference": true,
+          "type": ".Inventory"
+        },
+        "overhead": {
+          "type": ".MoneyAmount"
+        },
+        "overheadDistribution": {
+          "type": ".OverheadDistribution"
+        },
+        "positions": {
+          "collection": true,
+          "type": ".EnterPosition"
+        }
+      }
+    },
+    "EnterPosition": {
+      "baseType": ".ComingIn",
+      "properties": {
+        "overhead": {
+          "type": "Double"
+        },
+        "tags": {
+          "collection": true,
+          "type": "String"
+        }
+      }
+    },
+    "Entity": {
+      "baseType": ".AccountEntity",
+      "properties": {
+        "changeMode": {
+          "type": ".AccessMode"
+        },
+        "group": {
+          "reference": true,
+          "type": ".Group"
+        },
+        "owner": {
+          "reference": true,
+          "type": ".Employee"
+        },
+        "readMode": {
+          "type": ".AccessMode"
+        },
+        "shared": {
+          "type": "Boolean"
+        },
+        "version": {
+          "type": "Number"
+        }
+      }
+    },
+    "EntityMetadata": {
+      "baseType": ".LegendEntity",
+      "properties": {
+        "attributeMetadata": {
+          "collection": true,
+          "type": ".AttributeMetadata"
+        },
+        "codeValueType": {
+          "type": "Int"
+        },
+        "editableCalendarDays": {
+          "type": "Int"
+        },
+        "editableFromDate": {
+          "type": "DateTime"
+        },
+        "editablePeriod": {
+          "type": ".EditablePeriodType"
+        },
+        "editableWorkDays": {
+          "type": "Int"
+        },
+        "independentNameGenerator": {
+          "type": "Boolean"
+        },
+        "noApplicableFromOtherPlaceSource": {
+          "type": "Boolean"
+        },
+        "noApplicableFromOtherPlaceTarget": {
+          "type": "Boolean"
+        },
+        "noEditFromOtherPlaceSource": {
+          "type": "Boolean"
+        },
+        "noEditFromOtherPlaceTarget": {
+          "type": "Boolean"
+        },
+        "partialReserve": {
+          "type": "Boolean"
+        },
+        "uniqueCode": {
+          "type": "Boolean"
+        }
+      }
+    },
+    "EntityTemplatesMetadata": {
+      "baseType": ".TemplatesMetadata"
+    },
+    "ExpenseItem": {
+      "baseType": ".PredefinedLegendEntity",
+      "external": "true"
+    },
+    "Facture": {
+      "baseType": ".OperationWithPositions"
+    },
+    "FactureIn": {
+      "baseType": ".Facture",
+      "external": "true",
+      "properties": {
+        "incomingDate": {
+          "type": "DateTime"
+        },
+        "incomingNumber": {
+          "type": "String"
+        },
+        "payments": {
+          "collection": true,
+          "reference": true,
+          "type": ".FinanceOut"
+        },
+        "supplies": {
+          "collection": true,
+          "reference": true,
+          "type": ".Supply"
+        }
+      }
+    },
+    "FactureOut": {
+      "baseType": ".Facture",
+      "external": "true",
+      "properties": {
+        "demands": {
+          "collection": true,
+          "reference": true,
+          "type": ".Demand"
+        },
+        "extension": {
+          "type": ".FactureOutExtension"
+        },
+        "paymentDate": {
+          "type": "DateTime"
+        },
+        "paymentNumber": {
+          "type": "String"
+        },
+        "payments": {
+          "collection": true,
+          "reference": true,
+          "type": ".FinanceIn"
+        },
+        "returns": {
+          "collection": true,
+          "reference": true,
+          "type": ".SalesReturn"
+        }
+      }
+    },
+    "FactureOutExtension": {
+      "baseType": ".OperationExtension"
+    },
+    "FeatureAttributeValue": {
+      "baseType": ".AttributeValue"
+    },
+    "Finance": {
+      "baseType": ".Operation",
+      "properties": {
+        "expenseItem": {
+          "reference": true,
+          "type": ".ExpenseItem"
+        },
+        "incomingDate": {
+          "type": "DateTime"
+        },
+        "incomingNumber": {
+          "type": "String"
+        },
+        "paymentPurpose": {
+          "type": "String"
+        },
+        "vatSum": {
+          "type": "Double"
+        }
+      }
+    },
+    "FinanceIn": {
+      "baseType": ".Finance",
+      "properties": {
+        "commissionReport": {
+          "reference": true,
+          "type": ".CommissionReport"
+        },
+        "customerOrder": {
+          "reference": true,
+          "type": ".CustomerOrder"
+        },
+        "demands": {
+          "collection": true,
+          "reference": true,
+          "type": ".Demand"
+        },
+        "factureOut": {
+          "reference": true,
+          "type": ".FactureOut"
+        },
+        "invoiceOut": {
+          "reference": true,
+          "type": ".InvoiceOut"
+        },
+        "purchaseReturn": {
+          "reference": true,
+          "type": ".PurchaseReturn"
+        }
+      }
+    },
+    "FinanceOut": {
+      "baseType": ".Finance",
+      "properties": {
+        "commissionreportout": {
+          "reference": true,
+          "type": ".CommissionReportOut"
+        },
+        "factureIn": {
+          "reference": true,
+          "type": ".FactureIn"
+        },
+        "invoiceIn": {
+          "reference": true,
+          "type": ".InvoiceIn"
+        },
+        "purchaseOrder": {
+          "reference": true,
+          "type": ".PurchaseOrder"
+        },
+        "salesReturn": {
+          "reference": true,
+          "type": ".SalesReturn"
+        },
+        "supply": {
+          "reference": true,
+          "type": ".Supply"
+        }
+      }
+    },
+    "Good": {
+      "baseType": ".AbstractGood",
+      "properties": {
+        "images": {
+          "collection": true,
+          "type": ".GoodImage"
+        },
+        "isSerialTrackable": {
+          "type": "Boolean"
+        },
+        "minimumBalance": {
+          "type": "Double"
+        },
+        "pack": {
+          "collection": true,
+          "type": ".GoodPack"
+        },
+        "preferences": {
+          "collection": true,
+          "type": ".GoodSlotPreference"
+        },
+        "soldByWeight": {
+          "type": "Boolean"
+        },
+        "volume": {
+          "type": "Double"
+        },
+        "weight": {
+          "type": "Double"
+        }
+      }
+    },
+    "GoodAttributeValue": {
+      "baseType": ".AttributeValue",
+      "properties": {
+        "good": {
+          "reference": true,
+          "type": ".Good"
+        }
+      }
+    },
+    "GoodFolder": {
+      "baseType": ".Classifier",
+      "properties": {
+        "archived": {
+          "type": "Boolean"
+        },
+        "attributes": {
+          "collection": true,
+          "type": ".GoodAttributeValue"
+        },
+        "parent": {
+          "reference": true,
+          "type": ".GoodFolder"
+        },
+        "productCode": {
+          "type": "String"
+        },
+        "vat": {
+          "type": "Long"
+        }
+      }
+    },
+    "GoodImage": {
+      "baseType": ".AttachableDocument",
+      "properties": {
+        "tiny": {
+          "reference": true,
+          "type": ".TinyImage"
+        }
+      }
+    },
+    "GoodPack": {
+      "baseType": ".Entity",
+      "properties": {
+        "quantity": {
+          "type": "Double"
+        },
+        "uom": {
+          "reference": true,
+          "type": ".Uom"
+        }
+      }
+    },
+    "GoodSlotPreference": {
+      "baseType": ".Entity",
+      "properties": {
+        "slot": {
+          "reference": true,
+          "type": ".Slot"
+        }
+      }
+    },
+    "Group": {
+      "baseType": "Object",
+      "external": "true",
+      "properties": {
+        "accountUuid": {
+          "type": "String"
+        },
+        "name": {
+          "type": "String"
+        },
+        "uuid": {
+          "type": "ID"
+        }
+      }
+    },
+    "Gtd": {
+      "baseType": ".LegendEntity"
+    },
+    "InfoEntity": {
+      "baseType": ".Entity",
+      "properties": {
+        "deleted": {
+          "type": "DateTime"
+        },
+        "updated": {
+          "type": "DateTime"
+        }
+      }
+    },
+    "InternalOrder": {
+      "baseType": ".Order",
+      "external": "true",
+      "properties": {
+        "demands": {
+          "collection": true,
+          "reference": true,
+          "type": ".Demand"
+        },
+        "positions": {
+          "collection": true,
+          "type": ".PurchaseOrderPosition"
+        },
+        "purchaseOrders": {
+          "collection": true,
+          "reference": true,
+          "type": ".PurchaseOrder"
+        }
+      }
+    },
+    "Inventory": {
+      "baseType": ".OperationWithPositions",
+      "external": "true",
+      "properties": {
+        "enters": {
+          "collection": true,
+          "reference": true,
+          "type": ".Enter"
+        },
+        "losses": {
+          "collection": true,
+          "reference": true,
+          "type": ".Loss"
+        },
+        "positions": {
+          "collection": true,
+          "type": ".InventoryPosition"
+        }
+      }
+    },
+    "InventoryPosition": {
+      "baseType": ".Motion",
+      "properties": {
+        "correctionAmount": {
+          "type": "Double"
+        }
+      }
+    },
+    "Invoice": {
+      "baseType": ".OperationWithPositions",
+      "properties": {
+        "paymentPlannedMoment": {
+          "type": "DateTime"
+        },
+        "positions": {
+          "collection": true,
+          "type": ".InvoicePosition"
+        }
+      }
+    },
+    "InvoiceIn": {
+      "baseType": ".Invoice",
+      "external": "true",
+      "properties": {
+        "financesOut": {
+          "collection": true,
+          "reference": true,
+          "type": ".FinanceOut"
+        },
+        "incomingDate": {
+          "type": "DateTime"
+        },
+        "incomingNumber": {
+          "type": "String"
+        },
+        "purchaseOrder": {
+          "reference": true,
+          "type": ".PurchaseOrder"
+        },
+        "supplies": {
+          "collection": true,
+          "reference": true,
+          "type": ".Supply"
+        }
+      }
+    },
+    "InvoiceOut": {
+      "baseType": ".Invoice",
+      "external": "true",
+      "properties": {
+        "customerOrder": {
+          "reference": true,
+          "type": ".CustomerOrder"
+        },
+        "demands": {
+          "collection": true,
+          "reference": true,
+          "type": ".Demand"
+        },
+        "payments": {
+          "collection": true,
+          "reference": true,
+          "type": ".FinanceIn"
+        }
+      }
+    },
+    "InvoicePosition": {
+      "baseType": ".Motion"
+    },
+    "LegendEntity": {
+      "baseType": ".InfoEntity",
+      "properties": {
+        "code": {
+          "type": "String"
+        },
+        "description": {
+          "type": "String"
+        },
+        "externalCode": {
+          "type": "String"
+        },
+        "name": {
+          "type": "String"
+        }
+      }
+    },
+    "Loss": {
+      "baseType": ".ComingOutOperation",
+      "external": "true",
+      "properties": {
+        "expenseItem": {
+          "reference": true,
+          "type": ".ExpenseItem"
+        },
+        "inventory": {
+          "reference": true,
+          "type": ".Inventory"
+        },
+        "positions": {
+          "collection": true,
+          "type": ".LossPosition"
+        },
+        "salesReturn": {
+          "reference": true,
+          "type": ".SalesReturn"
+        }
+      }
+    },
+    "LossPosition": {
+      "baseType": ".ComingOut",
+      "properties": {
+        "tags": {
+          "collection": true,
+          "type": "String"
+        }
+      }
+    },
+    "Material": {
+      "baseType": ".ProcessingPlanItem",
+      "properties": {
+        "isOptional": {
+          "type": "Boolean"
+        }
+      }
+    },
+    "MoneyAmount": {
+      "baseType": "Object",
+      "properties": {
+        "sum": {
+          "type": "Double"
+        },
+        "sumInCurrency": {
+          "type": "Double"
+        }
+      }
+    },
+    "Motion": {
+      "baseType": ".Entity",
+      "properties": {
+        "basePrice": {
+          "type": ".MoneyAmount"
+        },
+        "consignment": {
+          "reference": true,
+          "type": ".Consignment"
+        },
+        "discount": {
+          "type": "Double"
+        },
+        "good": {
+          "reference": true,
+          "type": ".Good"
+        },
+        "goodPack": {
+          "reference": true,
+          "type": ".GoodPack"
+        },
+        "price": {
+          "type": ".MoneyAmount"
+        },
+        "quantity": {
+          "type": "Double"
+        },
+        "slot": {
+          "reference": true,
+          "type": ".Slot"
+        },
+        "things": {
+          "collection": true,
+          "type": ".Thing"
+        },
+        "vat": {
+          "type": "Long"
+        }
+      }
+    },
+    "Move": {
+      "baseType": ".StockOperation",
+      "external": "true",
+      "properties": {
+        "internalOrder": {
+          "reference": true,
+          "type": ".InternalOrder"
+        },
+        "overhead": {
+          "type": ".MoneyAmount"
+        },
+        "overheadDistribution": {
+          "type": ".OverheadDistribution"
+        },
+        "positions": {
+          "collection": true,
+          "type": ".MovePosition"
+        }
+      }
+    },
+    "MovePosition": {
+      "baseType": ".StockMotion",
+      "properties": {
+        "overhead": {
+          "type": "Double"
+        },
+        "sourceSlotUuid": {
+          "refType": ".SourceSlot",
+          "type": "slot"
+        }
+      }
+    },
+    "Operation": {
+      "baseType": ".LegendEntity",
+      "properties": {
+        "applicable": {
+          "type": "Boolean"
+        },
+        "attributes": {
+          "collection": true,
+          "type": ".OperationAttributeValue"
+        },
+        "contract": {
+          "reference": true,
+          "type": ".Contract"
+        },
+        "documents": {
+          "collection": true,
+          "type": ".OperationDocument"
+        },
+        "invoicedSum": {
+          "readonly": true,
+          "type": "Number"
+        },
+        "moment": {
+          "type": "DateTime"
+        },
+        "organization": {
+          "reference": true,
+          "type": ".Organization"
+        },
+        "payedSum": {
+          "readonly": true,
+          "type": "Number"
+        },
+        "project": {
+          "reference": true,
+          "type": ".Project"
+        },
+        "rate": {
+          "type": ".Rate"
+        },
+        "reservedSum": {
+          "type": "Double"
+        },
+        "retailShift": {
+          "reference": true,
+          "type": ".RetailShift"
+        },
+        "retailStore": {
+          "reference": true,
+          "type": ".RetailStore"
+        },
+        "shippedSum": {
+          "readonly": true,
+          "type": "Number"
+        },
+        "state": {
+          "expanded": true,
+          "reference": true,
+          "type": ".State"
+        },
+        "sum": {
+          "type": "Number"
+        },
+        "vatEnabled": {
+          "type": "Boolean"
+        },
+        "vatIncluded": {
+          "type": "Boolean"
+        },
+        "vatSum": {
+          "readonly": true,
+          "type": "Number"
+        }
+      }
+    },
+    "OperationAttributeValue": {
+      "baseType": ".AttributeValue",
+      "properties": {
+        "operation": {
+          "reference": true,
+          "type": ".Operation"
+        }
+      }
+    },
+    "OperationConnectorSetting": {
+      "baseType": ".AbstractConnectorSetting",
+      "properties": {
+        "adminDomain": {
+          "type": "String"
+        },
+        "autoReserve": {
+          "type": "Boolean"
+        },
+        "orderplace": {
+          "reference": true,
+          "type": ".Store"
+        },
+        "shopDomain": {
+          "type": "String"
+        },
+        "syncFeatures": {
+          "type": "Boolean"
+        },
+        "useShopOperationName": {
+          "type": "Boolean"
+        }
+      }
+    },
+    "OperationDocument": {
+      "baseType": ".PrintedDocument",
+      "properties": {
+        "operation": {
+          "reference": true,
+          "type": ".Operation"
+        }
+      }
+    },
+    "OperationExtension": {
+      "baseType": "Object",
+      "properties": {
+        "consignee": {
+          "reference": true,
+          "type": ".Agent"
+        }
+      }
+    },
+    "OperationWithPositions": {
+      "baseType": ".Operation"
+    },
+    "Order": {
+      "baseType": ".OperationWithPositions",
+      "properties": {
+        "deliveryPlannedMoment": {
+          "type": "DateTime"
+        },
+        "reservedSum": {
+          "type": "Double"
+        }
+      }
+    },
+    "OrderPosition": {
+      "baseType": ".Motion",
+      "properties": {
+        "reserve": {
+          "type": "Double"
+        }
+      }
+    },
+    "Organization": {
+      "baseType": ".Company",
+      "external": "true"
+    },
+    "OverheadDistribution": {
+      "baseType": "Enum",
+      "values": [
+        "BY_PRICE",
+        "BY_WEIGHT",
+        "BY_VOLUME"
+      ]
+    },
+    "PaymentIn": {
+      "baseType": ".FinanceIn",
+      "external": "true"
+    },
+    "PaymentOut": {
+      "baseType": ".FinanceOut",
+      "external": "true"
+    },
+    "PersonalDiscount": {
+      "baseType": ".Discount"
+    },
+    "PlaceAttributeValue": {
+      "baseType": ".AttributeValue",
+      "properties": {
+        "place": {
+          "reference": true,
+          "type": ".Store"
+        }
+      }
+    },
+    "PredefinedLegendEntity": {
+      "baseType": ".LegendEntity",
+      "properties": {
+        "favourite": {
+          "type": "Boolean"
+        }
+      }
+    },
+    "Price": {
+      "baseType": ".Entity",
+      "properties": {
+        "currency": {
+          "reference": true,
+          "type": ".Currency"
+        },
+        "priceType": {
+          "reference": true,
+          "type": ".PriceType"
+        },
+        "value": {
+          "type": "Double"
+        }
+      }
+    },
+    "PriceList": {
+      "baseType": ".OperationWithPositions",
+      "external": "true",
+      "properties": {
+        "metadata": {
+          "type": ".PriceListMetadata"
+        },
+        "priceListRow": {
+          "collection": true,
+          "type": ".PriceListRow"
+        }
+      }
+    },
+    "PriceListCell": {
+      "baseType": ".Entity",
+      "properties": {
+        "columnName": {
+          "type": "String"
+        },
+        "sum": {
+          "type": ".MoneyAmount"
+        }
+      }
+    },
+    "PriceListMetadata": {
+      "baseType": ".LegendEntity",
+      "properties": {
+        "column": {
+          "collection": true,
+          "type": ".PriceListMetadataColumn"
+        },
+        "priceType": {
+          "reference": true,
+          "type": ".PriceType"
+        }
+      }
+    },
+    "PriceListMetadataColumn": {
+      "baseType": ".LegendEntity",
+      "properties": {
+        "percentageDiscount": {
+          "type": "Int"
+        }
+      }
+    },
+    "PriceListRow": {
+      "baseType": ".Motion",
+      "properties": {
+        "cell": {
+          "collection": true,
+          "type": ".PriceListCell"
+        }
+      }
+    },
+    "PriceType": {
+      "baseType": ".InfoEntity",
+      "properties": {
+        "index": {
+          "type": "Int"
+        },
+        "name": {
+          "type": "String"
+        }
+      }
+    },
+    "Prices": {
+      "baseType": "Object",
+      "properties": {
+        "price": {
+          "collection": true,
+          "type": ".Price"
+        }
+      }
+    },
+    "PrintedDocument": {
+      "baseType": ".Document",
+      "properties": {
+        "publicId": {
+          "type": "String"
+        }
+      }
+    },
+    "Processing": {
+      "baseType": ".StockOperation",
+      "external": "true",
+      "properties": {
+        "material": {
+          "collection": true,
+          "type": ".ProcessingPositionMaterial"
+        },
+        "plan": {
+          "reference": true,
+          "type": ".ProcessingPlan"
+        },
+        "processingOrder": {
+          "reference": true,
+          "type": ".ProcessingOrder"
+        },
+        "processingSum": {
+          "type": "Double"
+        },
+        "quantity": {
+          "type": "Double"
+        },
+        "results": {
+          "collection": true,
+          "type": ".ProcessingPositionResult"
+        }
+      }
+    },
+    "ProcessingOrder": {
+      "baseType": ".Order",
+      "external": "true",
+      "properties": {
+        "plan": {
+          "reference": true,
+          "type": ".ProcessingPlan"
+        },
+        "positions": {
+          "collection": true,
+          "type": ".CustomerOrderPosition"
+        },
+        "processings": {
+          "collection": true,
+          "type": ".Processing"
+        },
+        "quantity": {
+          "type": "Double"
+        }
+      }
+    },
+    "ProcessingPlan": {
+      "baseType": ".ProcessingPlanFolder",
+      "external": "true",
+      "properties": {
+        "material": {
+          "collection": true,
+          "type": ".Material"
+        },
+        "price": {
+          "type": ".MoneyAmount"
+        },
+        "product": {
+          "collection": true,
+          "type": "._Product"
+        }
+      }
+    },
+    "ProcessingPlanFolder": {
+      "baseType": ".Classifier",
+      "properties": {
+        "parent": {
+          "reference": true,
+          "type": ".ProcessingPlanFolder"
+        }
+      }
+    },
+    "ProcessingPlanItem": {
+      "baseType": ".Entity",
+      "properties": {
+        "good": {
+          "reference": true,
+          "type": ".Good"
+        },
+        "plan": {
+          "reference": true,
+          "type": ".ProcessingPlan"
+        },
+        "quantity": {
+          "type": "Double"
+        }
+      }
+    },
+    "ProcessingPositionMaterial": {
+      "baseType": ".ComingOut"
+    },
+    "ProcessingPositionResult": {
+      "baseType": ".ComingIn",
+      "properties": {
+        "costShare": {
+          "type": "Double"
+        }
+      }
+    },
+    "Product": {
+      "baseType": ".Good",
+      "external": "true"
+    },
+    "Project": {
+      "baseType": ".LegendEntity",
+      "external": "true",
+      "properties": {
+        "archived": {
+          "type": "Boolean"
+        },
+        "attributes": {
+          "collection": true,
+          "type": ".ProjectAttributeValue"
+        }
+      }
+    },
+    "ProjectAttributeValue": {
+      "baseType": ".AttributeValue",
+      "properties": {
+        "project": {
+          "reference": true,
+          "type": ".Project"
+        }
+      }
+    },
+    "PurchaseOrder": {
+      "baseType": ".Order",
+      "external": "true",
+      "properties": {
+        "customerOrders": {
+          "collection": true,
+          "reference": true,
+          "type": ".CustomerOrder"
+        },
+        "internalOrders": {
+          "collection": true,
+          "type": ".InternalOrder"
+        },
+        "invoices": {
+          "collection": true,
+          "reference": true,
+          "type": ".InvoiceIn"
+        },
+        "payments": {
+          "collection": true,
+          "reference": true,
+          "type": ".FinanceOut"
+        },
+        "positions": {
+          "collection": true,
+          "type": ".PurchaseOrderPosition"
+        },
+        "supplies": {
+          "collection": true,
+          "reference": true,
+          "type": ".Supply"
+        }
+      }
+    },
+    "PurchaseOrderPosition": {
+      "baseType": ".OrderPosition"
+    },
+    "PurchaseReturn": {
+      "baseType": ".ComingOutOperation",
+      "external": "true",
+      "properties": {
+        "facture": {
+          "reference": true,
+          "type": ".Facture"
+        },
+        "payments": {
+          "collection": true,
+          "reference": true,
+          "type": ".FinanceIn"
+        },
+        "positions": {
+          "collection": true,
+          "type": ".PurchaseReturnPosition"
+        },
+        "supply": {
+          "reference": true,
+          "type": ".Supply"
+        }
+      }
+    },
+    "PurchaseReturnPosition": {
+      "baseType": ".AbstractShipmentOut"
+    },
+    "Rate": {
+      "properties": {
+        "currency": {
+          "reference": true,
+          "type": ".Currency"
+        },
+        "value": {
+          "type": "Number"
+        }
+      }
+    },
+    "ReportTemplatesMetadata": {
+      "baseType": ".TemplatesMetadata"
+    },
+    "Requisite": {
+      "baseType": "Object",
+      "properties": {
+        "actualAddress": {
+          "type": "String"
+        },
+        "bankAccount": {
+          "type": ".AgentAccount"
+        },
+        "dataSvidetelstva": {
+          "type": "DateTime"
+        },
+        "inn": {
+          "type": "String"
+        },
+        "kpp": {
+          "type": "String"
+        },
+        "legalAddress": {
+          "type": "String"
+        },
+        "legalTitle": {
+          "type": "String"
+        },
+        "nomerSvidetelstva": {
+          "type": "String"
+        },
+        "ogrn": {
+          "type": "String"
+        },
+        "ogrnip": {
+          "type": "String"
+        },
+        "okpo": {
+          "type": "String"
+        }
+      }
+    },
+    "RetailDemand": {
+      "baseType": ".AbstractDemand",
+      "external": "true",
+      "properties": {
+        "noCashSum": {
+          "type": ".MoneyAmount"
+        },
+        "nonCash": {
+          "type": "Boolean"
+        }
+      }
+    },
+    "RetailDrawerCashIn": {
+      "baseType": ".RetailDrawerCashOperation",
+      "external": "true"
+    },
+    "RetailDrawerCashOperation": {
+      "baseType": ".Operation"
+    },
+    "RetailDrawerCashOut": {
+      "baseType": ".RetailDrawerCashOperation",
+      "external": "true"
+    },
+    "RetailSalesReturn": {
+      "baseType": ".AbstractSalesReturn",
+      "external": "true",
+      "properties": {
+        "noCashSum": {
+          "type": ".MoneyAmount"
+        }
+      }
+    },
+    "RetailShift": {
+      "baseType": ".Operation",
+      "external": "true",
+      "properties": {
+        "closeDate": {
+          "type": "DateTime"
+        }
+      }
+    },
+    "RetailStore": {
+      "baseType": ".LegendEntity",
+      "external": "true",
+      "properties": {
+        "acquire": {
+          "reference": true,
+          "type": ".Agent"
+        },
+        "acquireAccount": {
+          "reference": true,
+          "type": ".AgentAccount"
+        },
+        "active": {
+          "type": "Boolean"
+        },
+        "address": {
+          "type": "String"
+        },
+        "controlCashierChoice": {
+          "type": "Boolean"
+        },
+        "controlShippingStock": {
+          "type": "Boolean"
+        },
+        "demandPrefix": {
+          "type": "String"
+        },
+        "enableDiscount": {
+          "type": "Boolean"
+        },
+        "maxDiscount": {
+          "type": "Double"
+        },
+        "myCompany": {
+          "reference": true,
+          "type": ".Organization"
+        },
+        "myCompanyAccount": {
+          "reference": true,
+          "type": ".AgentAccount"
+        },
+        "priceType": {
+          "reference": true,
+          "type": ".PriceType"
+        },
+        "warehouse": {
+          "reference": true,
+          "type": ".Store"
+        }
+      }
+    },
+    "RewardType": {
+      "baseType": "Enum",
+      "values": [
+        "PercentOfSales",
+        "None"
+      ]
+    },
+    "SalesReturn": {
+      "baseType": ".AbstractSalesReturn",
+      "external": "true"
+    },
+    "SalesReturnPosition": {
+      "baseType": ".ComingIn"
+    },
+    "Service": {
+      "baseType": ".AbstractGood",
+      "external": "true"
+    },
+    "ShipmentIn": {
+      "baseType": ".ComingIn",
+      "properties": {
+        "overhead": {
+          "type": "Double"
+        }
+      }
+    },
+    "ShipmentOut": {
+      "baseType": ".AbstractShipmentOut",
+      "properties": {
+        "overhead": {
+          "type": "Double"
+        }
+      }
+    },
+    "Slot": {
+      "baseType": ".LegendEntity",
+      "properties": {
+        "warehouse": {
+          "reference": true,
+          "type": ".Store"
+        }
+      }
+    },
+    "SpecialPriceDiscount": {
+      "baseType": ".Discount"
+    },
+    "State": {
+      "baseType": ".LegendEntity"
+    },
+    "StockMotion": {
+      "baseType": ".Motion",
+      "properties": {
+        "country": {
+          "reference": true,
+          "type": ".Country"
+        },
+        "gtd": {
+          "reference": true,
+          "type": ".Gtd"
+        }
+      }
+    },
+    "StockOperation": {
+      "baseType": ".OperationWithPositions"
+    },
+    "Store": {
+      "baseType": ".Classifier",
+      "external": "true",
+      "properties": {
+        "archived": {
+          "type": "Boolean"
+        },
+        "attributes": {
+          "collection": true,
+          "type": ".PlaceAttributeValue"
+        },
+        "contact": {
+          "type": ".Contact"
+        },
+        "parent": {
+          "reference": true,
+          "type": ".Store"
+        },
+        "slots": {
+          "collection": true,
+          "type": ".Slot"
+        }
+      }
+    },
+    "Supply": {
+      "baseType": ".ComingInOperation",
+      "external": "true",
+      "properties": {
+        "factureIn": {
+          "reference": true,
+          "type": ".FactureIn"
+        },
+        "incomingDate": {
+          "type": "DateTime"
+        },
+        "incomingNumber": {
+          "type": "String"
+        },
+        "invoicesIn": {
+          "collection": true,
+          "reference": true,
+          "type": ".InvoiceIn"
+        },
+        "overhead": {
+          "type": ".MoneyAmount"
+        },
+        "overheadDistribution": {
+          "type": ".OverheadDistribution"
+        },
+        "payments": {
+          "collection": true,
+          "reference": true,
+          "type": ".FinanceOut"
+        },
+        "purchaseOrder": {
+          "reference": true,
+          "type": ".PurchaseOrder"
+        },
+        "purchaseReturns": {
+          "collection": true,
+          "reference": true,
+          "type": ".PurchaseReturn"
+        },
+        "shipmentIn": {
+          "collection": true,
+          "type": ".ShipmentIn"
+        }
+      }
+    },
+    "Template": {
+      "baseType": ".Document"
+    },
+    "TemplatesMetadata": {
+      "baseType": ".LegendEntity",
+      "properties": {
+        "template": {
+          "collection": true,
+          "type": ".Template"
+        }
+      }
+    },
+    "Thing": {
+      "baseType": ".LegendEntity",
+      "properties": {
+        "attributes": {
+          "collection": true,
+          "type": ".ThingAttributeValue"
+        },
+        "good": {
+          "reference": true,
+          "type": ".Good"
+        }
+      }
+    },
+    "ThingAttributeValue": {
+      "baseType": ".AttributeValue",
+      "properties": {
+        "thing": {
+          "reference": true,
+          "type": ".Thing"
+        }
+      }
+    },
+    "TinyImage": {
+      "baseType": ".Document"
+    },
+    "Unit": {
+      "baseType": "Object",
+      "properties": {
+        "s1": {
+          "type": "String"
+        },
+        "s24": {
+          "type": "String"
+        },
+        "s5": {
+          "type": "String"
+        },
+        "sex": {
+          "type": "UnsignedShort"
+        }
+      }
+    },
+    "Uom": {
+      "baseType": ".PredefinedLegendEntity",
+      "external": "true",
+      "properties": {
+        "type": {
+          "type": ".UomType"
+        }
+      }
+    },
+    "UomType": {
+      "baseType": "Enum",
+      "values": [
+        "mass",
+        "volume",
+        "piece"
+      ]
+    },
+    "Variant": {
+      "baseType": ".LegendEntity",
+      "properties": {
+        "archived": {
+          "type": "Boolean"
+        },
+        "attributes": {
+          "collection": true,
+          "type": ".FeatureAttributeValue"
+        },
+        "good": {
+          "reference": true,
+          "type": ".Good"
+        },
+        "isDefault": {
+          "type": "Boolean"
+        }
+      }
+    },
+    "Webhook": {
+      "baseType": ".LegendEntity",
+      "external": "true",
+      "properties": {}
+    },
+    "Workflow": {
+      "baseType": ".LegendEntity",
+      "properties": {
+        "state": {
+          "collection": true,
+          "type": ".State"
+        }
+      }
+    },
+    "YmlConnectorSettings": {
+      "baseType": ".AbstractConnectorSetting"
+    },
+    "_Product": {
+      "baseType": ".ProcessingPlanItem"
+    }
+  }
+}

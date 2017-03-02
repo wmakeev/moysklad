@@ -1,33 +1,73 @@
 /*
  * moysklad
- * [object Object]
+ * Клиент для JSON API МойСклад
  *
- * Copyright (c) 2015, Vitaliy V. Makeev
+ * Copyright (c) 2017, Vitaliy V. Makeev
  * Licensed under MIT.
  */
 
-import stampit from 'stampit'
+'use strict'
 
-import actions from './actions'
-import actionCreators from './action-creators'
-import methods from './methods'
+const stampit = require('stampit')
+const have = require('./have')
 
-import { corePlugin, mediatorPlugin } from './plugins'
+// methods
+const getTimeString = require('./tools/getTimeString')
+const getAuthHeader = require('./methods/getAuthHeader')
+const buildUri = require('./methods/buildUri')
+const parseUri = require('./methods/parseUri')
+const fetchUri = require('./methods/fetchUri')
+const GET = require('./methods/GET')
+const POST = require('./methods/POST')
+const PUT = require('./methods/PUT')
+const DELETE = require('./methods/DELETE')
 
-export let Client = stampit()
-  .methods(methods)
-  .refs({ actionCreators })
-  .init(corePlugin({ name: 'moysklad' }))
-  .init(mediatorPlugin())
+module.exports = stampit({
+  // TODO bind methods to this
+  methods: {
+    getAuthHeader,
+    buildUri,
+    parseUri,
+    fetchUri,
+    GET,
+    POST,
+    PUT,
+    DELETE
+  },
+  statics: {
+    getTimeString
+  }
+})
+  .init(function (options) {
+    let _options
 
-export let CspClient = Client()
-  .init(({ instance }) => {
-    instance.forward({
-      [actions.LOAD]: 'xmlClient/load'
+    have(options, {
+      endpoint: 'opt str',
+      api: 'opt str',
+      apiVersion: 'opt str',
+      login: 'opt str',
+      password: 'opt str',
+      fetch: 'opt function'
+      // queue: 'opt bool',
+      // eventEmitter: 'opt obj',
     })
+
+    if (options.fetch) {
+      this.fetch = options.fetch
+    } else if (typeof fetch !== 'undefined') {
+      this.fetch = fetch
+    } else {
+      throw new Error('fetch not specified')
+    }
+
+    _options = Object.assign({
+      endpoint: 'https://online.moysklad.ru/api',
+      api: 'remap',
+      apiVersion: '1.1'
+    }, options)
+
+    this.getOptions = function () {
+      return _options
+    }
   })
 
-export function createCspClient () {
-  let cspClient = CspClient()
-  return cspClient()
-}

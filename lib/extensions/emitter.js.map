@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../src/extensions/emitter.js"],"names":["stampit","require","module","exports"],"mappings":"AAAA;;AAEA,IAAMA,UAAUC,QAAQ,SAAR,CAAhB;AACA;;AAEAC,OAAOC,OAAP,GAAiBH,SAAjB","file":"emitter.js","sourcesContent":["'use strict'\n\nconst stampit = require('stampit')\n// const have = require('../have')\n\nmodule.exports = stampit(/* TODO */)\n"]}

@@ -2,14 +2,11 @@
 	// Документацию о формате jsconfig.json см. в статье https://go.microsoft.com/fwlink/?LinkId=759670
 	//
 	"compilerOptions": {
-		"target": "es6",
-		"module": "commonjs",
+		"target": "es2017",
+		"module": "es6",
 		"allowSyntheticDefaultImports": true
 	},
-	"exclude": [
-		"node_modules",
-		"tmp",
-		"temp",
-		"_old"
+	"files": [
+		"src/"
 	]
 }

@@ -1,0 +1,38 @@
+{
+  // Use IntelliSense to find out which attributes exist for node debugging
+  // Use hover for the description of the existing attributes
+  // For further information visit https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "index.test",
+      "type": "node2",
+      "request": "launch",
+      "runtimeExecutable": "node",
+      "program": "${workspaceRoot}/tests/index.test.js",
+      "cwd": "${workspaceRoot}",
+      "runtimeArgs": [
+        "--harmony",
+        "--require",
+        "dotenv/config",
+        "--require",
+        "isomorphic-fetch"
+      ]
+    },
+    {
+      "name": "{some}.test",
+      "type": "node2",
+      "request": "launch",
+      "runtimeExecutable": "node",
+      "program": "/Users/mvv/Documents/GitHub/moysklad/src/extensions/__tests__/createMeta.test.js",
+      "cwd": "${workspaceRoot}",
+      "runtimeArgs": [
+        "--harmony",
+        "--require",
+        "dotenv/config",
+        "--require",
+        "isomorphic-fetch"
+      ]
+    }
+  ]
+}

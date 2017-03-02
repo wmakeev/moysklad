@@ -1,13 +1,15 @@
 {
   "name": "moysklad",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "description": "Библиотека для работы с API сервиса МойСклад",
-  "main": "dist/index.js",
+  "main": "lib/index.js",
   "scripts": {
-    "test": "babel-tape-runner \"src/**/__tests__/*-test.js\"",
     "lint": "eslint src",
-    "clean": "rm -rf dist || :",
-    "build": "npm run clean && cp -rf src dist && babel --source-maps --optional runtime --out-dir dist ./src"
+    "clean": "rm -rf lib || :",
+    "build": "npm run clean && cp -rf src lib && babel --source-maps --optional runtime --out-dir lib ./src",
+    "test-src": "node --harmony -r dotenv/config -r isomorphic-fetch tests --src src | tap-spec",
+    "test-lib": "node -r dotenv/config -r isomorphic-fetch -r babel-polyfill tests --src lib | tap-spec",
+    "test": "npm run lint && npm run clean && npm run build && npm run test-lib"
   },
   "repository": {
     "type": "git",
@@ -31,24 +33,20 @@
   },
   "homepage": "https://github.com/wmakeev/moysklad#readme",
   "dependencies": {
-    "babel-runtime": "^6.11",
-    "dotenv": "^2.0.0",
-    "have": "^0.4.0",
-    "js-csp": "^0.7.4",
-    "scaleflow": "github:wmakeev/scaleflow#1233b5b1c339c2611cc47696ad53922f1a910ca1"
+    "have2": "github:wmakeev/have2#d8445dff842c7ece17507018d70f71851f865c18",
+    "stampit": "^3.1.2",
+    "babel-polyfill": "^6.22.0"
   },
   "devDependencies": {
-    "babel-eslint": "^7.0.0",
-    "babel-plugin-transform-object-rest-spread": "^6.16.0",
-    "babel-preset-es2015": "^6.16.0",
-    "babel-preset-es2016": "^6.16.0",
-    "babel-preset-es2017": "^6.16.0",
-    "babel-tape-runner": "^2.0.1",
+    "babel-preset-env": "^1.1.8",
+    "babel-preset-stage-3": "^6.17.0",
     "blue-tape": "^1.0.0",
-    "eslint": "^3.8.0",
+    "dotenv": "^4.0.0",
+    "eslint": "^3.13.0",
     "eslint-config-standard": "6.2.0",
-    "eslint-plugin-promise": "^3.0.0",
+    "eslint-plugin-promise": "^3.4.0",
     "eslint-plugin-standard": "^2.0.1",
-    "tap-spec": "^4.1.1"
+    "isomorphic-fetch": "^2.2.1",
+    "walkdir": "0.0.11"
   }
 }

@@ -12,7 +12,7 @@ module.exports = {
     return UUID_REGEX.test(dicId) && UUID_REGEX.test(entId)
   },
   'model': model => model && model.name && model.types,
-  'Moysklad.Collection': col => col && col.meta && col.rows && col.rows instanceof Array
+  'Moysklad.Collection': col => col && col.meta && col.meta.href && col.meta.size
 }
 
 // TODO Проверка типов "Moysklad." на основании модели

@@ -8,17 +8,24 @@ module.exports = async function loadRows () {
     have.argumentsObject
   ])
 
-  // TODO Коллекция может быть не загружена!
-  if (!collection.meta.nextHref) {
-    return collection.rows
-  }
-
-  let pages = [collection]
-
   let { size, limit, offset } = collection.meta
   let href = client.parseUri(collection.meta.href)
+  let rowsPages = []
 
-  offset += limit
+  if (collection.rows && collection.rows.length) {
+    if (size <= limit) {
+      return query.offset ? collection.rows.slice(query.offset) : collection.rows
+    }
+
+    if (query.offset >= limit) {
+      offset = query.offset
+    } else {
+      rowsPages = [query.offset != null
+        ? collection.rows.slice(query.offset)
+        : collection.rows]
+      offset = limit
+    }
+  }
 
   if (query.limit != null) {
     if (query.limit <= 0) throw new Error('query.limit should be greater then 0')
@@ -26,12 +33,18 @@ module.exports = async function loadRows () {
   }
 
   while (size > offset) {
-    pages.push(client.GET(href.path,
-      Object.assign({}, href.query || {}, query, { offset })))
+    rowsPages.push(
+      client.GET(href.path, Object.assign({}, href.query, query, { offset, limit }))
+        .then(col => col.rows))
     offset += limit
   }
 
-  let rows = (await Promise.all(pages)).reduce((res, pos) => res.concat(pos.rows), [])
+  let cobinedRows = (await Promise.all(rowsPages))
+    // TODO Remove Debug
+    // .map(pos => {
+    //   return pos
+    // })
+    .reduce((res, rows) => res.concat(rows), [])
 
-  return rows
+  return cobinedRows
 }

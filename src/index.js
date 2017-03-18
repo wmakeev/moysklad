@@ -44,12 +44,14 @@ module.exports = stampit({
     have(options, {
       endpoint: 'opt str',
       api: 'opt str',
-      apiVersion: 'opt str',
-      login: 'opt str',
-      password: 'opt str',
-      fetch: 'opt function'
+      apiVersion: 'opt str'
+
+      // TODO fix have object arguments parsing
+      // login: 'opt str',
+      // password: 'opt str',
+      // fetch: 'opt function'
       // queue: 'opt bool',
-      // eventEmitter: 'opt obj',
+      // emitter: 'opt obj'
     })
 
     if (options.fetch) {
@@ -58,6 +60,10 @@ module.exports = stampit({
       this.fetch = fetch
     } else {
       throw new Error('fetch not specified')
+    }
+
+    if (options.emitter) {
+      this.emitter = options.emitter
     }
 
     _options = Object.assign({

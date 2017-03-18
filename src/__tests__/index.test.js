@@ -2,23 +2,6 @@
 
 const test = require('blue-tape')
 const Moysklad = require('..')
-// const sleep = require('../tools/sleep')
-
-// const PRODUCT_ID = '8dff01c6-e06d-413c-a38f-6139eaf4c2c7'
-// const PRODUCT_NAME = 'Тест 9999+'
-
-// const PRODUCT_ID_LIST = [
-//   '1a675fb4-5df2-11e5-90a2-8ecb0008e7d8',
-//   '1a660c84-5df2-11e5-90a2-8ecb0008e7be',
-//   '1a5f4f7f-5df2-11e5-90a2-8ecb0008e749',
-//   '1a607140-5df2-11e5-90a2-8ecb0008e756',
-//   '1a612644-5df2-11e5-90a2-8ecb0008e763',
-//   '1a61e09e-5df2-11e5-90a2-8ecb0008e770',
-//   '1a628f5a-5df2-11e5-90a2-8ecb0008e77d',
-//   '1a634466-5df2-11e5-90a2-8ecb0008e78a',
-//   '1a63f958-5df2-11e5-90a2-8ecb0008e797',
-//   '1a64b216-5df2-11e5-90a2-8ecb0008e7a4'
-// ]
 
 test('Moysklad constructor', t => {
   t.ok(Moysklad)
@@ -52,21 +35,13 @@ test('Create Moysklad instance with options', t => {
   }
 
   let ms = Moysklad(options)
-  let msOptions = ms.getOptions()
+  t.ok(ms)
 
+  let msOptions = ms.getOptions()
   t.true(msOptions !== options)
   t.equals(msOptions.login, 'login')
   t.equals(msOptions.password, 'password')
 
-  t.end()
-})
-
-test('Create Moysklad instance methods', t => {
-  let ms = Moysklad({
-    login: 'login',
-    password: 'password'
-  })
-  t.ok(ms)
   t.end()
 })
 

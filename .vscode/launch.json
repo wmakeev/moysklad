@@ -9,7 +9,26 @@
       "type": "node2",
       "request": "launch",
       "runtimeExecutable": "node",
-      "program": "${workspaceRoot}/tests/index.test.js",
+      "program": "${workspaceRoot}/tests/index.js",
+      "cwd": "${workspaceRoot}",
+      "args": [
+        "--src",
+        "src"
+      ],
+      "runtimeArgs": [
+        "--harmony",
+        "--require",
+        "dotenv/config",
+        "--require",
+        "isomorphic-fetch"
+      ]
+    },
+    {
+      "name": "src/{some}.test",
+      "type": "node2",
+      "request": "launch",
+      "runtimeExecutable": "node",
+      "program": "/Users/mvv/Documents/GitHub/moysklad/src/extensions/queue/__tests__/index.test.js",
       "cwd": "${workspaceRoot}",
       "runtimeArgs": [
         "--harmony",
@@ -20,14 +39,13 @@
       ]
     },
     {
-      "name": "{some}.test",
-      "type": "node2",
+      "name": "lib/{some}.test",
+      "type": "node",
       "request": "launch",
       "runtimeExecutable": "node",
-      "program": "/Users/mvv/Documents/GitHub/moysklad/src/extensions/__tests__/createMeta.test.js",
+      "program": "/Users/mvv/Documents/GitHub/moysklad/lib/__tests__/index.test.js",
       "cwd": "${workspaceRoot}",
       "runtimeArgs": [
-        "--harmony",
         "--require",
         "dotenv/config",
         "--require",

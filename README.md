@@ -22,7 +22,7 @@ $ npm install moysklad
 для работы библиотеки в node.js, дополнительно нужно установить полифил для
 [Fetch API](https://developer.mozilla.org/en/docs/Web/API/Fetch_API) или явно указать модуль с соответствующим интерфейсом при создании экземпляра библиотеки
 
-Полифил:
+**Полифил:**
 
 ```
 $ npm install isomorphic-fetch
@@ -35,7 +35,7 @@ const Moysklad = require('moysklad')
 const moysklad = Moysklad()
 ```
 
-Модуль:
+**Модуль:**
 
 ```
 $ npm install node-fetch
@@ -48,9 +48,9 @@ const Moysklad = require('moysklad')
 const moysklad = Moysklad({ fetch: nodeFetch })
 ```
 
-В примерах приведены две наиболее популярные библиотеки реализующие Fetch API в node.js
+В примерах выше приведены две наиболее популярные библиотеки реализующие Fetch API в node.js
 
-Для работы с библиотекой в браузере, установка полифила или отдельного модуля не требуется.
+Для работы с библиотекой в браузере установка полифила или отдельного модуля не требуется.
 
 ## Использование
 
@@ -62,7 +62,7 @@ const ms = new Moysklad({ login, password })
 ms.GET('entity/counterparty', {
   limit: 10,
   filter: {
-    name
+    name: 'ООО "Ромашка"'
   }
 }).then(({ meta, rows }) => {
   console.log('Всего контрагентов -', meta.size)
@@ -74,38 +74,34 @@ ms.GET('entity/counterparty', {
 ```
 ## API
 
-Статические методы:
-
 ### Moysklad.getTimeString
 
-> Преобразует дату в строку в формате API МойСклад в часовом поясе Москвы
+> Преобразует дату в строку в формате API МойСклад в часовом поясе Москвы (статический метод)
 
 `Moysklad.getTimeString(date: Date) : String`
 
-Параметры:
+**Параметры:**
 
 `date` - дата
 
-Пример использования:
+**Пример использования:**
 
 ```js
 let date = new Date(2017, 1, 1, 12, 10, 11)
-let timeString = getTimeString(date)
+let timeString = Moysklad.getTimeString(date)
 
 assert.equal(timeString, '2017-02-01 07:10:11')
 ```
-
-Методы экземпляра:
 
 ### moysklad#GET
 
 > GET запрос
 
-`moysklad.GET(path: String|Array<String>, query: Object?, options: Object?) : Promise`
+- `moysklad.GET(path: String|Array<String>, query: Object?, options: Object?) : Promise`
 
-`moysklad.GET(args: Object) : Promise`
+- `moysklad.GET(args: Object) : Promise`
 
-Параметры:
+**Параметры:**
 
 `path` - url ресурс (относительно текущего api)
 
@@ -113,7 +109,7 @@ assert.equal(timeString, '2017-02-01 07:10:11')
 
 `options` - опции запроса
 
-Пример использования:
+**Пример использования:**
 
 ```js
 let productsCollection = await moysklad.GET('entity/product', { limit: 50 })
@@ -125,11 +121,11 @@ let order = await moysklad.GET(['entity', 'customerorder', orderId], { expand: '
 
 > POST запрос
 
-`moysklad.POST(path: String|Array<String>, payload: Object|Array<Object>, query: Object?, options: Object?) : Promise`
+- `moysklad.POST(path: String|Array<String>, payload: Object|Array<Object>, query: Object?, options: Object?) : Promise`
 
-`moysklad.POST(args: Object) : Promise`
+- `moysklad.POST(args: Object) : Promise`
 
-Параметры:
+**Параметры:**
 
 `path` - url ресурс (относительно текущего api)
 
@@ -139,7 +135,7 @@ let order = await moysklad.GET(['entity', 'customerorder', orderId], { expand: '
 
 `options` - опции запроса
 
-Пример использования:
+**Пример использования:**
 
 ```js
 let newProduct = await moysklad.POST('entity/product', { name: 'Новый товар' })
@@ -149,11 +145,11 @@ let newProduct = await moysklad.POST('entity/product', { name: 'Новый то�
 
 > PUT запрос
 
-`moysklad.PUT(path: String|Array<String>, payload: Object, query: Object?, options: Object?) : Promise`
+- `moysklad.PUT(path: String|Array<String>, payload: Object, query: Object?, options: Object?) : Promise`
 
-`moysklad.PUT(args: Object) : Promise`
+- `moysklad.PUT(args: Object) : Promise`
 
-Параметры:
+**Параметры:**
 
 `path` - url ресурс (относительно текущего api)
 
@@ -163,7 +159,7 @@ let newProduct = await moysklad.POST('entity/product', { name: 'Новый то�
 
 `options` - опции запроса
 
-Пример использования:
+**Пример использования:**
 
 ```js
 let updatedProduct = await moysklad.PUT(['entity/product', id], product)
@@ -173,17 +169,17 @@ let updatedProduct = await moysklad.PUT(['entity/product', id], product)
 
 > DELETE запрос
 
-`moysklad.DELETE(path: String|Array<String>, options: Object?) : Promise`
+- `moysklad.DELETE(path: String|Array<String>, options: Object?) : Promise`
 
-`moysklad.DELETE(args: Object) : Promise`
+- `moysklad.DELETE(args: Object) : Promise`
 
-Параметры:
+**Параметры:**
 
 `path` - url ресурс (относительно текущего api)
 
 `options` - опции запроса
 
-Пример использования:
+**Пример использования:**
 
 ```js
 await moysklad.DELETE(['entity/product', product.id])
@@ -193,17 +189,17 @@ await moysklad.DELETE(['entity/product', product.id])
 
 > Формирует url запроса
 
-`moysklad.buildUri(path: String|Array<String>, query: Object?) : String`
+- `moysklad.buildUri(path: String|Array<String>, query: Object?) : String`
 
-`moysklad.buildUri(args: Object) : String`
+- `moysklad.buildUri(args: Object) : String`
 
-Параметры:
+**Параметры:**
 
 `path` - url ресурс (относительно текущего api)
 
 `query` - url параметры запроса
 
-Пример использования:
+**Пример использования:**
 
 ```js
 let url = moysklad.buildUri('entity/customerorder', { expand: 'positions' })
@@ -215,13 +211,13 @@ assert.equal(url, 'https://online.moysklad.ru/api/remap/1.1/entity/customerorder
 
 > Разбор uri на составные компоненты
 
-`moysklad.parseUri(uri: String) : Object`
+- `moysklad.parseUri(uri: String) : Object`
 
-Параметры:
+**Параметры:**
 
 `uri` - uri ресурс
 
-Пример использования:
+**Пример использования:**
 
 ```js
 let parsedUri = moysklad.parseUri('https://online.moysklad.ru/api/remap/1.1/entity/customerorder?expand=positions')
@@ -238,15 +234,15 @@ assert.deepEqual(parsedUri, {
 
 > Выполнить запрос по указанному uri
 
-`moysklad.fetchUri(uri: String, options: Object?) : Promise`
+- `moysklad.fetchUri(uri: String, options: Object?) : Promise`
 
-Параметры:
+**Параметры:**
 
 `uri` - uri ресурс
 
 `options` - опции запроса
 
-Пример использования:
+**Пример использования:**
 
 ```js
 let parsedUri = await moysklad.fetchUri('https://online.moysklad.ru/api/remap/1.1/entity/customerorder/eb7bcc22-ae8d-11e3-9e32-002590a28eca')

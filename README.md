@@ -3,7 +3,7 @@ moysklad
 
 > Библиотека для взаимодействия с JSON API сервиса МойСклад для node.js и браузера.
 
-> **ВНИМАНИЕ!** Библиотека не готова для использования. Идет активная разработка. Документация будет дополняться.
+> **ВНИМАНИЕ!** Библиотека не готова для использования. Идет активная разработка и тестирование. Документация не полная и будет дополняться.
 
 ## Особенности
 
@@ -102,7 +102,7 @@ assert.equal(timeString, '2017-02-01 07:10:11')
 
 > GET запрос
 
-- `moysklad.GET(path: String|Array<String>, query: Object?, options: Object?) : Promise`
+- `moysklad.GET(path: String|Array<String>, query?: Object, options?: Object) : Promise`
 
 - `moysklad.GET(args: Object) : Promise`
 
@@ -126,7 +126,7 @@ let order = await moysklad.GET(['entity', 'customerorder', orderId], { expand: '
 
 > POST запрос
 
-- `moysklad.POST(path: String|Array<String>, payload: Object|Array<Object>, query: Object?, options: Object?) : Promise`
+- `moysklad.POST(path: String|Array<String>, payload: Object|Array<Object>, query?: Object, options?: Object) : Promise`
 
 - `moysklad.POST(args: Object) : Promise`
 
@@ -150,7 +150,7 @@ let newProduct = await moysklad.POST('entity/product', { name: 'Новый то�
 
 > PUT запрос
 
-- `moysklad.PUT(path: String|Array<String>, payload: Object, query: Object?, options: Object?) : Promise`
+- `moysklad.PUT(path: String|Array<String>, payload: Object, query?: Object, options?: Object) : Promise`
 
 - `moysklad.PUT(args: Object) : Promise`
 
@@ -174,7 +174,7 @@ let updatedProduct = await moysklad.PUT(['entity/product', id], product)
 
 > DELETE запрос
 
-- `moysklad.DELETE(path: String|Array<String>, options: Object?) : Promise`
+- `moysklad.DELETE(path: String|Array<String>, options?: Object) : Promise`
 
 - `moysklad.DELETE(args: Object) : Promise`
 
@@ -194,7 +194,7 @@ await moysklad.DELETE(['entity/product', product.id])
 
 > Формирует url запроса
 
-- `moysklad.buildUri(path: String|Array<String>, query: Object?) : String`
+- `moysklad.buildUri(path: String|Array<String>, query?: Object) : String`
 
 - `moysklad.buildUri(args: Object) : String`
 
@@ -239,7 +239,7 @@ assert.deepEqual(parsedUri, {
 
 > Выполнить запрос по указанному uri
 
-- `moysklad.fetchUri(uri: String, options: Object?) : Promise`
+- `moysklad.fetchUri(uri: String, options?: Object) : Promise`
 
 **Параметры:**
 

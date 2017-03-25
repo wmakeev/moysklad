@@ -1,8 +1,8 @@
-sudo: false
 language: node_js
 node_js:
-  - '0.10'
-  - '0.12'
-  - '4.1'
-  - 'stable'
-  - 'iojs'
+  - '4.3.2'
+  - '4.5.0'
+  - '6'
+  - '7'
+script:
+  - npm run build

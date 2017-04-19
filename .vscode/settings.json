@@ -7,6 +7,7 @@
   "vsicons.presets.angular": false,
   "files.exclude": {
     "dist/**": true,
-    "lib/**": true
+    "lib/**": true,
+    ".idea/**": true
   }
 }

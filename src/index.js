@@ -13,6 +13,7 @@ const have = require('./have')
 
 // methods
 const getTimeString = require('./tools/getTimeString')
+const parseTimeString = require('./tools/parseTimeString')
 const getAuthHeader = require('./methods/getAuthHeader')
 const buildUri = require('./methods/buildUri')
 const parseUri = require('./methods/parseUri')
@@ -35,7 +36,8 @@ module.exports = stampit({
     DELETE
   },
   statics: {
-    getTimeString
+    getTimeString,
+    parseTimeString
   }
 })
   .init(function (options) {

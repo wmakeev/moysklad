@@ -53,7 +53,7 @@ const matchers = require('./matchers');
 
 module.exports = have.with(matchers);
 
-},{"./matchers":5,"have2":22}],4:[function(require,module,exports){
+},{"./matchers":5,"have2":23}],4:[function(require,module,exports){
 /*
  * moysklad
  * Клиент для JSON API МойСклад
@@ -69,6 +69,7 @@ const have = require('./have');
 
 // methods
 const getTimeString = require('./tools/getTimeString');
+const parseTimeString = require('./tools/parseTimeString');
 const getAuthHeader = require('./methods/getAuthHeader');
 const buildUri = require('./methods/buildUri');
 const parseUri = require('./methods/parseUri');
@@ -91,7 +92,8 @@ module.exports = stampit({
     DELETE: DELETE
   },
   statics: {
-    getTimeString: getTimeString
+    getTimeString: getTimeString,
+    parseTimeString: parseTimeString
   }
 }).init(function (options) {
   let _options;
@@ -114,7 +116,7 @@ module.exports = stampit({
   } else if (typeof fetch !== 'undefined') {
     this.fetch = fetch;
   } else {
-    throw new Error('fetch not specified');
+    throw new Error('Не указан Fetch API модуль.' + 'Подробнее см. https://github.com/wmakeev/moysklad#Установка');
   }
 
   if (options.emitter) {
@@ -132,7 +134,7 @@ module.exports = stampit({
   };
 });
 
-},{"./have":3,"./methods/DELETE":6,"./methods/GET":7,"./methods/POST":8,"./methods/PUT":9,"./methods/buildUri":10,"./methods/fetchUri":11,"./methods/getAuthHeader":12,"./methods/parseUri":13,"./tools/getTimeString":17,"stampit":23}],5:[function(require,module,exports){
+},{"./have":3,"./methods/DELETE":6,"./methods/GET":7,"./methods/POST":8,"./methods/PUT":9,"./methods/buildUri":10,"./methods/fetchUri":11,"./methods/getAuthHeader":12,"./methods/parseUri":13,"./tools/getTimeString":17,"./tools/parseTimeString":22,"stampit":24}],5:[function(require,module,exports){
 'use strict';
 
 const UUID_REGEX = /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/;
@@ -656,18 +658,18 @@ module.exports = function buildQuery(query) {
 },{"./buildFilter":15}],17:[function(require,module,exports){
 'use strict';
 
-const timeStringTailRegExp = /(?:\.\d+)?Z(?:.+)?$/;
-const mskTimezoneOffset = -120;
+const MSK_TIMEZONE_OFFSET = 180 * 60 * 1000;
 
 /**
  * Возвращает дату для фильтра в часовом поясе Москвы
  * @param {Date} date Конвертируемая дата
+ * @param {boolean} includeMs Отображать миллисекунды
  * @returns {string} Дата ввиде строки
  */
-module.exports = function getTimeString(date) {
-  let mskTime = new Date(+date - mskTimezoneOffset);
+module.exports = function getTimeString(date, includeMs) {
+  let mskTime = new Date(+date + MSK_TIMEZONE_OFFSET);
 
-  return mskTime.toJSON().replace('T', ' ').replace(timeStringTailRegExp, '');
+  return mskTime.toJSON().replace('T', ' ').replace(includeMs ? /Z$/ : /\.\d{3}Z$/, '');
 };
 
 },{}],18:[function(require,module,exports){
@@ -751,6 +753,27 @@ module.exports = function parseQueryString(queryString) {
 };
 
 },{}],22:[function(require,module,exports){
+'use strict';
+
+// https://regex101.com/r/Bxq7dZ/2
+
+const MS_TIME_REGEX = new RegExp(/^(\d{4})-(\d{2})-(\d{2})\s(\d{2}):(\d{2}):(\d{2})(?:\.(\d{3}))?$/);
+
+/**
+ * Преобразует строку времени МойСклад в объект даты (с учетом временной зоны)
+ * @param {string} timeString Время в формате МойСклад ("2017-04-08 13:33:00.123")
+ * @returns {Date} Дата
+ */
+module.exports = function parseTimeString(timeString) {
+  // 2017-04-08 13:33:00.123
+  let m = MS_TIME_REGEX.exec(timeString);
+  if (!m || m.length < 7 || m.length > 8) {
+    throw new Error(`Некорректный формат даты "${timeString}"`);
+  }
+  return new Date(`${m[1]}-${m[2]}-${m[3]}T${m[4]}:${m[5]}:${m[6]}${m[7] ? '.' + m[7] : ''}+03:00`);
+};
+
+},{}],23:[function(require,module,exports){
 'use strict'
 
 var ARR_RX = /^(.+) a(rr(ay)?)?$/i
@@ -1043,7 +1066,7 @@ module.exports = (function () {
 })()
 
 
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', { value: true });

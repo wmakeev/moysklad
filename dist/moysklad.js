@@ -113,10 +113,12 @@ module.exports = stampit({
 
   if (options.fetch) {
     this.fetch = options.fetch;
+  } else if (typeof window !== 'undefined' && window.fetch) {
+    this.fetch = window.fetch.bind(window);
   } else if (typeof fetch !== 'undefined') {
     this.fetch = fetch;
   } else {
-    throw new Error('Не указан Fetch API модуль.' + 'Подробнее см. https://github.com/wmakeev/moysklad#Установка');
+    throw new Error('Не указан Fetch API модуль' + ' (cм. подробнее https://github.com/wmakeev/moysklad#Установка).');
   }
 
   if (options.emitter) {
@@ -371,7 +373,6 @@ module.exports = (() => {
 })();
 
 },{"../errorsHttp":1,"../getResponseError":2,"../have":3}],12:[function(require,module,exports){
-(function (process){
 'use strict';
 
 /* global MOYSKLAD_LOGIN, MOYSKLAD_PASSWORD */
@@ -386,10 +387,10 @@ module.exports = function getAuthHeader() {
   if (options.login && options.password) {
     login = options.login;
     password = options.password;
-  } else if (process && process.env && process.env.MOYSKLAD_LOGIN && process.env.MOYSKLAD_PASSWORD) {
+  } else if (typeof process !== 'undefined' && process.env && process.env.MOYSKLAD_LOGIN && process.env.MOYSKLAD_PASSWORD) {
     login = process.env.MOYSKLAD_LOGIN;
     password = process.env.MOYSKLAD_PASSWORD;
-  } else if (MOYSKLAD_LOGIN && MOYSKLAD_PASSWORD) {
+  } else if (typeof MOYSKLAD_LOGIN !== 'undefined' && typeof MOYSKLAD_PASSWORD !== 'undefined') {
     login = MOYSKLAD_LOGIN;
     password = MOYSKLAD_PASSWORD;
   } else {
@@ -399,8 +400,7 @@ module.exports = function getAuthHeader() {
   return 'Basic ' + base64encode(`${login}:${password}`);
 };
 
-}).call(this,require('_process'))
-},{"../tools/base64encode":14,"_process":undefined}],13:[function(require,module,exports){
+},{"../tools/base64encode":14}],13:[function(require,module,exports){
 'use strict';
 'use srict';
 
@@ -449,7 +449,6 @@ module.exports = function parseUri(uri) {
 };
 
 },{"../have":3,"../tools/normalizeUrl":20,"../tools/parseQueryString":21}],14:[function(require,module,exports){
-(function (process,Buffer){
 'use strict';
 
 let encode;
@@ -479,8 +478,7 @@ module.exports = function base64encode(value) {
   return encode(value);
 };
 
-}).call(this,require('_process'),require("buffer").Buffer)
-},{"_process":undefined,"buffer":undefined}],15:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 'use strict';
 
 const getTimeString = require('./getTimeString');

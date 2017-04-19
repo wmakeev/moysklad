@@ -1,16 +1,25 @@
 {
   "name": "moysklad",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Библиотека для работы с API сервиса МойСклад",
   "main": "index.js",
+  "files": [
+    "lib",
+    "dist",
+    "src",
+    "tools",
+    "index.js",
+    "README.md"
+  ],
   "scripts": {
     "lint": "eslint src",
-    "clean": "rm -rf lib || :",
-    "transpile": "npm run clean && cp -rf src lib && babel --source-maps --optional runtime --out-dir lib ./src",
-    "build": "browserify --no-builtins -s MoyskladCore -o dist/moysklad.js lib/index.js",
+    "clean-lib": "rm -rf lib || :",
+    "clean-dist": "rm -rf dist || : && mkdir -p dist",
+    "transpile": "npm run clean-lib && cp -rf src lib && babel --source-maps --optional runtime --out-dir lib ./src",
+    "build": "npm run clean-dist && browserify --no-builtins -s MoyskladCore -o dist/moysklad.js lib/index.js",
     "test-src": "node --harmony -r dotenv/config -r isomorphic-fetch tests --src src | tap-spec",
     "test-lib": "node -r dotenv/config -r isomorphic-fetch tests --src lib | tap-spec",
-    "test": "npm run lint && npm run clean && npm run transpile && npm run build && npm run test-lib"
+    "test": "npm run lint && npm run transpile && npm run build && npm run test-lib"
   },
   "repository": {
     "type": "git",
@@ -52,6 +61,6 @@
     "walkdir": "0.0.11"
   },
   "engines": {
-    "node": "4.3.2"
+    "node": ">=4.3.2"
   }
 }

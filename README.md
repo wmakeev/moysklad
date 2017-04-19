@@ -83,19 +83,39 @@ ms.GET('entity/counterparty', {
 
 > Преобразует дату в строку в формате API МойСклад в часовом поясе Москвы (статический метод)
 
-`Moysklad.getTimeString(date: Date) : String`
+`Moysklad.getTimeString(date: Date, includeMs?: boolean) : String`
 
 **Параметры:**
 
 `date` - дата
 
+`includeMs` - если `true`, то в результирующую дату будут включены миллисекунды
+
 **Пример использования:**
 
 ```js
-let date = new Date(2017, 1, 1, 12, 10, 11)
-let timeString = Moysklad.getTimeString(date)
+let date = new Date('2017-02-01T07:10:11.123Z')
+let timeString = Moysklad.getTimeString(date, true)
 
-assert.equal(timeString, '2017-02-01 07:10:11')
+assert.equal(timeString, '2017-02-01 10:10:11.123')
+```
+
+### Moysklad.parseTimeString
+
+> Преобразует строку с датой в формате API МойСклад в объект даты (с учетом часового пояса исходной даты)
+
+`Moysklad.parseTimeString(date: string) : Date`
+
+**Параметры:**
+
+`date` - дата в формате МойСклад (напр. '2017-04-08 13:33:00.123')
+
+**Пример использования:**
+
+```js
+let parsedDate = Moysklad.parseTimeString('2017-04-08 13:33:00.123')
+
+assert.equal(parsedDate.toISOString(), '2017-04-08T10:33:00.123Z')
 ```
 
 ### moysklad#GET
@@ -250,7 +270,7 @@ assert.deepEqual(parsedUri, {
 **Пример использования:**
 
 ```js
-let parsedUri = await moysklad.fetchUri('https://online.moysklad.ru/api/remap/1.1/entity/customerorder/eb7bcc22-ae8d-11e3-9e32-002590a28eca')
+let order = await moysklad.fetchUri('https://online.moysklad.ru/api/remap/1.1/entity/customerorder/eb7bcc22-ae8d-11e3-9e32-002590a28eca')
 ```
 
 ### События

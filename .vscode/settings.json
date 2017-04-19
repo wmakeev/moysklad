@@ -4,5 +4,9 @@
   "editor.renderIndentGuides": true,
   "files.trimTrailingWhitespace": true,
   "files.insertFinalNewline": true,
-  "vsicons.presets.angular": false
+  "vsicons.presets.angular": false,
+  "files.exclude": {
+    "dist/**": true,
+    "lib/**": true
+  }
 }

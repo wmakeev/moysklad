@@ -21,5 +21,9 @@
     "no-use-before-define": ["error", { "functions": true, "classes": true }],
     "no-inner-declarations": [2, "both"],
     "vars-on-top": 2
-  }
+  },
+  "no-warning-comments": ["warn", {
+    "terms": ["todo", "fixme"],
+    "location": "start"
+  }]
 }

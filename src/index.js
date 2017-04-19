@@ -60,9 +60,11 @@ module.exports = stampit({
       this.fetch = options.fetch
     } else if (typeof window !== 'undefined' && window.fetch) {
       this.fetch = window.fetch.bind(window)
+    } else if (typeof fetch !== 'undefined') {
+      this.fetch = fetch
     } else {
       throw new Error('Не указан Fetch API модуль' +
-       '(cм. подробнее https://github.com/wmakeev/moysklad#Установка).')
+       ' (cм. подробнее https://github.com/wmakeev/moysklad#Установка).')
     }
 
     if (options.emitter) {

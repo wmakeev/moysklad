@@ -1,6 +1,6 @@
 {
   "name": "moysklad",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Библиотека для работы с API сервиса МойСклад",
   "main": "index.js",
   "files": [
@@ -58,6 +58,7 @@
     "eslint-plugin-promise": "^3.4.0",
     "eslint-plugin-standard": "^2.0.1",
     "isomorphic-fetch": "^2.2.1",
+    "node-fetch": "^1.6.3",
     "walkdir": "0.0.11"
   },
   "engines": {

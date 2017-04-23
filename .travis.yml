@@ -1,8 +1,8 @@
 language: node_js
 node_js:
-  - '4.3.2'
-  - '4.5.0'
-  - '6'
-  - '7'
+  # - '4.3.2'
+  - '7.9'
 script:
-  - npm run build
+  - npm run coverage
+after_success:
+  - npm run coverage-report

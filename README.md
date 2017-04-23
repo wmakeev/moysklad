@@ -146,7 +146,7 @@ let order = await moysklad.GET(['entity', 'customerorder', orderId], { expand: '
 
 > POST запрос
 
-- `moysklad.POST(path: String|Array<String>, payload: Object|Array<Object>, query?: Object, options?: Object) : Promise`
+- `moysklad.POST(path: String|Array<String>, payload?: Object|Array<Object>, query?: Object, options?: Object) : Promise`
 
 - `moysklad.POST(args: Object) : Promise`
 
@@ -154,7 +154,7 @@ let order = await moysklad.GET(['entity', 'customerorder', orderId], { expand: '
 
 `path` - url ресурс (относительно текущего api)
 
-`payload` - создаваемый обект или коллекция (массив)
+`payload` - объект или коллекция объектов (будет преобразовано в строку методом `JSON.stringify`)
 
 `query` - url параметры запроса
 
@@ -170,7 +170,7 @@ let newProduct = await moysklad.POST('entity/product', { name: 'Новый то�
 
 > PUT запрос
 
-- `moysklad.PUT(path: String|Array<String>, payload: Object, query?: Object, options?: Object) : Promise`
+- `moysklad.PUT(path: String|Array<String>, payload?: Object, query?: Object, options?: Object) : Promise`
 
 - `moysklad.PUT(args: Object) : Promise`
 
@@ -178,7 +178,7 @@ let newProduct = await moysklad.POST('entity/product', { name: 'Новый то�
 
 `path` - url ресурс (относительно текущего api)
 
-`payload` - обнвляемый обект
+`payload` - обнвляемый объект (будет преобразован в строку методом `JSON.stringify`)
 
 `query` - url параметры запроса
 
@@ -266,6 +266,47 @@ assert.deepEqual(parsedUri, {
 `uri` - uri ресурс
 
 `options` - опции запроса
+
+#### Свойства `options`
+
+Все опции (за исключением описанных ниже) переданные в объекте `options` передаются напрямую в опции метода `fetch` ([Fetch API](http://github.github.io/fetch/)) при осуществлении запроса.
+
+Свойства специфичные для библиотеки (не передаются в `fetch`):
+
+Свойство | Тип | Описание
+---------|-----|---------
+`includeHeaders` | `boolean` | Если `true`, то метод вернет результат ввиде массива `[headers, body, response]`
+`muteErrors` | `boolean` | Если `true`, то все ошибки будут проигнорированы (метод не будет генерировать ошибку если код ответа сервера не в диапазоне 200-299 и/или тело ответа содержит описание ошибки МойСклад.
+
+Пример формирования заполненного шаблона печатной формы и получение ссылки для загрузки:
+
+```js
+const ms = Moysklad({ fetch: require('node-fetch') })
+
+let body = {
+  template: {
+    meta: {
+      href: 'https://online.moysklad.ru/api/remap/1.1/entity/demand/metadata/customtemplate/' +
+        '8a686b8a-9e4a-11e5-7a69-97110004af3e',
+      type: 'customtemplate',
+      mediaType: 'application/json'
+    }
+  },
+  extension: 'pdf'
+}
+
+let [headers, result, response] = await ms
+  .POST('entity/demand/773e16c5-ef53-11e6-7a69-9711001669c5/export/', body, {
+    includeHeaders: true, // включить в ответ заголовки
+    muteErrors: true      // игнорировать ошибки
+  })
+
+let formUrl = headers.get('location')
+
+assert.true(/https:\/\/120708.selcdn.ru\/prod-files/.test(formUrl))
+assert.equal(result, undefined)
+assert.equal(response.code, 307)
+```
 
 **Пример использования:**
 

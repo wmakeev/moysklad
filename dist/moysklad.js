@@ -213,7 +213,7 @@ module.exports = function POST() {
   // TODO Test payload: 'Object or Object arr'
   var _have$strict = have.strict(args, [{
     path: 'str or str arr',
-    payload: 'Object or Object arr',
+    payload: 'opt Object or Object arr',
     query: 'opt Object',
     options: 'opt Object'
   }, have.argumentsObject]);
@@ -226,10 +226,8 @@ module.exports = function POST() {
 
 
   let uri = this.buildUri(path, query);
-  let fetchOptions = {
-    method: 'POST',
-    body: JSON.stringify(payload)
-  };
+  let fetchOptions = { method: 'POST' };
+  if (payload) fetchOptions.body = JSON.stringify(payload);
 
   return this.fetchUri(uri, Object.assign({}, options, fetchOptions));
 };
@@ -259,10 +257,8 @@ module.exports = function PUT() {
 
 
   let uri = this.buildUri(path, query);
-  let fetchOptions = {
-    method: 'PUT',
-    body: JSON.stringify(payload)
-  };
+  let fetchOptions = { method: 'PUT' };
+  if (payload) fetchOptions.body = JSON.stringify(payload);
 
   return this.fetchUri(uri, Object.assign({}, options, fetchOptions));
 };
@@ -317,22 +313,31 @@ module.exports = (() => {
 
     have.strict(arguments, { uri: 'str', options: 'opt Object' });
 
+    // Специфические параметры (не передаются в опции fetch)
+    let includeHeaders = false;
+    let muteErrors = false;
     let emit = this.emitter ? this.emitter.emit.bind(this.emitter) : null;
-    let fetchOptions = {
-      method: options.method || 'GET',
+
+    let fetchOptions = Object.assign({}, {
       headers: {
         'Content-Type': 'application/json'
       },
-      credentials: 'include'
-    };
+      credentials: 'include',
+      redirect: 'manual'
+    }, options);
+
+    if (fetchOptions.includeHeaders) {
+      includeHeaders = true;
+      delete fetchOptions.includeHeaders;
+    }
+    if (fetchOptions.muteErrors) {
+      muteErrors = true;
+      delete fetchOptions.muteErrors;
+    }
 
     let authHeader = this.getAuthHeader();
     if (authHeader) {
       fetchOptions.headers.Authorization = this.getAuthHeader();
-    }
-
-    if (options.body != null && options.method && options.method !== 'GET') {
-      fetchOptions.body = options.body;
     }
 
     if (emit) emit('request:start', { uri: uri, options: fetchOptions });
@@ -359,10 +364,10 @@ module.exports = (() => {
 
     if (error) {
       if (emit) emit('error', error);
-      throw error;
+      if (!muteErrors) throw error;
     }
 
-    return responseJson;
+    return includeHeaders ? [response.headers, responseJson, response] : responseJson;
   });
 
   function fetchUri(_x) {

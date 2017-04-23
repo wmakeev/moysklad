@@ -7,22 +7,31 @@ const errorsHttp = require('../errorsHttp')
 module.exports = async function fetchUri (uri, options = {}) {
   have.strict(arguments, { uri: 'str', options: 'opt Object' })
 
+  // Специфические параметры (не передаются в опции fetch)
+  let includeHeaders = false
+  let muteErrors = false
   let emit = this.emitter ? this.emitter.emit.bind(this.emitter) : null
-  let fetchOptions = {
-    method: options.method || 'GET',
+
+  let fetchOptions = Object.assign({}, {
     headers: {
       'Content-Type': 'application/json'
     },
-    credentials: 'include'
+    credentials: 'include',
+    redirect: 'manual'
+  }, options)
+
+  if (fetchOptions.includeHeaders) {
+    includeHeaders = true
+    delete fetchOptions.includeHeaders
+  }
+  if (fetchOptions.muteErrors) {
+    muteErrors = true
+    delete fetchOptions.muteErrors
   }
 
   let authHeader = this.getAuthHeader()
   if (authHeader) {
     fetchOptions.headers.Authorization = this.getAuthHeader()
-  }
-
-  if (options.body != null && options.method && options.method !== 'GET') {
-    fetchOptions.body = options.body
   }
 
   if (emit) emit('request:start', { uri, options: fetchOptions })
@@ -49,8 +58,8 @@ module.exports = async function fetchUri (uri, options = {}) {
 
   if (error) {
     if (emit) emit('error', error)
-    throw error
+    if (!muteErrors) throw error
   }
 
-  return responseJson
+  return includeHeaders ? [response.headers, responseJson, response] : responseJson
 }

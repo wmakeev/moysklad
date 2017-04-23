@@ -14,10 +14,8 @@ module.exports = function PUT (...args) {
   ])
 
   let uri = this.buildUri(path, query)
-  let fetchOptions = {
-    method: 'PUT',
-    body: JSON.stringify(payload)
-  }
+  let fetchOptions = { method: 'PUT' }
+  if (payload) fetchOptions.body = JSON.stringify(payload)
 
   return this.fetchUri(uri, Object.assign({}, options, fetchOptions))
 }

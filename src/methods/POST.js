@@ -7,7 +7,7 @@ module.exports = function POST (...args) {
   let { path, payload, query, options = {} } = have.strict(args, [
     {
       path: 'str or str arr',
-      payload: 'Object or Object arr',
+      payload: 'opt Object or Object arr',
       query: 'opt Object',
       options: 'opt Object'
     },
@@ -15,10 +15,8 @@ module.exports = function POST (...args) {
   ])
 
   let uri = this.buildUri(path, query)
-  let fetchOptions = {
-    method: 'POST',
-    body: JSON.stringify(payload)
-  }
+  let fetchOptions = { method: 'POST' }
+  if (payload) fetchOptions.body = JSON.stringify(payload)
 
   return this.fetchUri(uri, Object.assign({}, options, fetchOptions))
 }

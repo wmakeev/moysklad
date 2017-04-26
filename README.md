@@ -304,7 +304,7 @@ let body = {
 }
 
 let [headers, result, response] = await ms
-  .POST('entity/demand/773e16c5-ef53-11e6-7a69-9711001669c5/export/', body, {
+  .POST('entity/demand/773e16c5-ef53-11e6-7a69-9711001669c5/export/', body, null, {
     includeHeaders: true, // включить в ответ заголовки
     muteErrors: true      // игнорировать ошибки
   })
@@ -313,7 +313,7 @@ let formUrl = headers.get('location')
 
 assert.true(/https:\/\/120708.selcdn.ru\/prod-files/.test(formUrl))
 assert.equal(result, undefined)
-assert.equal(response.code, 307)
+assert.equal(response.status, 307)
 ```
 
 **Пример использования:**

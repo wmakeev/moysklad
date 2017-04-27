@@ -18,7 +18,7 @@ test('Array response with muted errors', async t => {
         mediaType: 'application/json'
       }
     },
-    extension: 'html'
+    extension: 'pdf'
   }
 
   let [headers, result, response] = await ms

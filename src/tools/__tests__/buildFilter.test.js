@@ -3,9 +3,9 @@
 const test = require('blue-tape')
 const buildFilter = require('../buildFilter')
 
-test('buildFilter is ok', t => {
+test('buildFilter', t => {
   t.ok(buildFilter)
-  t.equals(typeof buildFilter, 'function')
+  t.equals(typeof buildFilter, 'function', 'should to be function')
   t.end()
 })
 

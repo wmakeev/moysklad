@@ -1,7 +1,7 @@
 'use strict'
 
 const getTimeString = require('./getTimeString')
-const isObject = require('./isObject')
+const isPlainObject = require('./isPlainObject')
 const isSimpleValue = require('./isSimpleValue')
 
 let createValueSelector = selector => (path, value) => {
@@ -65,7 +65,7 @@ function getFilterParts (path, value) {
         .concat(getFilterParts(path.slice(0, -1), val)), [])
 
     case curKey === '$not':
-      if (!isObject(value)) {
+      if (!isPlainObject(value)) {
         throw new Error(`$not: selector value must to be an object`)
       }
       let headPath = path.slice(0, -1)
@@ -106,7 +106,7 @@ function getFilterParts (path, value) {
 }
 
 module.exports = function buildFilter (filter) {
-  if (!isObject(filter)) {
+  if (!isPlainObject(filter)) {
     throw new Error('filter must to be an object')
   }
 

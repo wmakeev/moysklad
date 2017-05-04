@@ -1,6 +1,7 @@
 'use strict'
 
 const buildFilter = require('./buildFilter')
+const isPlainObject = require('./isPlainObject')
 
 module.exports = function buildQuery (query) {
   return Object.keys(query)
@@ -12,14 +13,23 @@ module.exports = function buildQuery (query) {
         res = res.concat([[key, encodeURIComponent(val)]])
       }
 
-      if (key === 'filter') {
-        addPart(buildFilter(query[key]))
-      } else if (query[key] == null) {
-        addPart('')
-      } else if (query[key] instanceof Array) {
-        query[key].forEach(addPart)
-      } else {
-        addPart(query[key])
+      switch (true) {
+        case key === 'filter':
+          if (isPlainObject(query.filter)) addPart(buildFilter(query.filter))
+          else if (typeof query.filter === 'string') addPart(query.filter)
+          else throw new Error('filter must to be string or object')
+          break
+
+        case query[key] == null:
+          addPart('')
+          break
+
+        case query[key] instanceof Array:
+          query[key].forEach(addPart)
+          break
+
+        default:
+          addPart(query[key])
       }
 
       return res

@@ -136,7 +136,7 @@ module.exports = stampit({
   };
 });
 
-},{"./have":3,"./methods/DELETE":6,"./methods/GET":7,"./methods/POST":8,"./methods/PUT":9,"./methods/buildUri":10,"./methods/fetchUri":11,"./methods/getAuthHeader":12,"./methods/parseUri":13,"./tools/getTimeString":17,"./tools/parseTimeString":22,"stampit":24}],5:[function(require,module,exports){
+},{"./have":3,"./methods/DELETE":6,"./methods/GET":7,"./methods/POST":8,"./methods/PUT":9,"./methods/buildUri":10,"./methods/fetchUri":11,"./methods/getAuthHeader":12,"./methods/parseUri":13,"./tools/getTimeString":16,"./tools/parseTimeString":21,"stampit":24}],5:[function(require,module,exports){
 'use strict';
 
 const UUID_REGEX = /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/;
@@ -298,7 +298,7 @@ module.exports = function buildUri() {
   return uri;
 };
 
-},{"../have":3,"../tools/buildQuery":16,"../tools/normalizeUrl":20}],11:[function(require,module,exports){
+},{"../have":3,"../tools/buildQuery":15,"../tools/normalizeUrl":19}],11:[function(require,module,exports){
 'use strict';
 
 function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
@@ -382,7 +382,7 @@ module.exports = (() => {
 
 /* global MOYSKLAD_LOGIN, MOYSKLAD_PASSWORD */
 
-const base64encode = require('../tools/base64encode');
+const base64encode = require('@wmakeev/base64encode');
 
 module.exports = function getAuthHeader() {
   let login;
@@ -405,7 +405,7 @@ module.exports = function getAuthHeader() {
   return 'Basic ' + base64encode(`${login}:${password}`);
 };
 
-},{"../tools/base64encode":14}],13:[function(require,module,exports){
+},{"@wmakeev/base64encode":22}],13:[function(require,module,exports){
 'use strict';
 'use srict';
 
@@ -453,41 +453,11 @@ module.exports = function parseUri(uri) {
   return { endpoint: endpoint, api: api, apiVersion: apiVersion, path: path, query: query };
 };
 
-},{"../have":3,"../tools/normalizeUrl":20,"../tools/parseQueryString":21}],14:[function(require,module,exports){
-'use strict';
-
-let encode;
-
-if (typeof btoa !== 'undefined') {
-  // browser
-  encode = function encode(value) {
-    return btoa(value);
-  };
-} else if (typeof process !== 'undefined' && process.version) {
-  // node
-  let nodeVersion = Number(process.version.match(/^v(\d+\.\d+)/)[1]);
-  encode = nodeVersion < 4.5 ? function (value) {
-    return new Buffer(value).toString('base64');
-  } : function (value) {
-    return Buffer.from(value).toString('base64');
-  };
-} else {
-  // unknown context
-  throw new Error('base64encode: Can\'t determine environment');
-}
-
-module.exports = function base64encode(value) {
-  if (typeof value !== 'string') {
-    throw new Error('base64encode: value to encode must be a string');
-  }
-  return encode(value);
-};
-
-},{}],15:[function(require,module,exports){
+},{"../have":3,"../tools/normalizeUrl":19,"../tools/parseQueryString":20}],14:[function(require,module,exports){
 'use strict';
 
 const getTimeString = require('./getTimeString');
-const isObject = require('./isObject');
+const isPlainObject = require('./isPlainObject');
 const isSimpleValue = require('./isSimpleValue');
 
 let createValueSelector = selector => (path, value) => {
@@ -550,7 +520,7 @@ function getFilterParts(path, value) {
       return value.reduce((res, val) => res.concat(getFilterParts(path.slice(0, -1), val)), []);
 
     case curKey === '$not':
-      if (!isObject(value)) {
+      if (!isPlainObject(value)) {
         throw new Error(`$not: selector value must to be an object`);
       }
       let headPath = path.slice(0, -1);
@@ -587,7 +557,7 @@ function getFilterParts(path, value) {
 }
 
 module.exports = function buildFilter(filter) {
-  if (!isObject(filter)) {
+  if (!isPlainObject(filter)) {
     throw new Error('filter must to be an object');
   }
 
@@ -630,10 +600,11 @@ module.exports = function buildFilter(filter) {
   }).join(';');
 };
 
-},{"./getTimeString":17,"./isObject":18,"./isSimpleValue":19}],16:[function(require,module,exports){
+},{"./getTimeString":16,"./isPlainObject":17,"./isSimpleValue":18}],15:[function(require,module,exports){
 'use strict';
 
 const buildFilter = require('./buildFilter');
+const isPlainObject = require('./isPlainObject');
 
 module.exports = function buildQuery(query) {
   return Object.keys(query).reduce((res, key) => {
@@ -644,21 +615,28 @@ module.exports = function buildQuery(query) {
       res = res.concat([[key, encodeURIComponent(val)]]);
     };
 
-    if (key === 'filter') {
-      addPart(buildFilter(query[key]));
-    } else if (query[key] == null) {
-      addPart('');
-    } else if (query[key] instanceof Array) {
-      query[key].forEach(addPart);
-    } else {
-      addPart(query[key]);
+    switch (true) {
+      case key === 'filter':
+        if (isPlainObject(query.filter)) addPart(buildFilter(query.filter));else if (typeof query.filter === 'string') addPart(query.filter);else throw new Error('filter must to be string or object');
+        break;
+
+      case query[key] == null:
+        addPart('');
+        break;
+
+      case query[key] instanceof Array:
+        query[key].forEach(addPart);
+        break;
+
+      default:
+        addPart(query[key]);
     }
 
     return res;
   }, []).map(kv => `${kv[0]}=${kv[1]}`).join('&');
 };
 
-},{"./buildFilter":15}],17:[function(require,module,exports){
+},{"./buildFilter":14,"./isPlainObject":17}],16:[function(require,module,exports){
 'use strict';
 
 const MSK_TIMEZONE_OFFSET = 180 * 60 * 1000;
@@ -675,21 +653,21 @@ module.exports = function getTimeString(date, includeMs) {
   return mskTime.toJSON().replace('T', ' ').replace(includeMs ? /Z$/ : /\.\d{3}Z$/, '');
 };
 
-},{}],18:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 'use strict';
 
-module.exports = function isObject(value) {
-  return value != null && typeof value === 'object';
+module.exports = function isPlainObject(value) {
+  return Object.prototype.toString.call(value) === '[object Object]';
 };
 
-},{}],19:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 'use strict';
 
 module.exports = function isSimpleValue(value) {
   return typeof value !== 'object' || value instanceof Date || value === null;
 };
 
-},{}],20:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 'use strict';
 
 const URI_EXTRA_SLASH_REGEX = /([^:]\/)\/+/g;
@@ -699,7 +677,7 @@ module.exports = function normalizeUrl(url) {
   return url.replace(TRIM_SLASH, '').replace(URI_EXTRA_SLASH_REGEX, '$1').toLowerCase();
 };
 
-},{}],21:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 'use strict';
 
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
@@ -755,7 +733,7 @@ module.exports = function parseQueryString(queryString) {
   return result;
 };
 
-},{}],22:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 'use strict';
 
 // https://regex101.com/r/Bxq7dZ/2
@@ -775,6 +753,31 @@ module.exports = function parseTimeString(timeString) {
   }
   return new Date(`${m[1]}-${m[2]}-${m[3]}T${m[4]}:${m[5]}:${m[6]}${m[7] ? '.' + m[7] : ''}+03:00`);
 };
+
+},{}],22:[function(require,module,exports){
+'use strict'
+
+/* eslint node/no-deprecated-api:0 */
+
+var encode
+
+if (typeof btoa !== 'undefined') {
+  // browser
+  encode = function (value) { return btoa(value) }
+} else if (typeof process !== 'undefined' && process.version) {
+  // node
+  let nodeVersion = Number(process.version.match(/^v(\d+\.\d+)/)[1])
+  encode = nodeVersion < 4.5
+    ? function (value) { return new Buffer(value).toString('base64') }
+    : function (value) { return Buffer.from(value).toString('base64') }
+} else {
+  // unknown context
+  throw new Error('base64encode: Can\'t determine environment')
+}
+
+module.exports = function base64encode (value) {
+  return encode(String(value))
+}
 
 },{}],23:[function(require,module,exports){
 'use strict'

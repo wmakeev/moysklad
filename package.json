@@ -1,6 +1,6 @@
 {
   "name": "moysklad",
-  "version": "0.0.7",
+  "version": "0.1.0",
   "description": "Библиотека для работы с API сервиса МойСклад",
   "main": "index.js",
   "files": [
@@ -45,6 +45,7 @@
   },
   "homepage": "https://github.com/wmakeev/moysklad#readme",
   "dependencies": {
+    "@wmakeev/base64encode": "^1.0.0",
     "have2": "1.0.0-beta.1",
     "stampit": "^3.1.2"
   },

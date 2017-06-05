@@ -16,7 +16,8 @@
         "dotenv/config",
         "--require",
         "isomorphic-fetch"
-      ]
+      ],
+      "stopOnEntry": true
     },
     {
       "name": "index.test",

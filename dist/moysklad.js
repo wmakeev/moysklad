@@ -71,21 +71,36 @@ const have = require('./have');
 const getTimeString = require('./tools/getTimeString');
 const parseTimeString = require('./tools/parseTimeString');
 const getAuthHeader = require('./methods/getAuthHeader');
-const buildUri = require('./methods/buildUri');
-const parseUri = require('./methods/parseUri');
-const fetchUri = require('./methods/fetchUri');
+const buildUrl = require('./methods/buildUrl');
+const parseUrl = require('./methods/parseUrl');
+const fetchUrl = require('./methods/fetchUrl');
 const GET = require('./methods/GET');
 const POST = require('./methods/POST');
 const PUT = require('./methods/PUT');
 const DELETE = require('./methods/DELETE');
 
+// TODO Remove old methods
 module.exports = stampit({
-  // TODO bind methods to this
   methods: {
     getAuthHeader: getAuthHeader,
-    buildUri: buildUri,
-    parseUri: parseUri,
-    fetchUri: fetchUri,
+    buildUrl: buildUrl,
+    buildUri: function buildUri() {
+      console.log('Warning: метод buildUri переименован в buildUrl.');
+      return this.buildUrl.apply(this, arguments);
+    },
+
+    parseUrl: parseUrl,
+    parseUri: function parseUri() {
+      console.log('Warning: метод parseUri переименован в parseUrl.');
+      return this.parseUrl.apply(this, arguments);
+    },
+
+    fetchUrl: fetchUrl,
+    fetchUri: function fetchUri() {
+      console.log('Warning: метод fetchUri переименован в fetchUrl.');
+      return this.fetchUrl.apply(this, arguments);
+    },
+
     GET: GET,
     POST: POST,
     PUT: PUT,
@@ -136,21 +151,25 @@ module.exports = stampit({
   };
 });
 
-},{"./have":3,"./methods/DELETE":6,"./methods/GET":7,"./methods/POST":8,"./methods/PUT":9,"./methods/buildUri":10,"./methods/fetchUri":11,"./methods/getAuthHeader":12,"./methods/parseUri":13,"./tools/getTimeString":16,"./tools/parseTimeString":21,"stampit":24}],5:[function(require,module,exports){
+},{"./have":3,"./methods/DELETE":6,"./methods/GET":7,"./methods/POST":8,"./methods/PUT":9,"./methods/buildUrl":10,"./methods/fetchUrl":11,"./methods/getAuthHeader":12,"./methods/parseUrl":13,"./tools/getTimeString":16,"./tools/parseTimeString":21,"stampit":24}],5:[function(require,module,exports){
 'use strict';
 
 const UUID_REGEX = /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/;
 
+const urlMatcher = url => typeof url === 'string' && url.substring(0, 8) === 'https://';
+const uuidMatcher = uuid => typeof uuid === 'string' && UUID_REGEX.test(uuid);
+
 // TODO Убедиться что указан необходимый минимум полей для сущностей
 module.exports = {
-  'entity': ent => ent && ent.id && UUID_REGEX.test(ent.id) && ent.meta && ent.meta.type,
-  'uuid': _uuid => typeof _uuid === 'string' && UUID_REGEX.test(_uuid),
+  'entity': ent => !!(ent && ent.id && uuidMatcher(ent.id) && ent.meta && ent.meta.type),
+  'uuid': uuidMatcher,
+  'url': urlMatcher,
   // 'uuid/uuid': id => {
   //   if (typeof id !== 'string') { return false }
   //   let [dicId, entId] = id.split('/')
   //   return UUID_REGEX.test(dicId) && UUID_REGEX.test(entId)
   // },
-  'Moysklad.Collection': col => col && col.meta && col.meta.href && col.meta.size
+  'Moysklad.Collection': col => !!(col && col.meta && col.meta.type && urlMatcher(col.meta.href) && typeof col.meta.size === 'number')
 };
 
 // TODO Проверка типов "Moysklad." на основании модели
@@ -172,9 +191,9 @@ module.exports = function DELETE() {
   let options = _have$strict$options === undefined ? {} : _have$strict$options;
 
 
-  let uri = this.buildUri(path);
+  let uri = this.buildUrl(path);
 
-  return this.fetchUri(uri, Object.assign({}, options, { method: 'DELETE' }));
+  return this.fetchUrl(uri, Object.assign({}, options, { method: 'DELETE' }));
 };
 
 },{"../have":3}],7:[function(require,module,exports){
@@ -195,9 +214,9 @@ module.exports = function GET() {
   let options = _have$strict$options === undefined ? {} : _have$strict$options;
 
 
-  let uri = this.buildUri(path, query);
+  let uri = this.buildUrl(path, query);
 
-  return this.fetchUri(uri, Object.assign({}, options, { method: 'GET' }));
+  return this.fetchUrl(uri, Object.assign({}, options, { method: 'GET' }));
 };
 
 },{"../have":3}],8:[function(require,module,exports){
@@ -225,11 +244,11 @@ module.exports = function POST() {
   let options = _have$strict$options === undefined ? {} : _have$strict$options;
 
 
-  let uri = this.buildUri(path, query);
+  let uri = this.buildUrl(path, query);
   let fetchOptions = { method: 'POST' };
   if (payload) fetchOptions.body = JSON.stringify(payload);
 
-  return this.fetchUri(uri, Object.assign({}, options, fetchOptions));
+  return this.fetchUrl(uri, Object.assign({}, options, fetchOptions));
 };
 
 },{"../have":3}],9:[function(require,module,exports){
@@ -244,7 +263,7 @@ module.exports = function PUT() {
 
   var _have$strict = have.strict(args, [{
     path: 'str or str arr',
-    payload: 'Object',
+    payload: 'opt Object',
     query: 'opt Object',
     options: 'opt Object'
   }, have.argumentsObject]);
@@ -256,29 +275,39 @@ module.exports = function PUT() {
   let options = _have$strict$options === undefined ? {} : _have$strict$options;
 
 
-  let uri = this.buildUri(path, query);
+  let uri = this.buildUrl(path, query);
   let fetchOptions = { method: 'PUT' };
   if (payload) fetchOptions.body = JSON.stringify(payload);
 
-  return this.fetchUri(uri, Object.assign({}, options, fetchOptions));
+  return this.fetchUrl(uri, Object.assign({}, options, fetchOptions));
 };
 
 },{"../have":3}],10:[function(require,module,exports){
 'use strict';
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 const have = require('../have');
 const buildQuery = require('../tools/buildQuery');
 const normalizeUrl = require('../tools/normalizeUrl');
 
-module.exports = function buildUri() {
+module.exports = function buildUrl() {
   for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
     args[_key] = arguments[_key];
   }
 
-  var _have$strict = have.strict(args, [{ path: 'str or str arr', query: 'opt Object' }, have.argumentsObject]);
+  var _have$strict = have.strict(args, [{ url: 'url', query: 'opt Object' }, { path: 'str or str arr', query: 'opt Object' }, have.argumentsObject]);
 
-  let path = _have$strict.path,
+  let url = _have$strict.url,
+      path = _have$strict.path,
       query = _have$strict.query;
+
+
+  if (url) {
+    let parsedUrl = this.parseUrl(url);
+    path = parsedUrl.path;
+    query = _extends({}, parsedUrl.query, query);
+  }
 
   var _getOptions = this.getOptions();
 
@@ -287,19 +316,19 @@ module.exports = function buildUri() {
       apiVersion = _getOptions.apiVersion;
 
 
-  let uri = [endpoint, api, apiVersion].concat(path).join('/');
-
-  uri = normalizeUrl(uri);
+  let resultUrl = normalizeUrl([endpoint, api, apiVersion].concat(path).join('/'));
 
   if (query) {
-    uri = `${uri}?${buildQuery(query)}`;
+    resultUrl = `${resultUrl}?${buildQuery(query)}`;
   }
 
-  return uri;
+  return resultUrl;
 };
 
 },{"../have":3,"../tools/buildQuery":15,"../tools/normalizeUrl":19}],11:[function(require,module,exports){
 'use strict';
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
@@ -311,14 +340,14 @@ module.exports = (() => {
   var _ref = _asyncToGenerator(function* (uri) {
     let options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-    have.strict(arguments, { uri: 'str', options: 'opt Object' });
+    have.strict(arguments, { url: 'url', options: 'opt Object' });
 
     // Специфические параметры (не передаются в опции fetch)
     let includeHeaders = false;
     let muteErrors = false;
     let emit = this.emitter ? this.emitter.emit.bind(this.emitter) : null;
 
-    let fetchOptions = Object.assign({}, {
+    let fetchOptions = _extends({
       headers: {
         'Content-Type': 'application/json'
       },
@@ -370,11 +399,11 @@ module.exports = (() => {
     return includeHeaders ? [response.headers, responseJson, response] : responseJson;
   });
 
-  function fetchUri(_x) {
+  function fetchUrl(_x2) {
     return _ref.apply(this, arguments);
   }
 
-  return fetchUri;
+  return fetchUrl;
 })();
 
 },{"../errorsHttp":1,"../getResponseError":2,"../have":3}],12:[function(require,module,exports){
@@ -417,8 +446,15 @@ const parseQueryString = require('../tools/parseQueryString');
 
 const PATH_QUERY_REGEX = /([^?]+)(?:\?(.+))?$/;
 
-module.exports = function parseUri(uri) {
-  have.strict(arguments, { uri: 'str' });
+module.exports = function parseUrl() {
+  for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+    args[_key] = arguments[_key];
+  }
+
+  var _have$strict = have.strict(arguments, [{ url: 'url' }, { path: 'str or str arr' }]);
+
+  let url = _have$strict.url,
+      path = _have$strict.path;
 
   var _getOptions = this.getOptions();
 
@@ -427,30 +463,46 @@ module.exports = function parseUri(uri) {
       apiVersion = _getOptions.apiVersion;
 
 
-  let baseUri = normalizeUrl([endpoint, api, apiVersion].join('/'));
-  if (uri.indexOf(baseUri) !== 0) {
-    throw new Error('Uri does not match client settings (endpoint, api, apiVersion)');
+  if (path instanceof Array) {
+    return {
+      endpoint: endpoint,
+      api: api,
+      apiVersion: apiVersion,
+      path: normalizeUrl(path.join('/')).split(/\//g),
+      query: {}
+    };
   }
 
-  let tail = uri.substring(baseUri.length + 1);
+  let pathAndQuery;
 
-  var _PATH_QUERY_REGEX$exe = PATH_QUERY_REGEX.exec(tail),
+  if (url) {
+    let baseUrl = normalizeUrl([endpoint, api, apiVersion].join('/'));
+    if (url.indexOf(baseUrl) !== 0) {
+      throw new Error('Url не соответствует указанной в настройках точке доступа ' + baseUrl);
+    }
+    pathAndQuery = url.substring(baseUrl.length + 1);
+  } else {
+    pathAndQuery = path;
+  }
+
+  var _PATH_QUERY_REGEX$exe = PATH_QUERY_REGEX.exec(pathAndQuery),
       _PATH_QUERY_REGEX$exe2 = _slicedToArray(_PATH_QUERY_REGEX$exe, 3);
 
   let pathStr = _PATH_QUERY_REGEX$exe2[1],
       queryStr = _PATH_QUERY_REGEX$exe2[2];
 
 
-  if (!pathStr) {
-    throw new Error('Empty uri path');
-  }
-
-  let path = normalizeUrl(pathStr).split(/\//g);
-  let query = parseQueryString(queryStr);
+  if (!pathStr) throw new Error('Не указан путь запроса');
 
   // TODO Parse query.filter
 
-  return { endpoint: endpoint, api: api, apiVersion: apiVersion, path: path, query: query };
+  return {
+    endpoint: endpoint,
+    api: api,
+    apiVersion: apiVersion,
+    path: normalizeUrl(pathStr).split(/\//g),
+    query: parseQueryString(queryStr) || {}
+  };
 };
 
 },{"../have":3,"../tools/normalizeUrl":19,"../tools/parseQueryString":20}],14:[function(require,module,exports){
@@ -1516,7 +1568,7 @@ function stampit() {
     var uniqueComposers = [];
     for (var i = 0; i < composerFunctions.length; i += 1) {
       var composer = composerFunctions[i];
-      if (isFunction(composer) && !uniqueComposers.includes(composer)) {
+      if (isFunction(composer) && uniqueComposers.indexOf(composer) < 0) {
         uniqueComposers.push(composer);
       }
     }

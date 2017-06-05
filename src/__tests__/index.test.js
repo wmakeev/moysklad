@@ -18,9 +18,9 @@ test('Moysklad instance methods', t => {
   t.ok(ms)
   t.equals(typeof ms.getOptions, 'function')
   t.equals(typeof ms.getAuthHeader, 'function')
-  t.equals(typeof ms.fetchUri, 'function')
-  t.equals(typeof ms.buildUri, 'function')
-  t.equals(typeof ms.parseUri, 'function')
+  t.equals(typeof ms.fetchUrl, 'function')
+  t.equals(typeof ms.buildUrl, 'function')
+  t.equals(typeof ms.parseUrl, 'function')
   t.equals(typeof ms.GET, 'function')
   t.equals(typeof ms.POST, 'function')
   t.equals(typeof ms.PUT, 'function')
@@ -45,60 +45,6 @@ test('Create Moysklad instance with options', t => {
   t.end()
 })
 
-test('Moysklad#buildUri method', t => {
-  let ms = Moysklad()
-
-  t.equals(ms.buildUri(['/path/', 'To//My', 'Res/']),
-    'https://online.moysklad.ru/api/remap/1.1/path/to/my/res')
-
-  t.equals(ms.buildUri(['path', 'to', 'res'], {
-    a: 1,
-    b: 'tow',
-    c: true,
-    d: [1, '2']
-  }), 'https://online.moysklad.ru/api/remap/1.1/path/to/res?a=1&b=tow&c=true&d=1&d=2')
-
-  t.equals(ms.buildUri(['path', 'to', 'res'], {
-    a: 1,
-    filter: { name: 'foo', value: { $eq: 'bar' } }
-  }), 'https://online.moysklad.ru/api/remap/1.1/path/to/res?a=1&filter=name%3Dfoo%3Bvalue%3Dbar')
-
-  t.end()
-})
-
-test('Moysklad#parseUri method', t => {
-  let ms = Moysklad()
-  let { endpoint, api, apiVersion } = ms.getOptions()
-
-  let common = { endpoint, api, apiVersion }
-
-  t.deepEqual(ms.parseUri('https://online.moysklad.ru/api/remap/1.1/path/to/my/res'),
-    Object.assign({}, common, {
-      path: ['path', 'to', 'my', 'res'],
-      query: undefined
-    }))
-
-  t.deepEqual(ms.parseUri('https://online.moysklad.ru/api/remap/1.1/path/to/my/res?a=1&b=2&' +
-    'a=one&c=&foo.bar=baz&filter=name%3Dfoo%3Bvalue%3Dbar'),
-    Object.assign({}, common, {
-      path: ['path', 'to', 'my', 'res'],
-      query: {
-        a: [1, 'one'],
-        b: 2,
-        c: null,
-        'foo.bar': 'baz',
-        filter: 'name=foo;value=bar'
-        // TODO Filter parsing
-        // filter: {
-        //   name: 'foo',
-        //   value: 'bar'
-        // }
-      }
-    }))
-
-  t.end()
-})
-
 test('Moysklad#GET method', async t => {
   let ms = Moysklad()
 
@@ -107,15 +53,15 @@ test('Moysklad#GET method', async t => {
   t.ok(counterparties.rows instanceof Array, 'should return counterparties collection')
 
   let [employee, group] = await Promise.all([
-    ms.fetchUri(counterparties.context.employee.meta.href),
-    ms.fetchUri(counterparties.rows[0].group.meta.href)
+    ms.fetchUrl(counterparties.context.employee.meta.href),
+    ms.fetchUrl(counterparties.rows[0].group.meta.href)
   ])
 
   t.equals(typeof employee, 'object',
-    'Moysklad#fetchUri method should fetch employee object by href')
+    'Moysklad#fetchUrl method should fetch employee object by href')
 
   t.equals(typeof group, 'object',
-    'Moysklad#fetchUri method should fetch group object by href')
+    'Moysklad#fetchUrl method should fetch group object by href')
 })
 
 test('Moysklad#POST/PUT/DELETE', async t => {

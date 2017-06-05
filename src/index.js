@@ -15,21 +15,33 @@ const have = require('./have')
 const getTimeString = require('./tools/getTimeString')
 const parseTimeString = require('./tools/parseTimeString')
 const getAuthHeader = require('./methods/getAuthHeader')
-const buildUri = require('./methods/buildUri')
-const parseUri = require('./methods/parseUri')
-const fetchUri = require('./methods/fetchUri')
+const buildUrl = require('./methods/buildUrl')
+const parseUrl = require('./methods/parseUrl')
+const fetchUrl = require('./methods/fetchUrl')
 const GET = require('./methods/GET')
 const POST = require('./methods/POST')
 const PUT = require('./methods/PUT')
 const DELETE = require('./methods/DELETE')
 
+// TODO Remove old methods
 module.exports = stampit({
-  // TODO bind methods to this
   methods: {
     getAuthHeader,
-    buildUri,
-    parseUri,
-    fetchUri,
+    buildUrl,
+    buildUri (...args) {
+      console.log('Warning: метод buildUri переименован в buildUrl.')
+      return this.buildUrl(...args)
+    },
+    parseUrl,
+    parseUri (...args) {
+      console.log('Warning: метод parseUri переименован в parseUrl.')
+      return this.parseUrl(...args)
+    },
+    fetchUrl,
+    fetchUri (...args) {
+      console.log('Warning: метод fetchUri переименован в fetchUrl.')
+      return this.fetchUrl(...args)
+    },
     GET,
     POST,
     PUT,

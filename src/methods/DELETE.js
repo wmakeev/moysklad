@@ -8,7 +8,7 @@ module.exports = function DELETE (...args) {
     have.argumentsObject
   ])
 
-  let uri = this.buildUri(path)
+  let uri = this.buildUrl(path)
 
-  return this.fetchUri(uri, Object.assign({}, options, { method: 'DELETE' }))
+  return this.fetchUrl(uri, Object.assign({}, options, { method: 'DELETE' }))
 }

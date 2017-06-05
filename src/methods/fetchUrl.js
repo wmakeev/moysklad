@@ -4,21 +4,22 @@ const have = require('../have')
 const getResponseError = require('../getResponseError')
 const errorsHttp = require('../errorsHttp')
 
-module.exports = async function fetchUri (uri, options = {}) {
-  have.strict(arguments, { uri: 'str', options: 'opt Object' })
+module.exports = async function fetchUrl (uri, options = {}) {
+  have.strict(arguments, { url: 'url', options: 'opt Object' })
 
   // Специфические параметры (не передаются в опции fetch)
   let includeHeaders = false
   let muteErrors = false
   let emit = this.emitter ? this.emitter.emit.bind(this.emitter) : null
 
-  let fetchOptions = Object.assign({}, {
+  let fetchOptions = {
     headers: {
       'Content-Type': 'application/json'
     },
     credentials: 'include',
-    redirect: 'manual'
-  }, options)
+    redirect: 'manual',
+    ...options
+  }
 
   if (fetchOptions.includeHeaders) {
     includeHeaders = true

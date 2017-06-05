@@ -6,16 +6,16 @@ module.exports = function PUT (...args) {
   let { path, payload, query, options = {} } = have.strict(args, [
     {
       path: 'str or str arr',
-      payload: 'Object',
+      payload: 'opt Object',
       query: 'opt Object',
       options: 'opt Object'
     },
     have.argumentsObject
   ])
 
-  let uri = this.buildUri(path, query)
+  let uri = this.buildUrl(path, query)
   let fetchOptions = { method: 'PUT' }
   if (payload) fetchOptions.body = JSON.stringify(payload)
 
-  return this.fetchUri(uri, Object.assign({}, options, fetchOptions))
+  return this.fetchUrl(uri, Object.assign({}, options, fetchOptions))
 }

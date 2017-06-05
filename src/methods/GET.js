@@ -8,7 +8,7 @@ module.exports = function GET (...args) {
     have.argumentsObject
   ])
 
-  let uri = this.buildUri(path, query)
+  let uri = this.buildUrl(path, query)
 
-  return this.fetchUri(uri, Object.assign({}, options, { method: 'GET' }))
+  return this.fetchUrl(uri, Object.assign({}, options, { method: 'GET' }))
 }

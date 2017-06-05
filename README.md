@@ -218,33 +218,49 @@ let updatedProduct = await moysklad.PUT(['entity/product', id], product)
 await moysklad.DELETE(['entity/product', product.id])
 ```
 
-### moysklad#buildUri
+### moysklad#buildUrl
 
 > Формирует url запроса
 
-- `moysklad.buildUri(path: String|Array<String>, query?: Object) : String`
+- `moysklad.buildUrl(url: String, query?: Object) : String`
 
-- `moysklad.buildUri(args: Object) : String`
+- `moysklad.buildUrl(path: String|Array<String>, query?: Object) : String`
+
+- `moysklad.buildUrl(args: Object) : String`
 
 **Параметры:**
 
-`path` - url ресурс (относительно текущего api)
+`url` - полный url (должен соответствовать настройкам)
+
+`path` - путь относительно текущего api
 
 `query` - url параметры запроса
 
 **Пример использования:**
 
 ```js
-let url = moysklad.buildUri('entity/customerorder', { expand: 'positions' })
+let url = moysklad.buildUrl('https://online.moysklad.ru/api/remap/1.1/entity/customerorder?expand=positions', { limit: 100 })
+
+assert.equal(url, 'https://online.moysklad.ru/api/remap/1.1/entity/customerorder?expand=positions&limit=100')
+```
+
+```js
+let url = moysklad.buildUrl('entity/customerorder', { expand: 'positions' })
 
 assert.equal(url, 'https://online.moysklad.ru/api/remap/1.1/entity/customerorder?expand=positions')
 ```
 
-### moysklad#parseUri
+```js
+let url = moysklad.buildUrl(['entity', 'customerorder'], { expand: 'positions' })
+
+assert.equal(url, 'https://online.moysklad.ru/api/remap/1.1/entity/customerorder?expand=positions')
+```
+
+### moysklad#parseUrl
 
 > Разбор uri на составные компоненты
 
-- `moysklad.parseUri(uri: String) : Object`
+- `moysklad.parseUrl(uri: String) : Object`
 
 **Параметры:**
 
@@ -253,9 +269,12 @@ assert.equal(url, 'https://online.moysklad.ru/api/remap/1.1/entity/customerorder
 **Пример использования:**
 
 ```js
-let parsedUri = moysklad.parseUri('https://online.moysklad.ru/api/remap/1.1/entity/customerorder?expand=positions')
+let parsedUri = moysklad.parseUrl('https://online.moysklad.ru/api/remap/1.1/entity/customerorder?expand=positions')
 
 assert.deepEqual(parsedUri, {
+  endpoint: 'https://online.moysklad.ru/api',
+  api: 'remap'
+  apiVersion: '1.1',
   path: ['entity', 'customerorder'],
   query: {
     expand: 'positions'
@@ -263,15 +282,15 @@ assert.deepEqual(parsedUri, {
 })
 ```
 
-### moysklad#fetchUri
+### moysklad#fetchUrl
 
 > Выполнить запрос по указанному uri
 
-- `moysklad.fetchUri(uri: String, options?: Object) : Promise`
+- `moysklad.fetchUrl(url: String, options?: Object) : Promise`
 
 **Параметры:**
 
-`uri` - uri ресурс
+`url` - url ресурса
 
 `options` - опции запроса
 
@@ -319,7 +338,7 @@ assert.equal(response.status, 307)
 **Пример использования:**
 
 ```js
-let order = await moysklad.fetchUri('https://online.moysklad.ru/api/remap/1.1/entity/customerorder/eb7bcc22-ae8d-11e3-9e32-002590a28eca')
+let order = await moysklad.fetchUrl('https://online.moysklad.ru/api/remap/1.1/entity/customerorder/eb7bcc22-ae8d-11e3-9e32-002590a28eca')
 ```
 
 ### События

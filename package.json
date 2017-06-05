@@ -71,7 +71,7 @@
     "eslint-plugin-standard": "^3.0.1",
     "isomorphic-fetch": "^2.2.1",
     "node-fetch": "^1.6.3",
-    "nyc": "^11.2.0",
+    "nyc": "^11.0.2",
     "tap-spec": "^4.1.1",
     "walkdir": "0.0.11"
   },

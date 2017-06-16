@@ -9,7 +9,9 @@ function createError (responseError, errors) {
 }
 
 module.exports = function getResponseError (resp) {
-  if (resp.errors) {
+  if (!resp) {
+    return null
+  } else if (resp.errors) {
     return createError(resp.errors[0], resp.errors)
   } else if (resp.error) {
     return createError(resp)

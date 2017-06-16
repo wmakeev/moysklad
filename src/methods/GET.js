@@ -10,5 +10,5 @@ module.exports = function GET (...args) {
 
   let uri = this.buildUrl(path, query)
 
-  return this.fetchUrl(uri, Object.assign({}, options, { method: 'GET' }))
+  return this.fetchUrl(uri, { ...options, method: 'GET' })
 }

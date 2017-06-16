@@ -18,5 +18,5 @@ module.exports = function POST (...args) {
   let fetchOptions = { method: 'POST' }
   if (payload) fetchOptions.body = JSON.stringify(payload)
 
-  return this.fetchUrl(uri, Object.assign({}, options, fetchOptions))
+  return this.fetchUrl(uri, { ...options, ...fetchOptions })
 }

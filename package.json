@@ -1,6 +1,6 @@
 {
   "name": "moysklad",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Библиотека для работы с API сервиса МойСклад",
   "main": "index.js",
   "files": [
@@ -47,6 +47,7 @@
   "dependencies": {
     "@wmakeev/base64encode": "^1.0.0",
     "have2": "1.0.0-beta.1",
+    "lodash.defaultsdeep": "^4.6.0",
     "stampit": "^3.1.3"
   },
   "devDependencies": {
@@ -70,7 +71,7 @@
     "eslint-plugin-promise": "^3.5.0",
     "eslint-plugin-standard": "^3.0.1",
     "isomorphic-fetch": "^2.2.1",
-    "node-fetch": "^1.6.3",
+    "node-fetch": "^1.7.1",
     "nyc": "^11.0.2",
     "tap-spec": "^4.1.1",
     "walkdir": "0.0.11"

@@ -202,15 +202,17 @@ let updatedProduct = await moysklad.PUT(['entity/product', id], product)
 
 > DELETE запрос
 
-- `moysklad.DELETE(path: String|Array<String>, options?: Object) : Promise`
+- `moysklad.DELETE(path: String|Array<String>, options?: Object) : Promise<Response>`
 
-- `moysklad.DELETE(args: Object) : Promise`
+- `moysklad.DELETE(args: Object) : Promise<Response>`
 
 **Параметры:**
 
 `path` - url ресурс (относительно текущего api)
 
 `options` - опции запроса
+
+Метод `DELETE` возвращает объект [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response) текущего запроса.
 
 **Пример использования:**
 
@@ -302,8 +304,9 @@ assert.deepEqual(parsedUri, {
 
 Свойство | Тип | Описание
 ---------|-----|---------
-`includeHeaders` | `boolean` | Если `true`, то метод вернет результат ввиде массива `[headers, body, response]`
+`rawResponse` | `boolean` | Если `true`, то метод вернет результат ввиде объекта [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response)
 `muteErrors` | `boolean` | Если `true`, то все ошибки будут проигнорированы (метод не будет генерировать ошибку если код ответа сервера не в диапазоне 200-299 и/или тело ответа содержит описание ошибки МойСклад.
+`millisecond` | `boolean` | Если `true`, то включает в запрос заголовок `X-Lognex-Format-Millisecond` со значением `true` (все даты объекта будут возвращены с учетом миллисекунд).
 
 Пример формирования заполненного шаблона печатной формы и получение ссылки для загрузки:
 
@@ -322,17 +325,16 @@ let body = {
   extension: 'pdf'
 }
 
-let [headers, result, response] = await ms
+let { headers, status } = await ms
   .POST('entity/demand/773e16c5-ef53-11e6-7a69-9711001669c5/export/', body, null, {
-    includeHeaders: true, // включить в ответ заголовки
-    muteErrors: true      // игнорировать ошибки
+    rawResponse: true, // вернуть результат запроса без предварительного разбора
+    muteErrors: true   // не выводить ошибку, если код ответа сервера не в диапазоне 200-299
   })
 
-let formUrl = headers.get('location')
+assert.equal(status, 307)
 
-assert.true(/https:\/\/120708.selcdn.ru\/prod-files/.test(formUrl))
-assert.equal(result, undefined)
-assert.equal(response.status, 307)
+let location = headers.get('location')
+assert.true(/https:\/\/120708.selcdn.ru\/prod-files/.test(location))
 ```
 
 **Пример использования:**
@@ -345,11 +347,11 @@ let order = await moysklad.fetchUrl('https://online.moysklad.ru/api/remap/1.1/en
 
 > Описание
 
-#### `request:start`
+#### `request`
 
 ``` { uri, options } ```
 
-#### `response:head`
+#### `response`
 
 ``` { uri, options, response } ```
 

@@ -1,7 +1,3 @@
 # TODO
-- [ ] Поддержка заголовка `X-Lognex-Format-Millisecond`
-- [ ] Поддержка заголовка `Lognex-Pretty-Print-JSON`
 
-# Примечания
-
-
+- Поддержка операторов фильтра `~`, `~=`, `=~` ([Фильтрация выборки с помощью параметра filter](https://online.moysklad.ru/api/remap/1.1/doc/#header-фильтрация-выборки-с-помощью-параметра-filter))

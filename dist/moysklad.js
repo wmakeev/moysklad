@@ -642,6 +642,7 @@ module.exports = function buildFilter(filter) {
 
       case typeof value === 'string':
       case typeof value === 'number':
+      case typeof value === 'boolean':
         return [key, operator, value];
 
       default:

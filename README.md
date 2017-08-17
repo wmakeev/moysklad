@@ -304,7 +304,7 @@ assert.deepEqual(parsedUri, {
 
 Свойство | Тип | Описание
 ---------|-----|---------
-`rawResponse` | `boolean` | Если `true`, то метод вернет результат ввиде объекта [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response)
+`rawResponse` | `boolean` | Если `true`, то метод вернет результат в виде объекта [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response)
 `muteErrors` | `boolean` | Если `true`, то все ошибки будут проигнорированы (метод не будет генерировать ошибку если код ответа сервера не в диапазоне 200-299 и/или тело ответа содержит описание ошибки МойСклад.
 `millisecond` | `boolean` | Если `true`, то включает в запрос заголовок `X-Lognex-Format-Millisecond` со значением `true` (все даты объекта будут возвращены с учетом миллисекунд).
 

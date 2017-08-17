@@ -93,4 +93,3 @@ module.exports = stampit({
       return _options
     }
   })
-

@@ -87,8 +87,7 @@ test('Response with millisecond option', t => {
 
   return ms.GET('entity/product/0010fe40-307d-11e5-7a07-673d0013045f',
     { limit: 1 }, { millisecond: true })
-      .then(async res => {
-        t.equal(parseTimeString(res.updated).getMilliseconds(), 216)
-      })
+    .then(async res => {
+      t.equal(parseTimeString(res.updated).getMilliseconds(), 216)
+    })
 })
-

@@ -19,4 +19,3 @@ module.exports = function getResponseError (resp) {
     return null
   }
 }
-

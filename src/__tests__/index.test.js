@@ -119,4 +119,3 @@ test('Moysklad#POST/PUT/DELETE', async t => {
 
   await t.shouldFail((() => ms.GET(['entity/product', newProduct.id]))(), /не найден/i)
 })
-

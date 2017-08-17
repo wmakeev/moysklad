@@ -148,4 +148,3 @@ module.exports = function buildFilter (filter) {
     })
     .join(';')
 }
-

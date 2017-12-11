@@ -27,7 +27,7 @@ test('buildFilter with simple filter', t => {
 test('buildFilter with simple deep and many condition filter', t => {
   let query = {
     name: 'foo',
-    value: 3,
+    value: 0,
     moment: new Date('2017-01-09T19:15:06.556Z'),
     'deep.one': 5,
     deep: {
@@ -37,7 +37,7 @@ test('buildFilter with simple deep and many condition filter', t => {
   }
 
   t.deepEqual(buildFilter(query),
-    'deep.one=5;deep.tow=false;many=1;many=baz;moment=2017-01-09 22:15:06;name=foo;value=3')
+    'deep.one=5;deep.tow=false;many=1;many=baz;moment=2017-01-09 22:15:06;name=foo;value=0')
 
   t.end()
 })
@@ -67,13 +67,13 @@ test('buildFilter with mogo query comparison selectors', t => {
     },
     notMany: {
       $nin: [3, 6],
-      $gt: 5
+      $gt: 0
     }
   }
 
   t.deepEqual(buildFilter(query),
     'deep.tow!=bar;many!=;many=1;many=baz;moment>=2017-01-09 22:15:06;name=foo;notMany!=3;' +
-    'notMany!=6;notMany>5;num<10;num>=5;value>5')
+    'notMany!=6;notMany>0;num<10;num>=5;value>5')
 
   t.end()
 })

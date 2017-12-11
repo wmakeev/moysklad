@@ -13,8 +13,8 @@ test('Moysklad#buildUrl method', t => {
     a: 1,
     b: 'tow',
     c: true,
-    d: [1, '2']
-  }), 'https://online.moysklad.ru/api/remap/1.1/path/to/res?a=1&b=tow&c=true&d=1&d=2')
+    d: [0, '2']
+  }), 'https://online.moysklad.ru/api/remap/1.1/path/to/res?a=1&b=tow&c=true&d=0&d=2')
 
   t.equals(ms.buildUrl(['path', 'to', 'res'], {
     a: 1,
@@ -34,6 +34,18 @@ test('Moysklad#buildUrl method', t => {
     }),
     'https://online.moysklad.ru/api/remap/1.1/entity/purchaseorder' +
       '/191ebffa-45df-11e6-7a69-93a7000513f8/positions?expand=agent&limit=10&offset=100')
+
+  t.equals(
+    ms.buildUrl('https://online.moysklad.ru/api/remap/1.1/entity/purchaseorder' +
+      '/191ebffa-45df-11e6-7a69-93a7000513f8/positions', null),
+    'https://online.moysklad.ru/api/remap/1.1/entity/purchaseorder' +
+      '/191ebffa-45df-11e6-7a69-93a7000513f8/positions')
+
+  t.equals(
+    ms.buildUrl('https://online.moysklad.ru/api/remap/1.1/entity/purchaseorder' +
+      '/191ebffa-45df-11e6-7a69-93a7000513f8/positions', {}),
+    'https://online.moysklad.ru/api/remap/1.1/entity/purchaseorder' +
+      '/191ebffa-45df-11e6-7a69-93a7000513f8/positions')
 
   t.end()
 })

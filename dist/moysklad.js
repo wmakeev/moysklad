@@ -309,7 +309,8 @@ module.exports = function buildUrl() {
   let resultUrl = normalizeUrl([endpoint, api, apiVersion].concat(path).join('/'));
 
   if (query) {
-    resultUrl = `${resultUrl}?${buildQuery(query)}`;
+    let queryString = buildQuery(query);
+    resultUrl = resultUrl + (queryString ? `?${queryString}` : '');
   }
 
   return resultUrl;

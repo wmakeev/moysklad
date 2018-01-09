@@ -16,7 +16,7 @@ test('PUT error', t => {
   })
 })
 
-test.only('POST error', t => {
+test('POST error', t => {
   t.plan(2)
 
   const ms = Moysklad()

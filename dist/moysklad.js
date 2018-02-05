@@ -712,7 +712,7 @@ const MSK_TIMEZONE_OFFSET = 180 * 60 * 1000;
 module.exports = function getTimeString(date, includeMs) {
   let mskTime = new Date(+date + MSK_TIMEZONE_OFFSET);
 
-  return mskTime.toJSON().replace('T', ' ').replace(includeMs ? /Z$/ : /\.\d{3}Z$/, '');
+  return mskTime.toJSON().replace('T', ' ').replace(includeMs ? /Z$/ : /(\.\d{3})?Z$/, '');
 };
 
 },{}],16:[function(require,module,exports){

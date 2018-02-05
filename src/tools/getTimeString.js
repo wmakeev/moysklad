@@ -13,5 +13,5 @@ module.exports = function getTimeString (date, includeMs) {
 
   return mskTime.toJSON()
     .replace('T', ' ')
-    .replace(includeMs ? /Z$/ : /\.\d{3}Z$/, '')
+    .replace(includeMs ? /Z$/ : /(\.\d{3})?Z$/, '')
 }

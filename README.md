@@ -67,16 +67,22 @@ const Moysklad = require('moysklad')
 
 const ms = new Moysklad({ login, password })
 
-ms.GET('entity/counterparty', {
-  limit: 10,
+ms.GET('entity/customerorder', {
   filter: {
-    name: 'ООО "Ромашка"'
-  }
+    applicable: true,
+    sum: {
+      $gt: 1000000,
+      $lt: 2000000
+    }
+  },
+  limit: 10,
+  order: 'moment,desc',
+  expand: 'agent'
 }).then(({ meta, rows }) => {
-  console.log('Всего контрагентов -', meta.size)
-  console.log(`Первые ${meta.limit}:`)
-  rows.forEach((row, index) => {
-    console.log(`${index}. ${row.name}`)
+  console.log(`Последние ${meta.limit} из ${meta.size} проведенных заказов ` +
+    `на сумму от 10000 до 20000 руб`)
+  rows.forEach(row => {
+    console.log(`${row.name} ${row.agent.name} ${row.sum / 100}`)
   })
 })
 ```

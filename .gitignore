@@ -13,6 +13,7 @@ __old
 # Dependency directories
 node_modules
 typings
+package-lock.json
 
 # Local dependency directory
 !src/node_modules

@@ -71,7 +71,7 @@ test('Response with rawResponse and muteErrors options', async t => {
       muteErrors: true
     })
 
-  t.equal(code, 307, 'response.status should to be 307')
+  t.equal(code, 303, 'response.status should to be 303')
 
   t.ok(headers.get, 'headers should have get method')
   t.ok(/vensi_tov_check-NA-dmd-09995.pdf/.test(headers.get('location')),

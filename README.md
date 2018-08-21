@@ -4,14 +4,13 @@ moysklad
 [![npm](https://img.shields.io/npm/v/moysklad.svg?maxAge=1800&style=flat-square)](https://www.npmjs.com/package/moysklad)
 [![Travis](https://img.shields.io/travis/wmakeev/moysklad.svg?maxAge=1800&style=flat-square)](https://travis-ci.org/wmakeev/moysklad)
 [![Coveralls](https://img.shields.io/coveralls/wmakeev/moysklad.svg?maxAge=1800&style=flat-square)](https://coveralls.io/github/wmakeev/moysklad)
-[![bitHound Dependencies](https://img.shields.io/bithound/dependencies/github/wmakeev/moysklad.svg?maxAge=1800&style=flat-square)](https://www.bithound.io/github/wmakeev/moysklad/master/dependencies/npm)
-[![bitHound DevDependencies](https://img.shields.io/bithound/devDependencies/github/wmakeev/moysklad.svg?maxAge=1800&style=flat-square)](https://www.bithound.io/github/wmakeev/moysklad/master/dependencies/npm)
-[![bitHound](https://img.shields.io/bithound/code/github/wmakeev/moysklad.svg?maxAge=1800&style=flat-square)](https://www.bithound.io/github/wmakeev/moysklad)
+[![Code Climate](https://img.shields.io/codeclimate/maintainability-percentage/wmakeev/moysklad.svg?style=flat-square)](https://codeclimate.com/github/wmakeev/moysklad/maintainability)
+[![Code Climate](https://img.shields.io/codeclimate/tech-debt/wmakeev/moysklad.svg?style=flat-square)](https://codeclimate.com/github/wmakeev/moysklad/maintainability)
 [![JavaScript Style Guide](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square)](http://standardjs.com/)
 
 > Библиотека для взаимодействия с JSON API сервиса МойСклад для node.js и браузера.
 
-> **ВНИМАНИЕ!** Библиотека не готова для использования. Идет активная разработка и тестирование. Документация не полная и будет дополняться.
+> **ВНИМАНИЕ!** Библиотека находится в стадии разработки. Не весь код протестирован. Документация неполная и будет дополняться. API к релизной версии будет немного изменен.
 
 ## Особенности
 
@@ -91,6 +90,39 @@ ms.GET('entity/customerorder', {
 
 Библиотеку можно расширять дополнительными возможностями, подключая [внешние модули и расширения](https://github.com/wmakeev/moysklad-tools).
 
+## Фильтрация
+
+Для построения фильтра можно использовать селекторы в стиле Mongo
+
+Селектор | Фильтр МойСклад | Описание
+---------|-----------------|---------
+`key: { $eq: value }` | `key=value` | равно
+`key: { $ne: value }` | `key!=value` | не равно
+`key: { $gt: value }` | `key>value` | больше
+`key: { $gte: value }` | `key>=value` | больше или равно
+`key: { $lt: value }` | `key<value` | меньше
+`key: { $lte: value }` | `key<=value` | меньше или равно
+`key: { $st: value }` | `key~=value` | начинается со строки
+`key: { $et: value }` | `key=~value` | заканчивается строкой
+`key: { $contains: value }` | `key~value` | содержит строку
+`key: { $in: [..] }` или `key: [..]`| `key=value1;key=value2;...` | содержит
+`key: { $nin: [..] }` | `key!=value1;key!=value2;...` | не содержит
+`key: { $exists: true }` | `key!=` | наличие значения (не null)
+`key: { $exists: false }` | `key=` | пустое значение (null)
+`key: { $and: [{..}, ..] }` |  | объединение условий
+`key: { $not: {..} }` |  | отрицание условия
+
+На один ключ можно использовать несколько селекторов
+
+```js
+let filter = {
+  key: {
+    $eq: 'value',
+    $exists: true
+  }
+}
+```
+
 ## API
 
 ### Moysklad.getTimeString
@@ -132,7 +164,7 @@ let parsedDate = Moysklad.parseTimeString('2017-04-08 13:33:00.123')
 assert.equal(parsedDate.toISOString(), '2017-04-08T10:33:00.123Z')
 ```
 
-### moysklad#GET
+### GET
 
 > GET запрос
 
@@ -156,7 +188,7 @@ let productsCollection = await moysklad.GET('entity/product', { limit: 50 })
 let order = await moysklad.GET(['entity', 'customerorder', orderId], { expand: 'positions' })
 ```
 
-### moysklad#POST
+### POST
 
 > POST запрос
 
@@ -180,7 +212,7 @@ let order = await moysklad.GET(['entity', 'customerorder', orderId], { expand: '
 let newProduct = await moysklad.POST('entity/product', { name: 'Новый товар' })
 ```
 
-### moysklad#PUT
+### PUT
 
 > PUT запрос
 
@@ -204,7 +236,7 @@ let newProduct = await moysklad.POST('entity/product', { name: 'Новый то�
 let updatedProduct = await moysklad.PUT(['entity/product', id], product)
 ```
 
-### moysklad#DELETE
+### DELETE
 
 > DELETE запрос
 
@@ -226,7 +258,7 @@ let updatedProduct = await moysklad.PUT(['entity/product', id], product)
 await moysklad.DELETE(['entity/product', product.id])
 ```
 
-### moysklad#buildUrl
+### buildUrl
 
 > Формирует url запроса
 
@@ -264,7 +296,7 @@ let url = moysklad.buildUrl(['entity', 'customerorder'], { expand: 'positions' }
 assert.equal(url, 'https://online.moysklad.ru/api/remap/1.1/entity/customerorder?expand=positions')
 ```
 
-### moysklad#parseUrl
+### parseUrl
 
 > Разбор uri на составные компоненты
 
@@ -290,7 +322,7 @@ assert.deepEqual(parsedUri, {
 })
 ```
 
-### moysklad#fetchUrl
+### fetchUrl
 
 > Выполнить запрос по указанному uri
 
@@ -311,7 +343,7 @@ assert.deepEqual(parsedUri, {
 Свойство | Тип | Описание
 ---------|-----|---------
 `rawResponse` | `boolean` | Если `true`, то метод вернет результат в виде объекта [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response)
-`muteErrors` | `boolean` | Если `true`, то все ошибки будут проигнорированы (метод не будет генерировать ошибку если код ответа сервера не в диапазоне 200-299 и/или тело ответа содержит описание ошибки МойСклад.
+`muteErrors` | `boolean` | Если `true`, то все ошибки будут проигнорированы (метод не будет генерировать ошибку если код ответа сервера не в диапазоне 200-299 и/или тело ответа содержит описание ошибки МойСклад).
 `millisecond` | `boolean` | Если `true`, то включает в запрос заголовок `X-Lognex-Format-Millisecond` со значением `true` (все даты объекта будут возвращены с учетом миллисекунд).
 
 Пример формирования заполненного шаблона печатной формы и получение ссылки для загрузки:
@@ -334,7 +366,7 @@ let body = {
 let { headers, status } = await ms
   .POST('entity/demand/773e16c5-ef53-11e6-7a69-9711001669c5/export/', body, null, {
     rawResponse: true, // вернуть результат запроса без предварительного разбора
-    muteErrors: true   // не выводить ошибку, если код ответа сервера не в диапазоне 200-299
+    muteErrors: true   // не обрабатывать ошибки, если код ответа сервера не в диапазоне 200-299
   })
 
 assert.equal(status, 307)
@@ -366,3 +398,29 @@ let order = await moysklad.fetchUrl('https://online.moysklad.ru/api/remap/1.1/en
 ``` { uri, options, response, body } ```
 
 #### `error`
+
+## Планируемые изменения в API к версии 1.0
+
+- Метод `fetchUrl` и все остальные завязанные на него методы (`GET`, `POST`), будут возвращать специальный объект с набором методов для более тонкого управления запросом. При этом запрос к сервису будет выполнен только после вызова одного из определенных методов.
+
+  ```js
+  // получение объекта запроса (запрос к сервису еще не выполнен)
+  let requestObj = moysklad.GET(['entity/customerorder', someId])
+
+  // установка заголовка (возвращается новый объекта запроса)
+  requestObj = requestObj.setHeader('X-Lognex-Format-Millisecond', true)
+
+  // получение данных по текущему запросу (метод может быть вызван повторно с тем же результатом)
+  let order = await requestObj.data()
+  ```
+
+- Часть функционала библиотеки будет выненеса в отдельные модули-плагины и дальнейшее добавление новых фич будет происходить преимущественно путем написания соответствующих плагинов.
+
+## История изменений
+
+### 0.4.0
+
+- ⚠️ Исправлена важная ошибка - селектор `$lte` работал не верно (обрабатывался как `$gte`)
+- 🔧 Исправления в работе селектора `$not`
+- 🔄 Обновлены зависимости и убран файл package-lock.json
+- ✏️ Дополнена документация

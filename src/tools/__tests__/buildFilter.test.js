@@ -18,8 +18,13 @@ test('buildFilter with simple filter', t => {
     other: true
   }
 
-  t.deepEqual(buildFilter(query),
-    'moment=2017-01-09 22:15:06;name=foo;other=true;some=;value=3')
+  t.deepEqual(buildFilter(query), [
+    'moment=2017-01-09 22:15:06',
+    'name=foo',
+    'other=true',
+    'some=',
+    'value=3'
+  ].join(';'))
 
   t.end()
 })
@@ -36,8 +41,15 @@ test('buildFilter with simple deep and many condition filter', t => {
     many: [1, 'baz']
   }
 
-  t.deepEqual(buildFilter(query),
-    'deep.one=5;deep.tow=false;many=1;many=baz;moment=2017-01-09 22:15:06;name=foo;value=0')
+  t.deepEqual(buildFilter(query), [
+    'deep.one=5',
+    'deep.tow=false',
+    'many=1',
+    'many=baz',
+    'moment=2017-01-09 22:15:06',
+    'name=foo',
+    'value=0'
+  ].join(';'))
 
   t.end()
 })
@@ -46,6 +58,15 @@ test('buildFilter with mogo query comparison selectors', t => {
   let query = {
     name: {
       $eq: 'foo'
+    },
+    start: {
+      $st: 'prfx'
+    },
+    end: {
+      $et: 'psfx'
+    },
+    cont: {
+      $contains: 'str'
     },
     value: {
       $gt: 5
@@ -68,12 +89,30 @@ test('buildFilter with mogo query comparison selectors', t => {
     notMany: {
       $nin: [3, 6],
       $gt: 0
+    },
+    empty: {
+      $exists: false
     }
   }
 
-  t.deepEqual(buildFilter(query),
-    'deep.tow!=bar;many!=;many=1;many=baz;moment>=2017-01-09 22:15:06;name=foo;notMany!=3;' +
-    'notMany!=6;notMany>0;num<10;num>=5;value>5')
+  t.deepEqual(buildFilter(query), [
+    'cont~str',
+    'deep.tow!=bar',
+    'empty!=',
+    'end=~psfx',
+    'many!=',
+    'many=1',
+    'many=baz',
+    'moment<=2017-01-09 22:15:06',
+    'name=foo',
+    'notMany!=3',
+    'notMany!=6',
+    'notMany>0',
+    'num<10',
+    'num>=5',
+    'start~=prfx',
+    'value>5'
+  ].join(';'))
 
   t.end()
 })
@@ -91,11 +130,22 @@ test('buildFilter with mogo query logical selectors', t => {
         $eq: 10,
         $in: [5, 6]
       }
+    },
+    fantom: {
+      $not: {
+        $exists: true
+      }
     }
   }
 
-  t.deepEqual(buildFilter(query),
-    'name=bar;name=foo;value!=10;value!=5;value!=6;value=')
+  t.deepEqual(buildFilter(query), [
+    'fantom=',
+    'name=bar',
+    'name=foo',
+    'value!=10',
+    'value!=5',
+    'value!=6'
+  ].join(';'))
 
   t.end()
 })
@@ -103,35 +153,47 @@ test('buildFilter with mogo query logical selectors', t => {
 test('buildFilter errors', t => {
   t.throws(() => {
     buildFilter()
-  }, 'filter must to be an object')
+  }, /filter must to be an object/)
 
   t.throws(() => {
     buildFilter({ foo: undefined })
-  }, 'filter "foo" key value is undefined')
+  }, /filter "foo" key value is undefined/)
 
   t.throws(() => {
     buildFilter({ foo: Symbol('foo') })
-  }, 'filter "foo" key value is incorrect')
+  }, /filter "foo" key value is incorrect/)
 
   t.throws(() => {
     buildFilter({ foo: { $eq: { a: 1 } } })
-  }, '$eq: value must to be string, number, date or null')
+  }, /\$eq: value must to be string, number, date or null/)
 
   t.throws(() => {
     buildFilter({ foo: { $in: { a: 1 } } })
-  }, '$in: selector value must to be an array')
+  }, /\$in: selector value must to be an array/)
 
   t.throws(() => {
     buildFilter({ foo: { $and: { a: 1 } } })
-  }, '$and: selector value must to be an array')
+  }, /\$and: selector value must to be an array/)
 
   t.throws(() => {
     buildFilter({ foo: { $not: 3 } })
-  }, '$not: selector value must to be an object')
+  }, /\$not: selector value must to be an object/)
+
+  t.throws(() => {
+    buildFilter({ foo: { $not: { $st: 'start' } } })
+  }, /\$st not support negation/)
+
+  t.throws(() => {
+    buildFilter({ foo: { $not: { $et: 'start' } } })
+  }, /\$et not support negation/)
+
+  t.throws(() => {
+    buildFilter({ foo: { $not: { $contains: 'start' } } })
+  }, /\$contains not support negation/)
 
   t.throws(() => {
     buildFilter({ foo: { $exists: 'boo' } })
-  }, '$exists: elector value must to be boolean')
+  }, /\$exists: selector value must to be boolean/)
 
   t.end()
 })

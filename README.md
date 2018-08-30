@@ -64,7 +64,8 @@ const moysklad = Moysklad({ fetch: nodeFetch })
 ```js
 const Moysklad = require('moysklad')
 
-const ms = new Moysklad({ login, password })
+// Инициализировать экземпляр библиотеки можно без ключевого слова new
+const ms = Moysklad({ login, password })
 
 ms.GET('entity/customerorder', {
   filter: {
@@ -86,9 +87,22 @@ ms.GET('entity/customerorder', {
 })
 ```
 
-## Расширение
+## Параметры инициализации экземпляра
 
-Библиотеку можно расширять дополнительными возможностями, подключая [внешние модули и расширения](https://github.com/wmakeev/moysklad-tools).
+Параметр | Значение по умолчанию | Описание
+---------|--------------|----------
+`endpoint` | `https://online.moysklad.ru/api` | Точка досупа к API
+`api` | `remap` | Раздел API
+`apiVersion` | `1.1` | Версия API
+
+Пример использования:
+
+```js
+const Moysklad = require('moysklad')
+
+// Явное указание используемой версии API
+const moysklad = Moysklad({ apiVersion: '1.2' })
+```
 
 ## Фильтрация
 
@@ -121,6 +135,23 @@ let filter = {
     $exists: true
   }
 }
+```
+
+## Подключение расширений
+
+Библиотеку можно расширять дополнительными возможностями, подключая [внешние модули расширений](https://github.com/wmakeev/moysklad-tools).
+
+Пример подключения [расширения для очереди запросов](https://github.com/wmakeev/moysklad-tools/tree/master/packages/moysklad-extension-queue):
+
+```js
+const MoyskladCore = require('moysklad')
+const MoyskladQueueExtension = require('moysklad-extension-queue')
+
+const Moysklad = MoyskladCore.compose(MoyskladQueue)
+
+const moysklad = Moysklad({
+  queue: true // включение очереди запросов
+})
 ```
 
 ## API

@@ -98,7 +98,7 @@ test('buildFilter with mogo query comparison selectors', t => {
   t.deepEqual(buildFilter(query), [
     'cont~str',
     'deep.tow!=bar',
-    'empty!=',
+    'empty=',
     'end=~psfx',
     'many!=',
     'many=1',

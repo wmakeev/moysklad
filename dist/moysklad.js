@@ -523,7 +523,7 @@ const isSimpleValue = require('./isSimpleValue');
 
 let createValueSelector = selector => (path, value) => {
   if (!isSimpleValue(value)) {
-    throw new Error(`value must to be string, number, date or null`);
+    throw new TypeError(`value must to be string, number, date or null`);
   }
   return [[path, selector, value]];
 };
@@ -532,7 +532,7 @@ let createCollectionSelector = selector => {
   const sel = createValueSelector(selector);
   return (path, value) => {
     if (!(value instanceof Array)) {
-      throw new Error(`selector value must to be an array`);
+      throw new TypeError(`selector value must to be an array`);
     }
     return value.reduce((res, v) => res.concat(sel(path, v)), []);
   };
@@ -588,13 +588,13 @@ function getFilterParts(path, value) {
     // Mongo logical selectors
     case curKey === '$and':
       if (!(value instanceof Array)) {
-        throw new Error(`$and: selector value must to be an array`);
+        throw new TypeError(`$and: selector value must to be an array`);
       }
       return value.reduce((res, val) => res.concat(getFilterParts(path.slice(0, -1), val)), []);
 
     case curKey === '$not':
       if (!isPlainObject(value)) {
-        throw new Error(`$not: selector value must to be an object`);
+        throw new TypeError(`$not: selector value must to be an object`);
       }
       let headPath = path.slice(0, -1);
       return getFilterParts(headPath, value).map(invertFilterPart);
@@ -602,7 +602,7 @@ function getFilterParts(path, value) {
 
     case curKey === '$exists':
       if (typeof value !== 'boolean') {
-        throw new Error(`$exists: selector value must to be boolean`);
+        throw new TypeError(`$exists: selector value must to be boolean`);
       }
       return [[path.slice(0, -1), value ? selectors.ne : selectors.eq, null]];
 
@@ -632,7 +632,7 @@ function getFilterParts(path, value) {
 
 module.exports = function buildFilter(filter) {
   if (!isPlainObject(filter)) {
-    throw new Error('filter must to be an object');
+    throw new TypeError('filter must to be an object');
   }
 
   let filterParts = getFilterParts([], filter);
@@ -648,7 +648,7 @@ module.exports = function buildFilter(filter) {
     let value = part[2];
     switch (true) {
       case value === undefined:
-        throw new Error(`filter "${key}" key value is undefined`);
+        throw new TypeError(`filter "${key}" key value is undefined`);
 
       case value === null:
         return [key, operator, ''];
@@ -662,7 +662,7 @@ module.exports = function buildFilter(filter) {
         return [key, operator, value];
 
       default:
-        throw new Error(`filter "${key}" key value is incorrect`);
+        throw new TypeError(`filter "${key}" key value is incorrect`);
     }
   }).map(part => `${part[0]}${part[1]}${part[2]}`).sort((p1, p2) => {
     if (p1 > p2) {
@@ -681,22 +681,25 @@ module.exports = function buildFilter(filter) {
 const buildFilter = require('./buildFilter');
 const isPlainObject = require('./isPlainObject');
 
+const addQueryPart = (res, key) => val => {
+  if (val === null) {
+    res.push([key, '']);
+  } else if (val === undefined) {
+    return undefined;
+  } else if (['string', 'number', 'boolean'].indexOf(typeof val) === -1) {
+    throw new TypeError('url query key value must to be string, number, boolean, null or undefined');
+  } else {
+    res.push([key, encodeURIComponent(val)]);
+  }
+};
+
 module.exports = function buildQuery(query) {
   return Object.keys(query).reduce((res, key) => {
-    let addPart = val => {
-      if (['string', 'number', 'boolean'].indexOf(typeof val) === -1) {
-        throw new Error('url query key value must to be string, number or boolean');
-      }
-      res = res.concat([[key, encodeURIComponent(val)]]);
-    };
+    const addPart = addQueryPart(res, key);
 
     switch (true) {
       case key === 'filter':
-        if (isPlainObject(query.filter)) addPart(buildFilter(query.filter));else if (typeof query.filter === 'string') addPart(query.filter);else throw new Error('filter must to be string or object');
-        break;
-
-      case query[key] == null:
-        addPart('');
+        if (isPlainObject(query.filter)) addPart(buildFilter(query.filter));else if (typeof query.filter === 'string') addPart(query.filter);else throw new TypeError('query.filter must to be string or object');
         break;
 
       case query[key] instanceof Array:

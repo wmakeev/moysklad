@@ -10,7 +10,7 @@ test('buildFilter', t => {
 })
 
 test('buildFilter with simple filter', t => {
-  let query = {
+  let filter = {
     name: 'foo',
     value: 3,
     moment: new Date('2017-01-09T19:15:06.556Z'),
@@ -18,7 +18,7 @@ test('buildFilter with simple filter', t => {
     other: true
   }
 
-  t.deepEqual(buildFilter(query), [
+  t.deepEqual(buildFilter(filter), [
     'moment=2017-01-09 22:15:06',
     'name=foo',
     'other=true',
@@ -30,7 +30,7 @@ test('buildFilter with simple filter', t => {
 })
 
 test('buildFilter with simple deep and many condition filter', t => {
-  let query = {
+  let filter = {
     name: 'foo',
     value: 0,
     moment: new Date('2017-01-09T19:15:06.556Z'),
@@ -41,7 +41,7 @@ test('buildFilter with simple deep and many condition filter', t => {
     many: [1, 'baz']
   }
 
-  t.deepEqual(buildFilter(query), [
+  t.deepEqual(buildFilter(filter), [
     'deep.one=5',
     'deep.tow=false',
     'many=1',
@@ -55,7 +55,7 @@ test('buildFilter with simple deep and many condition filter', t => {
 })
 
 test('buildFilter with mogo query comparison selectors', t => {
-  let query = {
+  let filter = {
     name: {
       $eq: 'foo'
     },
@@ -95,7 +95,7 @@ test('buildFilter with mogo query comparison selectors', t => {
     }
   }
 
-  t.deepEqual(buildFilter(query), [
+  t.deepEqual(buildFilter(filter), [
     'cont~str',
     'deep.tow!=bar',
     'empty=',
@@ -118,7 +118,7 @@ test('buildFilter with mogo query comparison selectors', t => {
 })
 
 test('buildFilter with mogo query logical selectors', t => {
-  let query = {
+  let filter = {
     name: {
       $and: [
         { $eq: 'foo' },
@@ -138,7 +138,7 @@ test('buildFilter with mogo query logical selectors', t => {
     }
   }
 
-  t.deepEqual(buildFilter(query), [
+  t.deepEqual(buildFilter(filter), [
     'fantom=',
     'name=bar',
     'name=foo',
@@ -146,6 +146,20 @@ test('buildFilter with mogo query logical selectors', t => {
     'value!=5',
     'value!=6'
   ].join(';'))
+
+  t.end()
+})
+
+test('buildFilter with query selectors combined with sub fields', t => {
+  let filter = {
+    id: 5,
+    name: {
+      $eq: 'foo',
+      sub: 'bar'
+    }
+  }
+
+  t.deepEqual(buildFilter(filter), 'id=5;name.sub=bar;name=foo')
 
   t.end()
 })

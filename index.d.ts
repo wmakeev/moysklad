@@ -179,7 +179,7 @@ declare namespace Moysklad {
      *
      * по умолчанию используется глобальный fetch (если глобальный fetch не найден, то будет выброшена ошибка)
      */
-    fetch?: Function
+    fetch?: any
 
     /**
      * Точка досупа к API

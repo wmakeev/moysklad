@@ -11,12 +11,10 @@
       "program": "${file}",
       "cwd": "${workspaceRoot}",
       "runtimeArgs": [
-        "--harmony",
-        "--require",
-        "dotenv/config",
-        "--require",
-        "isomorphic-fetch"
-      ]
+        "-r",
+        "dotenv/config"
+      ],
+      "internalConsoleOptions": "openOnSessionStart"
     },
     {
       "name": "index.test",
@@ -30,12 +28,10 @@
         "src"
       ],
       "runtimeArgs": [
-        "--harmony",
-        "--require",
-        "dotenv/config",
-        "--require",
-        "isomorphic-fetch"
-      ]
+        "-r",
+        "dotenv/config"
+      ],
+      "internalConsoleOptions": "openOnSessionStart"
     },
     {
       "name": "src/{some}.test",
@@ -45,12 +41,10 @@
       "program": "/Users/mvv/Documents/GitHub/moysklad/src/extensions/queue/__tests__/index.test.js",
       "cwd": "${workspaceRoot}",
       "runtimeArgs": [
-        "--harmony",
-        "--require",
-        "dotenv/config",
-        "--require",
-        "isomorphic-fetch"
-      ]
+        "-r",
+        "dotenv/config"
+      ],
+      "internalConsoleOptions": "openOnSessionStart"
     }
   ]
 }

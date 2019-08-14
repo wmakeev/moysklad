@@ -6,6 +6,8 @@ const test = require('blue-tape')
 const Moysklad = require('..')
 
 test('Moysklad#DELETE', async t => {
+  t.plan(4)
+
   const ms = Moysklad({ fetch })
 
   let internalorder
@@ -40,11 +42,29 @@ test('Moysklad#DELETE', async t => {
       ]
     }, { expand: 'positions' })
 
-    t.equal(internalorder.positions.rows.length, 2, 'should create order with 2 positions')
+    t.equal(internalorder.positions.rows.length, 2)
 
     await ms.POST(['entity/internalorder', internalorder.id, 'positions/delete'],
       internalorder.positions.rows.map(pos => ({ meta: pos.meta })))
   } finally {
-    if (internalorder) await ms.DELETE(internalorder.meta.href)
+    if (internalorder) {
+      let result = await ms.DELETE(internalorder.meta.href)
+      t.equal(result, undefined, 'should return undefined')
+
+      try {
+        await ms.DELETE(internalorder.meta.href)
+      } catch (err) {
+        t.ok(
+          err.message.includes('не найден'),
+          'should throw on deletion deleted entity'
+        )
+      }
+
+      result = await ms.DELETE(internalorder.meta.href, { muteErrors: true })
+      t.ok(
+        result.errors[0].error.includes('не найден'),
+        'should return error object on deletion deleted entity'
+      )
+    }
   }
 })

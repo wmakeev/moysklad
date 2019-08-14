@@ -10,5 +10,5 @@ module.exports = function DELETE (...args) {
 
   const uri = this.buildUrl(path)
 
-  return this.fetchUrl(uri, { ...options, method: 'DELETE', rawResponse: true })
+  return this.fetchUrl(uri, { ...options, method: 'DELETE' })
 }

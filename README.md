@@ -47,7 +47,7 @@ moysklad
     - [`error`](#error)
 - [Вероятные изменения API в следующих версиях](#вероятные-изменения-api-в-следующих-версиях)
 - [TODO](#todo)
-- [[История изменений](https://github.com/wmakeev/moysklad/blob/master/CHANGELOG.md)](#история-измененийhttpsgithubcomwmakeevmoyskladblobmasterchangelogmd)
+- [История изменений](#история-изменений)
 
 <!-- /TOC -->
 
@@ -602,4 +602,6 @@ const query = {
 
 Фичи, которые могут быть включены в следующие версии, описаны в [TODO.md](https://github.com/wmakeev/moysklad/blob/master/TODO.md)
 
-## [История изменений](https://github.com/wmakeev/moysklad/blob/master/CHANGELOG.md)
+## История изменений
+
+[CHANGELOG.md](https://github.com/wmakeev/moysklad/blob/master/CHANGELOG.md)

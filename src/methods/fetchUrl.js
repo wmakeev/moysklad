@@ -36,9 +36,19 @@ module.exports = async function fetchUrl (uri, options = {}) {
     muteErrors = true
     delete fetchOptions.muteErrors
   }
+
+  // X-Lognex
   if (fetchOptions.millisecond) {
     fetchOptions.headers['X-Lognex-Format-Millisecond'] = 'true'
     delete fetchOptions.millisecond
+  }
+  if (fetchOptions.precision) {
+    fetchOptions.headers['X-Lognex-Precision'] = 'true'
+    delete fetchOptions.precision
+  }
+  if (fetchOptions.webHookDisable) {
+    fetchOptions.headers['X-Lognex-WebHook-Disable'] = 'true'
+    delete fetchOptions.webHookDisable
   }
 
   let authHeader = this.getAuthHeader()

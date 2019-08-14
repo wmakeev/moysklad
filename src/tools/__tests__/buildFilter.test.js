@@ -154,12 +154,13 @@ test('buildFilter with query selectors combined with sub fields', t => {
   let filter = {
     id: 5,
     name: {
+      $gt: 15,
       $eq: 'foo',
       sub: 'bar'
     }
   }
 
-  t.deepEqual(buildFilter(filter), 'id=5;name.sub=bar;name=foo')
+  t.deepEqual(buildFilter(filter), 'id=5;name.sub=bar;name=foo;name>15')
 
   t.end()
 })

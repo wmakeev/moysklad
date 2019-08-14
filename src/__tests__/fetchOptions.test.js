@@ -79,6 +79,8 @@ test('Response with rawResponse and muteErrors options', async t => {
 })
 
 test('Response with millisecond option', t => {
+  t.plan(1)
+
   const ms = Moysklad({
     fetch: nodeFetch
   })
@@ -90,4 +92,42 @@ test('Response with millisecond option', t => {
     .then(async res => {
       t.equal(parseTimeString(res.updated).getMilliseconds(), 216)
     })
+})
+
+test('Request with precision option', t => {
+  t.plan(2)
+
+  const ms = Moysklad({
+    fetch: (url, options) => {
+      t.equal(options.headers['X-Lognex-Precision'], 'true',
+        'should add header')
+
+      t.notOk(options.precision,
+        'should remove option from fetch options')
+
+      throw new Error('stop')
+    }
+  })
+
+  ms.GET('entity/some', null, { precision: true })
+    .catch(() => { t.end() })
+})
+
+test('Request with webHookDisable option', t => {
+  t.plan(2)
+
+  const ms = Moysklad({
+    fetch: (url, options) => {
+      t.equal(options.headers['X-Lognex-WebHook-Disable'], 'true',
+        'should add header')
+
+      t.notOk(options.webHookDisable,
+        'should remove option from fetch options')
+
+      throw new Error('stop')
+    }
+  })
+
+  ms.GET('entity/some', null, { webHookDisable: true })
+    .catch(() => { t.end() })
 })

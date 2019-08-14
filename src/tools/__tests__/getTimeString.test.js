@@ -10,8 +10,8 @@ test('getTimeString', t => {
 })
 
 test('getTimeString', t => {
-  let date1 = new Date('2017-02-01T07:10:11Z')
-  let date2 = new Date('2017-02-01T07:10:11.123Z')
+  const date1 = new Date('2017-02-01T07:10:11Z')
+  const date2 = new Date('2017-02-01T07:10:11.123Z')
 
   t.equals(getTimeString(date1), '2017-02-01 10:10:11',
     'should return time string')

@@ -7,9 +7,9 @@ const uuidMatcher = uuid => typeof uuid === 'string' && UUID_REGEX.test(uuid)
 
 // TODO Убедиться что указан необходимый минимум полей для сущностей
 module.exports = {
-  'entity': ent => !!(ent && ent.id && uuidMatcher(ent.id) && ent.meta && ent.meta.type),
-  'uuid': uuidMatcher,
-  'url': urlMatcher,
+  entity: ent => !!(ent && ent.id && uuidMatcher(ent.id) && ent.meta && ent.meta.type),
+  uuid: uuidMatcher,
+  url: urlMatcher,
   // 'uuid/uuid': id => {
   //   if (typeof id !== 'string') { return false }
   //   let [dicId, entId] = id.split('/')

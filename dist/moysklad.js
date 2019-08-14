@@ -1,838 +1,4 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.MoyskladCore = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
-'use strict';
-
-function createError(responseError, errors) {
-  let error = new Error(responseError.error);
-  if (responseError.code) {
-    error.code = responseError.code;
-  }
-  if (responseError.moreInfo) {
-    error.moreInfo = responseError.moreInfo;
-  }
-  if (errors && errors.length > 1) {
-    error.errors = errors;
-  }
-  return error;
-}
-
-module.exports = function getResponseError(resp) {
-  if (!resp) {
-    return null;
-  } else if (resp.errors) {
-    return createError(resp.errors[0], resp.errors);
-  } else if (resp instanceof Array) {
-    // Учитывается только первая ошибка
-    let errorItem = resp.find(item => item.errors);
-    return errorItem ? createError(errorItem.errors[0], errorItem.errors) : null;
-  } else {
-    return null;
-  }
-};
-
-},{}],2:[function(require,module,exports){
-'use strict';
-
-const have = require('have2');
-const matchers = require('./matchers');
-
-module.exports = have.with(matchers);
-
-},{"./matchers":4,"have2":22}],3:[function(require,module,exports){
-/*
- * moysklad
- * Клиент для JSON API МойСклад
- *
- * Copyright (c) 2017, Vitaliy V. Makeev
- * Licensed under MIT.
- */
-
-'use strict';
-
-const stampit = require('stampit');
-const have = require('./have');
-
-// methods
-const getTimeString = require('./tools/getTimeString');
-const parseTimeString = require('./tools/parseTimeString');
-const getAuthHeader = require('./methods/getAuthHeader');
-const buildUrl = require('./methods/buildUrl');
-const parseUrl = require('./methods/parseUrl');
-const fetchUrl = require('./methods/fetchUrl');
-const GET = require('./methods/GET');
-const POST = require('./methods/POST');
-const PUT = require('./methods/PUT');
-const DELETE = require('./methods/DELETE');
-
-// TODO Remove old methods
-module.exports = stampit({
-  methods: {
-    getAuthHeader: getAuthHeader,
-    buildUrl: buildUrl,
-    buildUri: function buildUri() {
-      console.log('Warning: метод buildUri переименован в buildUrl.');
-      return this.buildUrl.apply(this, arguments);
-    },
-
-    parseUrl: parseUrl,
-    parseUri: function parseUri() {
-      console.log('Warning: метод parseUri переименован в parseUrl.');
-      return this.parseUrl.apply(this, arguments);
-    },
-
-    fetchUrl: fetchUrl,
-    fetchUri: function fetchUri() {
-      console.log('Warning: метод fetchUri переименован в fetchUrl.');
-      return this.fetchUrl.apply(this, arguments);
-    },
-
-    GET: GET,
-    POST: POST,
-    PUT: PUT,
-    DELETE: DELETE
-  },
-  statics: {
-    getTimeString: getTimeString,
-    parseTimeString: parseTimeString
-  }
-}).init(function (options) {
-  let _options;
-
-  have(options, {
-    endpoint: 'opt str',
-    api: 'opt str',
-    apiVersion: 'opt str'
-
-    // TODO fix have object arguments parsing
-    // login: 'opt str',
-    // password: 'opt str',
-    // fetch: 'opt function'
-    // queue: 'opt bool',
-    // emitter: 'opt obj'
-  });
-
-  if (options.fetch) {
-    this.fetch = options.fetch;
-  } else if (typeof window !== 'undefined' && window.fetch) {
-    this.fetch = window.fetch.bind(window);
-  } else if (typeof fetch !== 'undefined') {
-    this.fetch = fetch;
-  } else {
-    throw new Error('Не указан Fetch API модуль' + ' (cм. подробнее https://github.com/wmakeev/moysklad#Установка).');
-  }
-
-  if (options.emitter) {
-    this.emitter = options.emitter;
-  }
-
-  _options = Object.assign({
-    endpoint: 'https://online.moysklad.ru/api',
-    api: 'remap',
-    apiVersion: '1.1'
-  }, options);
-
-  this.getOptions = function () {
-    return _options;
-  };
-});
-
-},{"./have":2,"./methods/DELETE":5,"./methods/GET":6,"./methods/POST":7,"./methods/PUT":8,"./methods/buildUrl":9,"./methods/fetchUrl":10,"./methods/getAuthHeader":11,"./methods/parseUrl":12,"./tools/getTimeString":15,"./tools/parseTimeString":20,"stampit":24}],4:[function(require,module,exports){
-'use strict';
-
-const UUID_REGEX = /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/;
-
-const urlMatcher = url => typeof url === 'string' && url.substring(0, 8) === 'https://';
-const uuidMatcher = uuid => typeof uuid === 'string' && UUID_REGEX.test(uuid);
-
-// TODO Убедиться что указан необходимый минимум полей для сущностей
-module.exports = {
-  'entity': ent => !!(ent && ent.id && uuidMatcher(ent.id) && ent.meta && ent.meta.type),
-  'uuid': uuidMatcher,
-  'url': urlMatcher,
-  // 'uuid/uuid': id => {
-  //   if (typeof id !== 'string') { return false }
-  //   let [dicId, entId] = id.split('/')
-  //   return UUID_REGEX.test(dicId) && UUID_REGEX.test(entId)
-  // },
-  'Moysklad.Collection': col => !!(col && col.meta && col.meta.type && urlMatcher(col.meta.href) && typeof col.meta.size === 'number')
-};
-
-// TODO Проверка типов "Moysklad." на основании модели
-
-},{}],5:[function(require,module,exports){
-'use strict';
-
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-const have = require('../have');
-
-module.exports = function DELETE() {
-  for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-    args[_key] = arguments[_key];
-  }
-
-  var _have$strict = have.strict(args, [{ path: 'str or str arr', options: 'opt Object' }, have.argumentsObject]);
-
-  let path = _have$strict.path;
-  var _have$strict$options = _have$strict.options;
-  let options = _have$strict$options === undefined ? {} : _have$strict$options;
-
-
-  let uri = this.buildUrl(path);
-
-  return this.fetchUrl(uri, _extends({}, options, { method: 'DELETE', rawResponse: true }));
-};
-
-},{"../have":2}],6:[function(require,module,exports){
-'use strict';
-
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-const have = require('../have');
-
-module.exports = function GET() {
-  for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-    args[_key] = arguments[_key];
-  }
-
-  var _have$strict = have.strict(args, [{ path: 'str or str arr', query: 'opt Object', options: 'opt Object' }, have.argumentsObject]);
-
-  let path = _have$strict.path,
-      query = _have$strict.query;
-  var _have$strict$options = _have$strict.options;
-  let options = _have$strict$options === undefined ? {} : _have$strict$options;
-
-
-  let uri = this.buildUrl(path, query);
-
-  return this.fetchUrl(uri, _extends({}, options, { method: 'GET' }));
-};
-
-},{"../have":2}],7:[function(require,module,exports){
-'use strict';
-
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-const have = require('../have');
-
-module.exports = function POST() {
-  for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-    args[_key] = arguments[_key];
-  }
-
-  // TODO Test payload: 'Object or Object arr'
-  var _have$strict = have.strict(args, [{
-    path: 'str or str arr',
-    payload: 'opt Object or Object arr',
-    query: 'opt Object',
-    options: 'opt Object'
-  }, have.argumentsObject]);
-
-  let path = _have$strict.path,
-      payload = _have$strict.payload,
-      query = _have$strict.query;
-  var _have$strict$options = _have$strict.options;
-  let options = _have$strict$options === undefined ? {} : _have$strict$options;
-
-
-  let uri = this.buildUrl(path, query);
-  let fetchOptions = { method: 'POST' };
-  if (payload) fetchOptions.body = JSON.stringify(payload);
-
-  return this.fetchUrl(uri, _extends({}, options, fetchOptions));
-};
-
-},{"../have":2}],8:[function(require,module,exports){
-'use strict';
-
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-const have = require('../have');
-
-module.exports = function PUT() {
-  for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-    args[_key] = arguments[_key];
-  }
-
-  var _have$strict = have.strict(args, [{
-    path: 'str or str arr',
-    payload: 'opt Object',
-    query: 'opt Object',
-    options: 'opt Object'
-  }, have.argumentsObject]);
-
-  let path = _have$strict.path,
-      payload = _have$strict.payload,
-      query = _have$strict.query;
-  var _have$strict$options = _have$strict.options;
-  let options = _have$strict$options === undefined ? {} : _have$strict$options;
-
-
-  let uri = this.buildUrl(path, query);
-  let fetchOptions = { method: 'PUT' };
-  if (payload) fetchOptions.body = JSON.stringify(payload);
-
-  return this.fetchUrl(uri, _extends({}, options, fetchOptions));
-};
-
-},{"../have":2}],9:[function(require,module,exports){
-'use strict';
-
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-const have = require('../have');
-const buildQuery = require('../tools/buildQuery');
-const normalizeUrl = require('../tools/normalizeUrl');
-
-module.exports = function buildUrl() {
-  for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-    args[_key] = arguments[_key];
-  }
-
-  var _have$strict = have.strict(args, [{ url: 'url', query: 'opt Object' }, { path: 'str or str arr', query: 'opt Object' }, have.argumentsObject]);
-
-  let url = _have$strict.url,
-      path = _have$strict.path,
-      query = _have$strict.query;
-
-
-  if (url) {
-    let parsedUrl = this.parseUrl(url);
-    path = parsedUrl.path;
-    query = _extends({}, parsedUrl.query, query);
-  }
-
-  var _getOptions = this.getOptions();
-
-  let endpoint = _getOptions.endpoint,
-      api = _getOptions.api,
-      apiVersion = _getOptions.apiVersion;
-
-
-  let resultUrl = normalizeUrl([endpoint, api, apiVersion].concat(path).join('/'));
-
-  if (query) {
-    let queryString = buildQuery(query);
-    resultUrl = resultUrl + (queryString ? `?${queryString}` : '');
-  }
-
-  return resultUrl;
-};
-
-},{"../have":2,"../tools/buildQuery":14,"../tools/normalizeUrl":18}],10:[function(require,module,exports){
-'use strict';
-
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
-
-const defaultsDeep = require('lodash.defaultsdeep');
-
-const have = require('../have');
-const getResponseError = require('../getResponseError');
-
-module.exports = (() => {
-  var _ref = _asyncToGenerator(function* (uri) {
-    let options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-    have.strict(arguments, { url: 'url', options: 'opt Object' });
-
-    let resBodyJson, error;
-
-    // Специфические параметры (не передаются в опции fetch)
-    let rawResponse = false;
-    let muteErrors = false;
-
-    let emit = this.emitter ? this.emitter.emit.bind(this.emitter) : null;
-
-    let fetchOptions = defaultsDeep(_extends({}, options), {
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      redirect: 'manual'
-    });
-
-    if (!fetchOptions.headers.Authorization) {
-      fetchOptions.credentials = 'include';
-    }
-
-    // получаем специфичные параметры
-    if (fetchOptions.rawResponse) {
-      rawResponse = true;
-      delete fetchOptions.rawResponse;
-    }
-    if (fetchOptions.muteErrors) {
-      muteErrors = true;
-      delete fetchOptions.muteErrors;
-    }
-    if (fetchOptions.millisecond) {
-      fetchOptions.headers['X-Lognex-Format-Millisecond'] = 'true';
-      delete fetchOptions.millisecond;
-    }
-
-    let authHeader = this.getAuthHeader();
-    if (authHeader) {
-      fetchOptions.headers.Authorization = this.getAuthHeader();
-    }
-
-    if (emit) emit('request', { uri: uri, options: fetchOptions });
-
-    /** @type {Response} */
-    let response = yield this.fetch(uri, fetchOptions);
-
-    if (emit) emit('response', { uri: uri, options: fetchOptions, response: response });
-
-    if (rawResponse && muteErrors) return response;
-
-    if (!response.ok) {
-      error = new Error(`${response.status} ${response.statusText}`);
-    } else if (rawResponse) {
-      return response;
-    }
-
-    // разбираем тело запроса
-    if (response.headers.has('Content-Type') && response.headers.get('Content-Type').indexOf('application/json') !== -1) {
-      // response.json() может вызвать ошибку, если тело ответа пустое
-      try {
-        resBodyJson = yield response.json();
-      } catch (e) {}
-
-      if (emit) emit('response:body', { uri: uri, options: fetchOptions, response: response, body: resBodyJson });
-      error = getResponseError(resBodyJson) || error;
-    }
-
-    if (error && !muteErrors) {
-      if (emit) emit('error', error);
-      throw error;
-    }
-
-    return rawResponse ? response : resBodyJson;
-  });
-
-  function fetchUrl(_x2) {
-    return _ref.apply(this, arguments);
-  }
-
-  return fetchUrl;
-})();
-
-},{"../getResponseError":1,"../have":2,"lodash.defaultsdeep":23}],11:[function(require,module,exports){
-'use strict';
-
-/* global MOYSKLAD_LOGIN, MOYSKLAD_PASSWORD */
-
-const base64encode = require('@wmakeev/base64encode');
-
-module.exports = function getAuthHeader() {
-  let login;
-  let password;
-  let options = this.getOptions();
-
-  if (options.login && options.password) {
-    login = options.login;
-    password = options.password;
-  } else if (typeof process !== 'undefined' && process.env && process.env.MOYSKLAD_LOGIN && process.env.MOYSKLAD_PASSWORD) {
-    login = process.env.MOYSKLAD_LOGIN;
-    password = process.env.MOYSKLAD_PASSWORD;
-  } else if (typeof MOYSKLAD_LOGIN !== 'undefined' && typeof MOYSKLAD_PASSWORD !== 'undefined') {
-    login = MOYSKLAD_LOGIN;
-    password = MOYSKLAD_PASSWORD;
-  } else {
-    return null;
-  }
-
-  return 'Basic ' + base64encode(`${login}:${password}`);
-};
-
-},{"@wmakeev/base64encode":21}],12:[function(require,module,exports){
-'use strict';
-'use srict';
-
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
-const have = require('../have');
-const normalizeUrl = require('../tools/normalizeUrl');
-const parseQueryString = require('../tools/parseQueryString');
-
-const PATH_QUERY_REGEX = /([^?]+)(?:\?(.+))?$/;
-
-module.exports = function parseUrl() {
-  for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-    args[_key] = arguments[_key];
-  }
-
-  var _have$strict = have.strict(arguments, [{ url: 'url' }, { path: 'str or str arr' }]);
-
-  let url = _have$strict.url,
-      path = _have$strict.path;
-
-  var _getOptions = this.getOptions();
-
-  let endpoint = _getOptions.endpoint,
-      api = _getOptions.api,
-      apiVersion = _getOptions.apiVersion;
-
-
-  if (path instanceof Array) {
-    return {
-      endpoint: endpoint,
-      api: api,
-      apiVersion: apiVersion,
-      path: normalizeUrl(path.join('/')).split(/\//g),
-      query: {}
-    };
-  }
-
-  let pathAndQuery;
-
-  if (url) {
-    let baseUrl = normalizeUrl([endpoint, api, apiVersion].join('/'));
-    if (url.indexOf(baseUrl) !== 0) {
-      throw new Error('Url не соответствует указанной в настройках точке доступа ' + baseUrl);
-    }
-    pathAndQuery = url.substring(baseUrl.length + 1);
-  } else {
-    pathAndQuery = path;
-  }
-
-  var _PATH_QUERY_REGEX$exe = PATH_QUERY_REGEX.exec(pathAndQuery),
-      _PATH_QUERY_REGEX$exe2 = _slicedToArray(_PATH_QUERY_REGEX$exe, 3);
-
-  let pathStr = _PATH_QUERY_REGEX$exe2[1],
-      queryStr = _PATH_QUERY_REGEX$exe2[2];
-
-
-  if (!pathStr) throw new Error('Не указан путь запроса');
-
-  // TODO Parse query.filter
-
-  return {
-    endpoint: endpoint,
-    api: api,
-    apiVersion: apiVersion,
-    path: normalizeUrl(pathStr).split(/\//g),
-    query: parseQueryString(queryStr) || {}
-  };
-};
-
-},{"../have":2,"../tools/normalizeUrl":18,"../tools/parseQueryString":19}],13:[function(require,module,exports){
-'use strict';
-
-const getTimeString = require('./getTimeString');
-const isPlainObject = require('./isPlainObject');
-const isSimpleValue = require('./isSimpleValue');
-
-let createValueSelector = selector => (path, value) => {
-  if (!isSimpleValue(value)) {
-    throw new TypeError(`value must to be string, number, date or null`);
-  }
-  return [[path, selector, value]];
-};
-
-let createCollectionSelector = selector => {
-  const sel = createValueSelector(selector);
-  return (path, value) => {
-    if (!(value instanceof Array)) {
-      throw new TypeError(`selector value must to be an array`);
-    }
-    return value.reduce((res, v) => res.concat(sel(path, v)), []);
-  };
-};
-
-// Comparison selectors
-const selectors = {
-  eq: { operator: '=' },
-  gt: { operator: '>' },
-  gte: { operator: '>=' },
-  lt: { operator: '<' },
-  lte: { operator: '<=' },
-  ne: { operator: '!=' },
-  contains: { operator: '~' },
-  st: { operator: '~=' },
-  et: { operator: '=~' },
-  in: { operator: '=', collection: true },
-  nin: { operator: '!=', collection: true }
-};
-
-Object.keys(selectors).forEach(key => {
-  selectors[key].name = `$${key}`;
-});
-
-selectors.eq.not = selectors.ne;
-selectors.gt.not = selectors.lte;
-selectors.gte.not = selectors.lt;
-selectors.lt.not = selectors.gte;
-selectors.lte.not = selectors.gt;
-selectors.ne.not = selectors.eq;
-selectors.in.not = selectors.nin;
-selectors.nin.not = selectors.in;
-
-const comparisonSelectors = Object.keys(selectors).reduce((res, key) => {
-  let op = selectors[key];
-  res['$' + key] = (op.collection ? createCollectionSelector : createValueSelector)(op);
-  return res;
-}, {});
-
-// Logical selectors
-const invertFilterPart = fp => {
-  if (!fp[1].not) {
-    throw new Error(`${fp[1].name} not support negation like $not`);
-  }
-  return [fp[0], fp[1].not, fp[2]];
-};
-
-function getFilterParts(path, value) {
-  const pathLen = path.length;
-  const curKey = pathLen ? path[pathLen - 1] : null;
-
-  switch (true) {
-    // Mongo logical selectors
-    case curKey === '$and':
-      if (!(value instanceof Array)) {
-        throw new TypeError(`$and: selector value must to be an array`);
-      }
-      return value.reduce((res, val) => res.concat(getFilterParts(path.slice(0, -1), val)), []);
-
-    case curKey === '$not':
-      if (!isPlainObject(value)) {
-        throw new TypeError(`$not: selector value must to be an object`);
-      }
-      let headPath = path.slice(0, -1);
-      return getFilterParts(headPath, value).map(invertFilterPart);
-    // .concat([[headPath, selectors.eq, null]])
-
-    case curKey === '$exists':
-      if (typeof value !== 'boolean') {
-        throw new TypeError(`$exists: selector value must to be boolean`);
-      }
-      return [[path.slice(0, -1), value ? selectors.ne : selectors.eq, null]];
-
-    // Mongo comparison selectors
-    case !!comparisonSelectors[curKey]:
-      let parts;
-      try {
-        parts = comparisonSelectors[curKey](path.slice(0, -1), value);
-      } catch (error) {
-        throw new Error(`${curKey}: ${error.message}`);
-      }
-      return parts;
-
-    // Array
-    case value instanceof Array:
-      return value.reduce((res, val) => res.concat(getFilterParts(path, val)), []);
-
-    // Object
-    case !isSimpleValue(value):
-      return Object.keys(value).reduce((res, key) => res.concat(getFilterParts(path.concat(key), value[key])), []);
-
-    // some other value
-    default:
-      return [[path, selectors.eq, value]];
-  }
-}
-
-module.exports = function buildFilter(filter) {
-  if (!isPlainObject(filter)) {
-    throw new TypeError('filter must to be an object');
-  }
-
-  let filterParts = getFilterParts([], filter);
-
-  // преобразование ключа в строку
-  filterParts = filterParts.map(part => [part[0].join('.'), part[1], part[2]]);
-
-  return filterParts
-  // конвертация операторов и значений в строку
-  .map(part => {
-    let key = part[0];
-    let operator = part[1].operator;
-    let value = part[2];
-    switch (true) {
-      case value === undefined:
-        throw new TypeError(`filter "${key}" key value is undefined`);
-
-      case value === null:
-        return [key, operator, ''];
-
-      case value instanceof Date:
-        return [key, operator, getTimeString(value)];
-
-      case typeof value === 'string':
-      case typeof value === 'number':
-      case typeof value === 'boolean':
-        return [key, operator, value];
-
-      default:
-        throw new TypeError(`filter "${key}" key value is incorrect`);
-    }
-  }).map(part => `${part[0]}${part[1]}${part[2]}`).sort((p1, p2) => {
-    if (p1 > p2) {
-      return 1;
-    }
-    if (p1 < p2) {
-      return -1;
-    }
-    return 0;
-  }).join(';');
-};
-
-},{"./getTimeString":15,"./isPlainObject":16,"./isSimpleValue":17}],14:[function(require,module,exports){
-'use strict';
-
-const buildFilter = require('./buildFilter');
-const isPlainObject = require('./isPlainObject');
-
-const addQueryPart = (res, key) => val => {
-  if (val === null) {
-    res.push([key, '']);
-  } else if (val === undefined) {
-    return undefined;
-  } else if (['string', 'number', 'boolean'].indexOf(typeof val) === -1) {
-    throw new TypeError('url query key value must to be string, number, boolean, null or undefined');
-  } else {
-    res.push([key, encodeURIComponent(val)]);
-  }
-};
-
-module.exports = function buildQuery(query) {
-  return Object.keys(query).reduce((res, key) => {
-    const addPart = addQueryPart(res, key);
-
-    switch (true) {
-      case key === 'filter':
-        if (isPlainObject(query.filter)) addPart(buildFilter(query.filter));else if (typeof query.filter === 'string') addPart(query.filter);else throw new TypeError('query.filter must to be string or object');
-        break;
-
-      case query[key] instanceof Array:
-        query[key].forEach(addPart);
-        break;
-
-      default:
-        addPart(query[key]);
-    }
-
-    return res;
-  }, []).map(kv => `${kv[0]}=${kv[1]}`).join('&');
-};
-
-},{"./buildFilter":13,"./isPlainObject":16}],15:[function(require,module,exports){
-'use strict';
-
-const MSK_TIMEZONE_OFFSET = 180 * 60 * 1000;
-
-/**
- * Возвращает дату для фильтра в часовом поясе Москвы
- * @param {Date} date Конвертируемая дата
- * @param {boolean} includeMs Отображать миллисекунды
- * @returns {string} Дата ввиде строки
- */
-module.exports = function getTimeString(date, includeMs) {
-  let mskTime = new Date(+date + MSK_TIMEZONE_OFFSET);
-
-  return mskTime.toJSON().replace('T', ' ').replace(includeMs ? /Z$/ : /(\.\d{3})?Z$/, '');
-};
-
-},{}],16:[function(require,module,exports){
-'use strict';
-
-module.exports = function isPlainObject(value) {
-  return Object.prototype.toString.call(value) === '[object Object]';
-};
-
-},{}],17:[function(require,module,exports){
-'use strict';
-
-module.exports = function isSimpleValue(value) {
-  return typeof value !== 'object' || value instanceof Date || value === null;
-};
-
-},{}],18:[function(require,module,exports){
-'use strict';
-
-const URI_EXTRA_SLASH_REGEX = /([^:]\/)\/+/g;
-const TRIM_SLASH = /^\/+|\/+$/g;
-
-module.exports = function normalizeUrl(url) {
-  return url.replace(TRIM_SLASH, '').replace(URI_EXTRA_SLASH_REGEX, '$1').toLowerCase();
-};
-
-},{}],19:[function(require,module,exports){
-'use strict';
-
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
-function extractQueryValue(str) {
-  if (str === '') {
-    return null;
-  }
-  let asBool = Boolean(str);
-  if (asBool.toString() === str) {
-    return asBool;
-  }
-
-  let asNum = parseInt(str);
-  if (asNum.toString() === str) {
-    return asNum;
-  }
-
-  return decodeURIComponent(str);
-}
-
-function extractQueryValues(str) {
-  return str.indexOf(',') !== -1 ? str.split(',').map(v => extractQueryValue(v)) : [extractQueryValue(str)];
-}
-
-module.exports = function parseQueryString(queryString) {
-  if (queryString == null || queryString === '') {
-    return void 0;
-  }
-  queryString = queryString.trim();
-  if (!queryString) {
-    return void 0;
-  }
-
-  let kvMap = queryString.split('&').reduce((res, queryPart) => {
-    let kv = queryPart.split('=');
-    let key = kv[0];
-    let value = extractQueryValues(kv[1]);
-    let resValue = res.get(key);
-    return res.set(key, resValue ? resValue.concat(value) : value);
-  }, new Map());
-
-  let result = {};
-  for (let entry of kvMap.entries()) {
-    var _entry = _slicedToArray(entry, 2);
-
-    let key = _entry[0],
-        value = _entry[1];
-
-    result[key] = value.length > 1 ? value : value[0];
-  }
-
-  return result;
-};
-
-},{}],20:[function(require,module,exports){
-'use strict';
-
-// https://regex101.com/r/Bxq7dZ/2
-
-const MS_TIME_REGEX = new RegExp(/^(\d{4})-(\d{2})-(\d{2})\s(\d{2}):(\d{2}):(\d{2})(?:\.(\d{3}))?$/);
-
-/**
- * Преобразует строку времени МойСклад в объект даты (с учетом временной зоны)
- * @param {string} timeString Время в формате МойСклад ("2017-04-08 13:33:00.123")
- * @returns {Date} Дата
- */
-module.exports = function parseTimeString(timeString) {
-  // 2017-04-08 13:33:00.123
-  let m = MS_TIME_REGEX.exec(timeString);
-  if (!m || m.length < 7 || m.length > 8) {
-    throw new Error(`Некорректный формат даты "${timeString}"`);
-  }
-  return new Date(`${m[1]}-${m[2]}-${m[3]}T${m[4]}:${m[5]}:${m[6]}${m[7] ? '.' + m[7] : ''}+03:00`);
-};
-
-},{}],21:[function(require,module,exports){
 'use strict'
 
 /* eslint node/no-deprecated-api:0 */
@@ -857,7 +23,7 @@ module.exports = function base64encode (value) {
   return encode(String(value))
 }
 
-},{}],22:[function(require,module,exports){
+},{}],2:[function(require,module,exports){
 'use strict'
 
 var ARR_RX = /^(.+) a(rr(ay)?)?$/i
@@ -1150,11 +316,11 @@ module.exports = (function () {
 })()
 
 
-},{}],23:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 /**
- * lodash (Custom Build) <https://lodash.com/>
+ * Lodash (Custom Build) <https://lodash.com/>
  * Build: `lodash modularize exports="npm" -o ./`
- * Copyright jQuery Foundation and other contributors <https://jquery.org/>
+ * Copyright OpenJS Foundation and other contributors <https://openjsf.org/>
  * Released under MIT license <https://lodash.com/license>
  * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
  * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -1166,12 +332,17 @@ var LARGE_ARRAY_SIZE = 200;
 /** Used to stand-in for `undefined` hash values. */
 var HASH_UNDEFINED = '__lodash_hash_undefined__';
 
+/** Used to detect hot functions by number of calls within a span of milliseconds. */
+var HOT_COUNT = 800,
+    HOT_SPAN = 16;
+
 /** Used as references for various `Number` constants. */
 var MAX_SAFE_INTEGER = 9007199254740991;
 
 /** `Object#toString` result references. */
 var argsTag = '[object Arguments]',
     arrayTag = '[object Array]',
+    asyncTag = '[object AsyncFunction]',
     boolTag = '[object Boolean]',
     dateTag = '[object Date]',
     errorTag = '[object Error]',
@@ -1179,12 +350,13 @@ var argsTag = '[object Arguments]',
     genTag = '[object GeneratorFunction]',
     mapTag = '[object Map]',
     numberTag = '[object Number]',
+    nullTag = '[object Null]',
     objectTag = '[object Object]',
-    promiseTag = '[object Promise]',
+    proxyTag = '[object Proxy]',
     regexpTag = '[object RegExp]',
     setTag = '[object Set]',
     stringTag = '[object String]',
-    symbolTag = '[object Symbol]',
+    undefinedTag = '[object Undefined]',
     weakMapTag = '[object WeakMap]';
 
 var arrayBufferTag = '[object ArrayBuffer]',
@@ -1204,9 +376,6 @@ var arrayBufferTag = '[object ArrayBuffer]',
  * [syntax characters](http://ecma-international.org/ecma-262/7.0/#sec-patterns).
  */
 var reRegExpChar = /[\\^$.*+?()[\]{}|]/g;
-
-/** Used to match `RegExp` flags from their coerced string values. */
-var reFlags = /\w*$/;
 
 /** Used to detect host constructors (Safari). */
 var reIsHostCtor = /^\[object .+?Constructor\]$/;
@@ -1229,22 +398,6 @@ typedArrayTags[mapTag] = typedArrayTags[numberTag] =
 typedArrayTags[objectTag] = typedArrayTags[regexpTag] =
 typedArrayTags[setTag] = typedArrayTags[stringTag] =
 typedArrayTags[weakMapTag] = false;
-
-/** Used to identify `toStringTag` values supported by `_.clone`. */
-var cloneableTags = {};
-cloneableTags[argsTag] = cloneableTags[arrayTag] =
-cloneableTags[arrayBufferTag] = cloneableTags[dataViewTag] =
-cloneableTags[boolTag] = cloneableTags[dateTag] =
-cloneableTags[float32Tag] = cloneableTags[float64Tag] =
-cloneableTags[int8Tag] = cloneableTags[int16Tag] =
-cloneableTags[int32Tag] = cloneableTags[mapTag] =
-cloneableTags[numberTag] = cloneableTags[objectTag] =
-cloneableTags[regexpTag] = cloneableTags[setTag] =
-cloneableTags[stringTag] = cloneableTags[symbolTag] =
-cloneableTags[uint8Tag] = cloneableTags[uint8ClampedTag] =
-cloneableTags[uint16Tag] = cloneableTags[uint32Tag] = true;
-cloneableTags[errorTag] = cloneableTags[funcTag] =
-cloneableTags[weakMapTag] = false;
 
 /** Detect free variable `global` from Node.js. */
 var freeGlobal = typeof global == 'object' && global && global.Object === Object && global;
@@ -1270,40 +423,20 @@ var freeProcess = moduleExports && freeGlobal.process;
 /** Used to access faster Node.js helpers. */
 var nodeUtil = (function() {
   try {
-    return freeProcess && freeProcess.binding('util');
+    // Use `util.types` for Node.js 10+.
+    var types = freeModule && freeModule.require && freeModule.require('util').types;
+
+    if (types) {
+      return types;
+    }
+
+    // Legacy `process.binding('util')` for Node.js < 10.
+    return freeProcess && freeProcess.binding && freeProcess.binding('util');
   } catch (e) {}
 }());
 
 /* Node.js helper references. */
 var nodeIsTypedArray = nodeUtil && nodeUtil.isTypedArray;
-
-/**
- * Adds the key-value `pair` to `map`.
- *
- * @private
- * @param {Object} map The map to modify.
- * @param {Array} pair The key-value pair to add.
- * @returns {Object} Returns `map`.
- */
-function addMapEntry(map, pair) {
-  // Don't return `map.set` because it's not chainable in IE 11.
-  map.set(pair[0], pair[1]);
-  return map;
-}
-
-/**
- * Adds `value` to `set`.
- *
- * @private
- * @param {Object} set The set to modify.
- * @param {*} value The value to add.
- * @returns {Object} Returns `set`.
- */
-function addSetEntry(set, value) {
-  // Don't return `set.add` because it's not chainable in IE 11.
-  set.add(value);
-  return set;
-}
 
 /**
  * A faster alternative to `Function#apply`, this function invokes `func`
@@ -1323,71 +456,6 @@ function apply(func, thisArg, args) {
     case 3: return func.call(thisArg, args[0], args[1], args[2]);
   }
   return func.apply(thisArg, args);
-}
-
-/**
- * A specialized version of `_.forEach` for arrays without support for
- * iteratee shorthands.
- *
- * @private
- * @param {Array} [array] The array to iterate over.
- * @param {Function} iteratee The function invoked per iteration.
- * @returns {Array} Returns `array`.
- */
-function arrayEach(array, iteratee) {
-  var index = -1,
-      length = array ? array.length : 0;
-
-  while (++index < length) {
-    if (iteratee(array[index], index, array) === false) {
-      break;
-    }
-  }
-  return array;
-}
-
-/**
- * Appends the elements of `values` to `array`.
- *
- * @private
- * @param {Array} array The array to modify.
- * @param {Array} values The values to append.
- * @returns {Array} Returns `array`.
- */
-function arrayPush(array, values) {
-  var index = -1,
-      length = values.length,
-      offset = array.length;
-
-  while (++index < length) {
-    array[offset + index] = values[index];
-  }
-  return array;
-}
-
-/**
- * A specialized version of `_.reduce` for arrays without support for
- * iteratee shorthands.
- *
- * @private
- * @param {Array} [array] The array to iterate over.
- * @param {Function} iteratee The function invoked per iteration.
- * @param {*} [accumulator] The initial value.
- * @param {boolean} [initAccum] Specify using the first element of `array` as
- *  the initial value.
- * @returns {*} Returns the accumulated value.
- */
-function arrayReduce(array, iteratee, accumulator, initAccum) {
-  var index = -1,
-      length = array ? array.length : 0;
-
-  if (initAccum && length) {
-    accumulator = array[++index];
-  }
-  while (++index < length) {
-    accumulator = iteratee(accumulator, array[index], index, array);
-  }
-  return accumulator;
 }
 
 /**
@@ -1435,42 +503,6 @@ function getValue(object, key) {
 }
 
 /**
- * Checks if `value` is a host object in IE < 9.
- *
- * @private
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a host object, else `false`.
- */
-function isHostObject(value) {
-  // Many host objects are `Object` objects that can coerce to strings
-  // despite having improperly defined `toString` methods.
-  var result = false;
-  if (value != null && typeof value.toString != 'function') {
-    try {
-      result = !!(value + '');
-    } catch (e) {}
-  }
-  return result;
-}
-
-/**
- * Converts `map` to its key-value pairs.
- *
- * @private
- * @param {Object} map The map to convert.
- * @returns {Array} Returns the key-value pairs.
- */
-function mapToArray(map) {
-  var index = -1,
-      result = Array(map.size);
-
-  map.forEach(function(value, key) {
-    result[++index] = [key, value];
-  });
-  return result;
-}
-
-/**
  * Creates a unary function that invokes `func` with its argument transformed.
  *
  * @private
@@ -1484,23 +516,6 @@ function overArg(func, transform) {
   };
 }
 
-/**
- * Converts `set` to an array of its values.
- *
- * @private
- * @param {Object} set The set to convert.
- * @returns {Array} Returns the values.
- */
-function setToArray(set) {
-  var index = -1,
-      result = Array(set.size);
-
-  set.forEach(function(value) {
-    result[++index] = value;
-  });
-  return result;
-}
-
 /** Used for built-in method references. */
 var arrayProto = Array.prototype,
     funcProto = Function.prototype,
@@ -1509,27 +524,27 @@ var arrayProto = Array.prototype,
 /** Used to detect overreaching core-js shims. */
 var coreJsData = root['__core-js_shared__'];
 
-/** Used to detect methods masquerading as native. */
-var maskSrcKey = (function() {
-  var uid = /[^.]+$/.exec(coreJsData && coreJsData.keys && coreJsData.keys.IE_PROTO || '');
-  return uid ? ('Symbol(src)_1.' + uid) : '';
-}());
-
 /** Used to resolve the decompiled source of functions. */
 var funcToString = funcProto.toString;
 
 /** Used to check objects for own properties. */
 var hasOwnProperty = objectProto.hasOwnProperty;
 
-/** Used to infer the `Object` constructor. */
-var objectCtorString = funcToString.call(Object);
+/** Used to detect methods masquerading as native. */
+var maskSrcKey = (function() {
+  var uid = /[^.]+$/.exec(coreJsData && coreJsData.keys && coreJsData.keys.IE_PROTO || '');
+  return uid ? ('Symbol(src)_1.' + uid) : '';
+}());
 
 /**
  * Used to resolve the
  * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
  * of values.
  */
-var objectToString = objectProto.toString;
+var nativeObjectToString = objectProto.toString;
+
+/** Used to infer the `Object` constructor. */
+var objectCtorString = funcToString.call(Object);
 
 /** Used to detect if a method is native. */
 var reIsNative = RegExp('^' +
@@ -1541,35 +556,53 @@ var reIsNative = RegExp('^' +
 var Buffer = moduleExports ? root.Buffer : undefined,
     Symbol = root.Symbol,
     Uint8Array = root.Uint8Array,
+    allocUnsafe = Buffer ? Buffer.allocUnsafe : undefined,
     getPrototype = overArg(Object.getPrototypeOf, Object),
     objectCreate = Object.create,
     propertyIsEnumerable = objectProto.propertyIsEnumerable,
-    splice = arrayProto.splice;
+    splice = arrayProto.splice,
+    symToStringTag = Symbol ? Symbol.toStringTag : undefined;
+
+var defineProperty = (function() {
+  try {
+    var func = getNative(Object, 'defineProperty');
+    func({}, '', {});
+    return func;
+  } catch (e) {}
+}());
 
 /* Built-in method references for those with the same name as other `lodash` methods. */
-var nativeGetSymbols = Object.getOwnPropertySymbols,
-    nativeIsBuffer = Buffer ? Buffer.isBuffer : undefined,
-    nativeKeys = overArg(Object.keys, Object),
-    nativeMax = Math.max;
+var nativeIsBuffer = Buffer ? Buffer.isBuffer : undefined,
+    nativeMax = Math.max,
+    nativeNow = Date.now;
 
 /* Built-in method references that are verified to be native. */
-var DataView = getNative(root, 'DataView'),
-    Map = getNative(root, 'Map'),
-    Promise = getNative(root, 'Promise'),
-    Set = getNative(root, 'Set'),
-    WeakMap = getNative(root, 'WeakMap'),
+var Map = getNative(root, 'Map'),
     nativeCreate = getNative(Object, 'create');
 
-/** Used to detect maps, sets, and weakmaps. */
-var dataViewCtorString = toSource(DataView),
-    mapCtorString = toSource(Map),
-    promiseCtorString = toSource(Promise),
-    setCtorString = toSource(Set),
-    weakMapCtorString = toSource(WeakMap);
-
-/** Used to convert symbols to primitives and strings. */
-var symbolProto = Symbol ? Symbol.prototype : undefined,
-    symbolValueOf = symbolProto ? symbolProto.valueOf : undefined;
+/**
+ * The base implementation of `_.create` without support for assigning
+ * properties to the created object.
+ *
+ * @private
+ * @param {Object} proto The object to inherit from.
+ * @returns {Object} Returns the new object.
+ */
+var baseCreate = (function() {
+  function object() {}
+  return function(proto) {
+    if (!isObject(proto)) {
+      return {};
+    }
+    if (objectCreate) {
+      return objectCreate(proto);
+    }
+    object.prototype = proto;
+    var result = new object;
+    object.prototype = undefined;
+    return result;
+  };
+}());
 
 /**
  * Creates a hash object.
@@ -1580,7 +613,7 @@ var symbolProto = Symbol ? Symbol.prototype : undefined,
  */
 function Hash(entries) {
   var index = -1,
-      length = entries ? entries.length : 0;
+      length = entries == null ? 0 : entries.length;
 
   this.clear();
   while (++index < length) {
@@ -1598,6 +631,7 @@ function Hash(entries) {
  */
 function hashClear() {
   this.__data__ = nativeCreate ? nativeCreate(null) : {};
+  this.size = 0;
 }
 
 /**
@@ -1611,7 +645,9 @@ function hashClear() {
  * @returns {boolean} Returns `true` if the entry was removed, else `false`.
  */
 function hashDelete(key) {
-  return this.has(key) && delete this.__data__[key];
+  var result = this.has(key) && delete this.__data__[key];
+  this.size -= result ? 1 : 0;
+  return result;
 }
 
 /**
@@ -1643,7 +679,7 @@ function hashGet(key) {
  */
 function hashHas(key) {
   var data = this.__data__;
-  return nativeCreate ? data[key] !== undefined : hasOwnProperty.call(data, key);
+  return nativeCreate ? (data[key] !== undefined) : hasOwnProperty.call(data, key);
 }
 
 /**
@@ -1658,6 +694,7 @@ function hashHas(key) {
  */
 function hashSet(key, value) {
   var data = this.__data__;
+  this.size += this.has(key) ? 0 : 1;
   data[key] = (nativeCreate && value === undefined) ? HASH_UNDEFINED : value;
   return this;
 }
@@ -1678,7 +715,7 @@ Hash.prototype.set = hashSet;
  */
 function ListCache(entries) {
   var index = -1,
-      length = entries ? entries.length : 0;
+      length = entries == null ? 0 : entries.length;
 
   this.clear();
   while (++index < length) {
@@ -1696,6 +733,7 @@ function ListCache(entries) {
  */
 function listCacheClear() {
   this.__data__ = [];
+  this.size = 0;
 }
 
 /**
@@ -1720,6 +758,7 @@ function listCacheDelete(key) {
   } else {
     splice.call(data, index, 1);
   }
+  --this.size;
   return true;
 }
 
@@ -1767,6 +806,7 @@ function listCacheSet(key, value) {
       index = assocIndexOf(data, key);
 
   if (index < 0) {
+    ++this.size;
     data.push([key, value]);
   } else {
     data[index][1] = value;
@@ -1790,7 +830,7 @@ ListCache.prototype.set = listCacheSet;
  */
 function MapCache(entries) {
   var index = -1,
-      length = entries ? entries.length : 0;
+      length = entries == null ? 0 : entries.length;
 
   this.clear();
   while (++index < length) {
@@ -1807,6 +847,7 @@ function MapCache(entries) {
  * @memberOf MapCache
  */
 function mapCacheClear() {
+  this.size = 0;
   this.__data__ = {
     'hash': new Hash,
     'map': new (Map || ListCache),
@@ -1824,7 +865,9 @@ function mapCacheClear() {
  * @returns {boolean} Returns `true` if the entry was removed, else `false`.
  */
 function mapCacheDelete(key) {
-  return getMapData(this, key)['delete'](key);
+  var result = getMapData(this, key)['delete'](key);
+  this.size -= result ? 1 : 0;
+  return result;
 }
 
 /**
@@ -1864,7 +907,11 @@ function mapCacheHas(key) {
  * @returns {Object} Returns the map cache instance.
  */
 function mapCacheSet(key, value) {
-  getMapData(this, key).set(key, value);
+  var data = getMapData(this, key),
+      size = data.size;
+
+  data.set(key, value);
+  this.size += data.size == size ? 0 : 1;
   return this;
 }
 
@@ -1883,7 +930,8 @@ MapCache.prototype.set = mapCacheSet;
  * @param {Array} [entries] The key-value pairs to cache.
  */
 function Stack(entries) {
-  this.__data__ = new ListCache(entries);
+  var data = this.__data__ = new ListCache(entries);
+  this.size = data.size;
 }
 
 /**
@@ -1895,6 +943,7 @@ function Stack(entries) {
  */
 function stackClear() {
   this.__data__ = new ListCache;
+  this.size = 0;
 }
 
 /**
@@ -1907,7 +956,11 @@ function stackClear() {
  * @returns {boolean} Returns `true` if the entry was removed, else `false`.
  */
 function stackDelete(key) {
-  return this.__data__['delete'](key);
+  var data = this.__data__,
+      result = data['delete'](key);
+
+  this.size = data.size;
+  return result;
 }
 
 /**
@@ -1947,16 +1000,18 @@ function stackHas(key) {
  * @returns {Object} Returns the stack cache instance.
  */
 function stackSet(key, value) {
-  var cache = this.__data__;
-  if (cache instanceof ListCache) {
-    var pairs = cache.__data__;
+  var data = this.__data__;
+  if (data instanceof ListCache) {
+    var pairs = data.__data__;
     if (!Map || (pairs.length < LARGE_ARRAY_SIZE - 1)) {
       pairs.push([key, value]);
+      this.size = ++data.size;
       return this;
     }
-    cache = this.__data__ = new MapCache(pairs);
+    data = this.__data__ = new MapCache(pairs);
   }
-  cache.set(key, value);
+  data.set(key, value);
+  this.size = data.size;
   return this;
 }
 
@@ -1976,18 +1031,26 @@ Stack.prototype.set = stackSet;
  * @returns {Array} Returns the array of property names.
  */
 function arrayLikeKeys(value, inherited) {
-  // Safari 8.1 makes `arguments.callee` enumerable in strict mode.
-  // Safari 9 makes `arguments.length` enumerable in strict mode.
-  var result = (isArray(value) || isArguments(value))
-    ? baseTimes(value.length, String)
-    : [];
-
-  var length = result.length,
-      skipIndexes = !!length;
+  var isArr = isArray(value),
+      isArg = !isArr && isArguments(value),
+      isBuff = !isArr && !isArg && isBuffer(value),
+      isType = !isArr && !isArg && !isBuff && isTypedArray(value),
+      skipIndexes = isArr || isArg || isBuff || isType,
+      result = skipIndexes ? baseTimes(value.length, String) : [],
+      length = result.length;
 
   for (var key in value) {
     if ((inherited || hasOwnProperty.call(value, key)) &&
-        !(skipIndexes && (key == 'length' || isIndex(key, length)))) {
+        !(skipIndexes && (
+           // Safari 9 has enumerable `arguments.length` in strict mode.
+           key == 'length' ||
+           // Node.js 0.10 has enumerable non-index properties on buffers.
+           (isBuff && (key == 'offset' || key == 'parent')) ||
+           // PhantomJS 2 has enumerable non-index properties on typed arrays.
+           (isType && (key == 'buffer' || key == 'byteLength' || key == 'byteOffset')) ||
+           // Skip index properties.
+           isIndex(key, length)
+        ))) {
       result.push(key);
     }
   }
@@ -2005,8 +1068,8 @@ function arrayLikeKeys(value, inherited) {
  */
 function assignMergeValue(object, key, value) {
   if ((value !== undefined && !eq(object[key], value)) ||
-      (typeof key == 'number' && value === undefined && !(key in object))) {
-    object[key] = value;
+      (value === undefined && !(key in object))) {
+    baseAssignValue(object, key, value);
   }
 }
 
@@ -2024,7 +1087,7 @@ function assignValue(object, key, value) {
   var objValue = object[key];
   if (!(hasOwnProperty.call(object, key) && eq(objValue, value)) ||
       (value === undefined && !(key in object))) {
-    object[key] = value;
+    baseAssignValue(object, key, value);
   }
 }
 
@@ -2047,130 +1110,65 @@ function assocIndexOf(array, key) {
 }
 
 /**
- * The base implementation of `_.assign` without support for multiple sources
- * or `customizer` functions.
+ * The base implementation of `assignValue` and `assignMergeValue` without
+ * value checks.
  *
  * @private
- * @param {Object} object The destination object.
- * @param {Object} source The source object.
+ * @param {Object} object The object to modify.
+ * @param {string} key The key of the property to assign.
+ * @param {*} value The value to assign.
+ */
+function baseAssignValue(object, key, value) {
+  if (key == '__proto__' && defineProperty) {
+    defineProperty(object, key, {
+      'configurable': true,
+      'enumerable': true,
+      'value': value,
+      'writable': true
+    });
+  } else {
+    object[key] = value;
+  }
+}
+
+/**
+ * The base implementation of `baseForOwn` which iterates over `object`
+ * properties returned by `keysFunc` and invokes `iteratee` for each property.
+ * Iteratee functions may exit iteration early by explicitly returning `false`.
+ *
+ * @private
+ * @param {Object} object The object to iterate over.
+ * @param {Function} iteratee The function invoked per iteration.
+ * @param {Function} keysFunc The function to get the keys of `object`.
  * @returns {Object} Returns `object`.
  */
-function baseAssign(object, source) {
-  return object && copyObject(source, keys(source), object);
-}
+var baseFor = createBaseFor();
 
 /**
- * The base implementation of `_.clone` and `_.cloneDeep` which tracks
- * traversed objects.
- *
- * @private
- * @param {*} value The value to clone.
- * @param {boolean} [isDeep] Specify a deep clone.
- * @param {boolean} [isFull] Specify a clone including symbols.
- * @param {Function} [customizer] The function to customize cloning.
- * @param {string} [key] The key of `value`.
- * @param {Object} [object] The parent object of `value`.
- * @param {Object} [stack] Tracks traversed objects and their clone counterparts.
- * @returns {*} Returns the cloned value.
- */
-function baseClone(value, isDeep, isFull, customizer, key, object, stack) {
-  var result;
-  if (customizer) {
-    result = object ? customizer(value, key, object, stack) : customizer(value);
-  }
-  if (result !== undefined) {
-    return result;
-  }
-  if (!isObject(value)) {
-    return value;
-  }
-  var isArr = isArray(value);
-  if (isArr) {
-    result = initCloneArray(value);
-    if (!isDeep) {
-      return copyArray(value, result);
-    }
-  } else {
-    var tag = getTag(value),
-        isFunc = tag == funcTag || tag == genTag;
-
-    if (isBuffer(value)) {
-      return cloneBuffer(value, isDeep);
-    }
-    if (tag == objectTag || tag == argsTag || (isFunc && !object)) {
-      if (isHostObject(value)) {
-        return object ? value : {};
-      }
-      result = initCloneObject(isFunc ? {} : value);
-      if (!isDeep) {
-        return copySymbols(value, baseAssign(result, value));
-      }
-    } else {
-      if (!cloneableTags[tag]) {
-        return object ? value : {};
-      }
-      result = initCloneByTag(value, tag, baseClone, isDeep);
-    }
-  }
-  // Check for circular references and return its corresponding clone.
-  stack || (stack = new Stack);
-  var stacked = stack.get(value);
-  if (stacked) {
-    return stacked;
-  }
-  stack.set(value, result);
-
-  if (!isArr) {
-    var props = isFull ? getAllKeys(value) : keys(value);
-  }
-  arrayEach(props || value, function(subValue, key) {
-    if (props) {
-      key = subValue;
-      subValue = value[key];
-    }
-    // Recursively populate clone (susceptible to call stack limits).
-    assignValue(result, key, baseClone(subValue, isDeep, isFull, customizer, key, value, stack));
-  });
-  return result;
-}
-
-/**
- * The base implementation of `_.create` without support for assigning
- * properties to the created object.
- *
- * @private
- * @param {Object} prototype The object to inherit from.
- * @returns {Object} Returns the new object.
- */
-function baseCreate(proto) {
-  return isObject(proto) ? objectCreate(proto) : {};
-}
-
-/**
- * The base implementation of `getAllKeys` and `getAllKeysIn` which uses
- * `keysFunc` and `symbolsFunc` to get the enumerable property names and
- * symbols of `object`.
- *
- * @private
- * @param {Object} object The object to query.
- * @param {Function} keysFunc The function to get the keys of `object`.
- * @param {Function} symbolsFunc The function to get the symbols of `object`.
- * @returns {Array} Returns the array of property names and symbols.
- */
-function baseGetAllKeys(object, keysFunc, symbolsFunc) {
-  var result = keysFunc(object);
-  return isArray(object) ? result : arrayPush(result, symbolsFunc(object));
-}
-
-/**
- * The base implementation of `getTag`.
+ * The base implementation of `getTag` without fallbacks for buggy environments.
  *
  * @private
  * @param {*} value The value to query.
  * @returns {string} Returns the `toStringTag`.
  */
 function baseGetTag(value) {
-  return objectToString.call(value);
+  if (value == null) {
+    return value === undefined ? undefinedTag : nullTag;
+  }
+  return (symToStringTag && symToStringTag in Object(value))
+    ? getRawTag(value)
+    : objectToString(value);
+}
+
+/**
+ * The base implementation of `_.isArguments`.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is an `arguments` object,
+ */
+function baseIsArguments(value) {
+  return isObjectLike(value) && baseGetTag(value) == argsTag;
 }
 
 /**
@@ -2185,7 +1183,7 @@ function baseIsNative(value) {
   if (!isObject(value) || isMasked(value)) {
     return false;
   }
-  var pattern = (isFunction(value) || isHostObject(value)) ? reIsNative : reIsHostCtor;
+  var pattern = isFunction(value) ? reIsNative : reIsHostCtor;
   return pattern.test(toSource(value));
 }
 
@@ -2198,27 +1196,7 @@ function baseIsNative(value) {
  */
 function baseIsTypedArray(value) {
   return isObjectLike(value) &&
-    isLength(value.length) && !!typedArrayTags[objectToString.call(value)];
-}
-
-/**
- * The base implementation of `_.keys` which doesn't treat sparse arrays as dense.
- *
- * @private
- * @param {Object} object The object to query.
- * @returns {Array} Returns the array of property names.
- */
-function baseKeys(object) {
-  if (!isPrototype(object)) {
-    return nativeKeys(object);
-  }
-  var result = [];
-  for (var key in Object(object)) {
-    if (hasOwnProperty.call(object, key) && key != 'constructor') {
-      result.push(key);
-    }
-  }
-  return result;
+    isLength(value.length) && !!typedArrayTags[baseGetTag(value)];
 }
 
 /**
@@ -2258,21 +1236,14 @@ function baseMerge(object, source, srcIndex, customizer, stack) {
   if (object === source) {
     return;
   }
-  if (!(isArray(source) || isTypedArray(source))) {
-    var props = baseKeysIn(source);
-  }
-  arrayEach(props || source, function(srcValue, key) {
-    if (props) {
-      key = srcValue;
-      srcValue = source[key];
-    }
+  baseFor(source, function(srcValue, key) {
+    stack || (stack = new Stack);
     if (isObject(srcValue)) {
-      stack || (stack = new Stack);
       baseMergeDeep(object, source, key, srcIndex, baseMerge, customizer, stack);
     }
     else {
       var newValue = customizer
-        ? customizer(object[key], srcValue, (key + ''), object, source, stack)
+        ? customizer(safeGet(object, key), srcValue, (key + ''), object, source, stack)
         : undefined;
 
       if (newValue === undefined) {
@@ -2280,7 +1251,7 @@ function baseMerge(object, source, srcIndex, customizer, stack) {
       }
       assignMergeValue(object, key, newValue);
     }
-  });
+  }, keysIn);
 }
 
 /**
@@ -2299,8 +1270,8 @@ function baseMerge(object, source, srcIndex, customizer, stack) {
  *  counterparts.
  */
 function baseMergeDeep(object, source, key, srcIndex, mergeFunc, customizer, stack) {
-  var objValue = object[key],
-      srcValue = source[key],
+  var objValue = safeGet(object, key),
+      srcValue = safeGet(source, key),
       stacked = stack.get(srcValue);
 
   if (stacked) {
@@ -2314,29 +1285,37 @@ function baseMergeDeep(object, source, key, srcIndex, mergeFunc, customizer, sta
   var isCommon = newValue === undefined;
 
   if (isCommon) {
+    var isArr = isArray(srcValue),
+        isBuff = !isArr && isBuffer(srcValue),
+        isTyped = !isArr && !isBuff && isTypedArray(srcValue);
+
     newValue = srcValue;
-    if (isArray(srcValue) || isTypedArray(srcValue)) {
+    if (isArr || isBuff || isTyped) {
       if (isArray(objValue)) {
         newValue = objValue;
       }
       else if (isArrayLikeObject(objValue)) {
         newValue = copyArray(objValue);
       }
-      else {
+      else if (isBuff) {
         isCommon = false;
-        newValue = baseClone(srcValue, true);
+        newValue = cloneBuffer(srcValue, true);
+      }
+      else if (isTyped) {
+        isCommon = false;
+        newValue = cloneTypedArray(srcValue, true);
+      }
+      else {
+        newValue = [];
       }
     }
     else if (isPlainObject(srcValue) || isArguments(srcValue)) {
+      newValue = objValue;
       if (isArguments(objValue)) {
         newValue = toPlainObject(objValue);
       }
-      else if (!isObject(objValue) || (srcIndex && isFunction(objValue))) {
-        isCommon = false;
-        newValue = baseClone(srcValue, true);
-      }
-      else {
-        newValue = objValue;
+      else if (!isObject(objValue) || isFunction(objValue)) {
+        newValue = initCloneObject(srcValue);
       }
     }
     else {
@@ -2361,25 +1340,25 @@ function baseMergeDeep(object, source, key, srcIndex, mergeFunc, customizer, sta
  * @returns {Function} Returns the new function.
  */
 function baseRest(func, start) {
-  start = nativeMax(start === undefined ? (func.length - 1) : start, 0);
-  return function() {
-    var args = arguments,
-        index = -1,
-        length = nativeMax(args.length - start, 0),
-        array = Array(length);
-
-    while (++index < length) {
-      array[index] = args[start + index];
-    }
-    index = -1;
-    var otherArgs = Array(start + 1);
-    while (++index < start) {
-      otherArgs[index] = args[index];
-    }
-    otherArgs[start] = array;
-    return apply(func, this, otherArgs);
-  };
+  return setToString(overRest(func, start, identity), func + '');
 }
+
+/**
+ * The base implementation of `setToString` without support for hot loop shorting.
+ *
+ * @private
+ * @param {Function} func The function to modify.
+ * @param {Function} string The `toString` result.
+ * @returns {Function} Returns `func`.
+ */
+var baseSetToString = !defineProperty ? identity : function(func, string) {
+  return defineProperty(func, 'toString', {
+    'configurable': true,
+    'enumerable': false,
+    'value': constant(string),
+    'writable': true
+  });
+};
 
 /**
  * Creates a clone of  `buffer`.
@@ -2393,7 +1372,9 @@ function cloneBuffer(buffer, isDeep) {
   if (isDeep) {
     return buffer.slice();
   }
-  var result = new buffer.constructor(buffer.length);
+  var length = buffer.length,
+      result = allocUnsafe ? allocUnsafe(length) : new buffer.constructor(length);
+
   buffer.copy(result);
   return result;
 }
@@ -2409,71 +1390,6 @@ function cloneArrayBuffer(arrayBuffer) {
   var result = new arrayBuffer.constructor(arrayBuffer.byteLength);
   new Uint8Array(result).set(new Uint8Array(arrayBuffer));
   return result;
-}
-
-/**
- * Creates a clone of `dataView`.
- *
- * @private
- * @param {Object} dataView The data view to clone.
- * @param {boolean} [isDeep] Specify a deep clone.
- * @returns {Object} Returns the cloned data view.
- */
-function cloneDataView(dataView, isDeep) {
-  var buffer = isDeep ? cloneArrayBuffer(dataView.buffer) : dataView.buffer;
-  return new dataView.constructor(buffer, dataView.byteOffset, dataView.byteLength);
-}
-
-/**
- * Creates a clone of `map`.
- *
- * @private
- * @param {Object} map The map to clone.
- * @param {Function} cloneFunc The function to clone values.
- * @param {boolean} [isDeep] Specify a deep clone.
- * @returns {Object} Returns the cloned map.
- */
-function cloneMap(map, isDeep, cloneFunc) {
-  var array = isDeep ? cloneFunc(mapToArray(map), true) : mapToArray(map);
-  return arrayReduce(array, addMapEntry, new map.constructor);
-}
-
-/**
- * Creates a clone of `regexp`.
- *
- * @private
- * @param {Object} regexp The regexp to clone.
- * @returns {Object} Returns the cloned regexp.
- */
-function cloneRegExp(regexp) {
-  var result = new regexp.constructor(regexp.source, reFlags.exec(regexp));
-  result.lastIndex = regexp.lastIndex;
-  return result;
-}
-
-/**
- * Creates a clone of `set`.
- *
- * @private
- * @param {Object} set The set to clone.
- * @param {Function} cloneFunc The function to clone values.
- * @param {boolean} [isDeep] Specify a deep clone.
- * @returns {Object} Returns the cloned set.
- */
-function cloneSet(set, isDeep, cloneFunc) {
-  var array = isDeep ? cloneFunc(setToArray(set), true) : setToArray(set);
-  return arrayReduce(array, addSetEntry, new set.constructor);
-}
-
-/**
- * Creates a clone of the `symbol` object.
- *
- * @private
- * @param {Object} symbol The symbol object to clone.
- * @returns {Object} Returns the cloned symbol object.
- */
-function cloneSymbol(symbol) {
-  return symbolValueOf ? Object(symbolValueOf.call(symbol)) : {};
 }
 
 /**
@@ -2519,6 +1435,7 @@ function copyArray(source, array) {
  * @returns {Object} Returns `object`.
  */
 function copyObject(source, props, object, customizer) {
+  var isNew = !object;
   object || (object = {});
 
   var index = -1,
@@ -2531,21 +1448,16 @@ function copyObject(source, props, object, customizer) {
       ? customizer(object[key], source[key], key, object, source)
       : undefined;
 
-    assignValue(object, key, newValue === undefined ? source[key] : newValue);
+    if (newValue === undefined) {
+      newValue = source[key];
+    }
+    if (isNew) {
+      baseAssignValue(object, key, newValue);
+    } else {
+      assignValue(object, key, newValue);
+    }
   }
   return object;
-}
-
-/**
- * Copies own symbol properties of `source` to `object`.
- *
- * @private
- * @param {Object} source The object to copy symbols from.
- * @param {Object} [object={}] The object to copy symbols to.
- * @returns {Object} Returns `object`.
- */
-function copySymbols(source, object) {
-  return copyObject(source, getSymbols(source), object);
 }
 
 /**
@@ -2582,14 +1494,51 @@ function createAssigner(assigner) {
 }
 
 /**
- * Creates an array of own enumerable property names and symbols of `object`.
+ * Creates a base function for methods like `_.forIn` and `_.forOwn`.
  *
  * @private
- * @param {Object} object The object to query.
- * @returns {Array} Returns the array of property names and symbols.
+ * @param {boolean} [fromRight] Specify iterating from right to left.
+ * @returns {Function} Returns the new base function.
  */
-function getAllKeys(object) {
-  return baseGetAllKeys(object, keys, getSymbols);
+function createBaseFor(fromRight) {
+  return function(object, iteratee, keysFunc) {
+    var index = -1,
+        iterable = Object(object),
+        props = keysFunc(object),
+        length = props.length;
+
+    while (length--) {
+      var key = props[fromRight ? length : ++index];
+      if (iteratee(iterable[key], key, iterable) === false) {
+        break;
+      }
+    }
+    return object;
+  };
+}
+
+/**
+ * Used by `_.defaultsDeep` to customize its `_.merge` use to merge source
+ * objects into destination objects that are passed thru.
+ *
+ * @private
+ * @param {*} objValue The destination value.
+ * @param {*} srcValue The source value.
+ * @param {string} key The key of the property to merge.
+ * @param {Object} object The parent object of `objValue`.
+ * @param {Object} source The parent object of `srcValue`.
+ * @param {Object} [stack] Tracks traversed source values and their merged
+ *  counterparts.
+ * @returns {*} Returns the value to assign.
+ */
+function customDefaultsMerge(objValue, srcValue, key, object, source, stack) {
+  if (isObject(objValue) && isObject(srcValue)) {
+    // Recursively merge objects and arrays (susceptible to call stack limits).
+    stack.set(srcValue, objValue);
+    baseMerge(objValue, srcValue, undefined, customDefaultsMerge, stack);
+    stack['delete'](srcValue);
+  }
+  return objValue;
 }
 
 /**
@@ -2621,63 +1570,28 @@ function getNative(object, key) {
 }
 
 /**
- * Creates an array of the own enumerable symbol properties of `object`.
- *
- * @private
- * @param {Object} object The object to query.
- * @returns {Array} Returns the array of symbols.
- */
-var getSymbols = nativeGetSymbols ? overArg(nativeGetSymbols, Object) : stubArray;
-
-/**
- * Gets the `toStringTag` of `value`.
+ * A specialized version of `baseGetTag` which ignores `Symbol.toStringTag` values.
  *
  * @private
  * @param {*} value The value to query.
- * @returns {string} Returns the `toStringTag`.
+ * @returns {string} Returns the raw `toStringTag`.
  */
-var getTag = baseGetTag;
+function getRawTag(value) {
+  var isOwn = hasOwnProperty.call(value, symToStringTag),
+      tag = value[symToStringTag];
 
-// Fallback for data views, maps, sets, and weak maps in IE 11,
-// for data views in Edge < 14, and promises in Node.js.
-if ((DataView && getTag(new DataView(new ArrayBuffer(1))) != dataViewTag) ||
-    (Map && getTag(new Map) != mapTag) ||
-    (Promise && getTag(Promise.resolve()) != promiseTag) ||
-    (Set && getTag(new Set) != setTag) ||
-    (WeakMap && getTag(new WeakMap) != weakMapTag)) {
-  getTag = function(value) {
-    var result = objectToString.call(value),
-        Ctor = result == objectTag ? value.constructor : undefined,
-        ctorString = Ctor ? toSource(Ctor) : undefined;
+  try {
+    value[symToStringTag] = undefined;
+    var unmasked = true;
+  } catch (e) {}
 
-    if (ctorString) {
-      switch (ctorString) {
-        case dataViewCtorString: return dataViewTag;
-        case mapCtorString: return mapTag;
-        case promiseCtorString: return promiseTag;
-        case setCtorString: return setTag;
-        case weakMapCtorString: return weakMapTag;
-      }
+  var result = nativeObjectToString.call(value);
+  if (unmasked) {
+    if (isOwn) {
+      value[symToStringTag] = tag;
+    } else {
+      delete value[symToStringTag];
     }
-    return result;
-  };
-}
-
-/**
- * Initializes an array clone.
- *
- * @private
- * @param {Array} array The array to clone.
- * @returns {Array} Returns the initialized clone.
- */
-function initCloneArray(array) {
-  var length = array.length,
-      result = array.constructor(length);
-
-  // Add properties assigned by `RegExp#exec`.
-  if (length && typeof array[0] == 'string' && hasOwnProperty.call(array, 'index')) {
-    result.index = array.index;
-    result.input = array.input;
   }
   return result;
 }
@@ -2696,55 +1610,6 @@ function initCloneObject(object) {
 }
 
 /**
- * Initializes an object clone based on its `toStringTag`.
- *
- * **Note:** This function only supports cloning values with tags of
- * `Boolean`, `Date`, `Error`, `Number`, `RegExp`, or `String`.
- *
- * @private
- * @param {Object} object The object to clone.
- * @param {string} tag The `toStringTag` of the object to clone.
- * @param {Function} cloneFunc The function to clone values.
- * @param {boolean} [isDeep] Specify a deep clone.
- * @returns {Object} Returns the initialized clone.
- */
-function initCloneByTag(object, tag, cloneFunc, isDeep) {
-  var Ctor = object.constructor;
-  switch (tag) {
-    case arrayBufferTag:
-      return cloneArrayBuffer(object);
-
-    case boolTag:
-    case dateTag:
-      return new Ctor(+object);
-
-    case dataViewTag:
-      return cloneDataView(object, isDeep);
-
-    case float32Tag: case float64Tag:
-    case int8Tag: case int16Tag: case int32Tag:
-    case uint8Tag: case uint8ClampedTag: case uint16Tag: case uint32Tag:
-      return cloneTypedArray(object, isDeep);
-
-    case mapTag:
-      return cloneMap(object, isDeep, cloneFunc);
-
-    case numberTag:
-    case stringTag:
-      return new Ctor(object);
-
-    case regexpTag:
-      return cloneRegExp(object);
-
-    case setTag:
-      return cloneSet(object, isDeep, cloneFunc);
-
-    case symbolTag:
-      return cloneSymbol(object);
-  }
-}
-
-/**
  * Checks if `value` is a valid array-like index.
  *
  * @private
@@ -2753,10 +1618,13 @@ function initCloneByTag(object, tag, cloneFunc, isDeep) {
  * @returns {boolean} Returns `true` if `value` is a valid index, else `false`.
  */
 function isIndex(value, length) {
+  var type = typeof value;
   length = length == null ? MAX_SAFE_INTEGER : length;
+
   return !!length &&
-    (typeof value == 'number' || reIsUint.test(value)) &&
-    (value > -1 && value % 1 == 0 && value < length);
+    (type == 'number' ||
+      (type != 'symbol' && reIsUint.test(value))) &&
+        (value > -1 && value % 1 == 0 && value < length);
 }
 
 /**
@@ -2823,29 +1691,6 @@ function isPrototype(value) {
 }
 
 /**
- * Used by `_.defaultsDeep` to customize its `_.merge` use.
- *
- * @private
- * @param {*} objValue The destination value.
- * @param {*} srcValue The source value.
- * @param {string} key The key of the property to merge.
- * @param {Object} object The parent object of `objValue`.
- * @param {Object} source The parent object of `srcValue`.
- * @param {Object} [stack] Tracks traversed source values and their merged
- *  counterparts.
- * @returns {*} Returns the value to assign.
- */
-function mergeDefaults(objValue, srcValue, key, object, source, stack) {
-  if (isObject(objValue) && isObject(srcValue)) {
-    // Recursively merge objects and arrays (susceptible to call stack limits).
-    stack.set(srcValue, objValue);
-    baseMerge(objValue, srcValue, undefined, mergeDefaults, stack);
-    stack['delete'](srcValue);
-  }
-  return objValue;
-}
-
-/**
  * This function is like
  * [`Object.keys`](http://ecma-international.org/ecma-262/7.0/#sec-object.keys)
  * except that it includes inherited enumerable properties.
@@ -2865,10 +1710,110 @@ function nativeKeysIn(object) {
 }
 
 /**
+ * Converts `value` to a string using `Object.prototype.toString`.
+ *
+ * @private
+ * @param {*} value The value to convert.
+ * @returns {string} Returns the converted string.
+ */
+function objectToString(value) {
+  return nativeObjectToString.call(value);
+}
+
+/**
+ * A specialized version of `baseRest` which transforms the rest array.
+ *
+ * @private
+ * @param {Function} func The function to apply a rest parameter to.
+ * @param {number} [start=func.length-1] The start position of the rest parameter.
+ * @param {Function} transform The rest array transform.
+ * @returns {Function} Returns the new function.
+ */
+function overRest(func, start, transform) {
+  start = nativeMax(start === undefined ? (func.length - 1) : start, 0);
+  return function() {
+    var args = arguments,
+        index = -1,
+        length = nativeMax(args.length - start, 0),
+        array = Array(length);
+
+    while (++index < length) {
+      array[index] = args[start + index];
+    }
+    index = -1;
+    var otherArgs = Array(start + 1);
+    while (++index < start) {
+      otherArgs[index] = args[index];
+    }
+    otherArgs[start] = transform(array);
+    return apply(func, this, otherArgs);
+  };
+}
+
+/**
+ * Gets the value at `key`, unless `key` is "__proto__" or "constructor".
+ *
+ * @private
+ * @param {Object} object The object to query.
+ * @param {string} key The key of the property to get.
+ * @returns {*} Returns the property value.
+ */
+function safeGet(object, key) {
+  if (key === 'constructor' && typeof object[key] === 'function') {
+    return;
+  }
+
+  if (key == '__proto__') {
+    return;
+  }
+
+  return object[key];
+}
+
+/**
+ * Sets the `toString` method of `func` to return `string`.
+ *
+ * @private
+ * @param {Function} func The function to modify.
+ * @param {Function} string The `toString` result.
+ * @returns {Function} Returns `func`.
+ */
+var setToString = shortOut(baseSetToString);
+
+/**
+ * Creates a function that'll short out and invoke `identity` instead
+ * of `func` when it's called `HOT_COUNT` or more times in `HOT_SPAN`
+ * milliseconds.
+ *
+ * @private
+ * @param {Function} func The function to restrict.
+ * @returns {Function} Returns the new shortable function.
+ */
+function shortOut(func) {
+  var count = 0,
+      lastCalled = 0;
+
+  return function() {
+    var stamp = nativeNow(),
+        remaining = HOT_SPAN - (stamp - lastCalled);
+
+    lastCalled = stamp;
+    if (remaining > 0) {
+      if (++count >= HOT_COUNT) {
+        return arguments[0];
+      }
+    } else {
+      count = 0;
+    }
+    return func.apply(undefined, arguments);
+  };
+}
+
+/**
  * Converts `func` to its source code.
  *
  * @private
- * @param {Function} func The function to process.
+ * @param {Function} func The function to convert.
  * @returns {string} Returns the source code.
  */
 function toSource(func) {
@@ -2937,11 +1882,10 @@ function eq(value, other) {
  * _.isArguments([1, 2, 3]);
  * // => false
  */
-function isArguments(value) {
-  // Safari 8.1 makes `arguments.callee` enumerable in strict mode.
-  return isArrayLikeObject(value) && hasOwnProperty.call(value, 'callee') &&
-    (!propertyIsEnumerable.call(value, 'callee') || objectToString.call(value) == argsTag);
-}
+var isArguments = baseIsArguments(function() { return arguments; }()) ? baseIsArguments : function(value) {
+  return isObjectLike(value) && hasOwnProperty.call(value, 'callee') &&
+    !propertyIsEnumerable.call(value, 'callee');
+};
 
 /**
  * Checks if `value` is classified as an `Array` object.
@@ -3063,10 +2007,13 @@ var isBuffer = nativeIsBuffer || stubFalse;
  * // => false
  */
 function isFunction(value) {
+  if (!isObject(value)) {
+    return false;
+  }
   // The use of `Object#toString` avoids issues with the `typeof` operator
-  // in Safari 8-9 which returns 'object' for typed array and other constructors.
-  var tag = isObject(value) ? objectToString.call(value) : '';
-  return tag == funcTag || tag == genTag;
+  // in Safari 9 which returns 'object' for typed arrays and other constructors.
+  var tag = baseGetTag(value);
+  return tag == funcTag || tag == genTag || tag == asyncTag || tag == proxyTag;
 }
 
 /**
@@ -3127,7 +2074,7 @@ function isLength(value) {
  */
 function isObject(value) {
   var type = typeof value;
-  return !!value && (type == 'object' || type == 'function');
+  return value != null && (type == 'object' || type == 'function');
 }
 
 /**
@@ -3155,7 +2102,7 @@ function isObject(value) {
  * // => false
  */
 function isObjectLike(value) {
-  return !!value && typeof value == 'object';
+  return value != null && typeof value == 'object';
 }
 
 /**
@@ -3187,8 +2134,7 @@ function isObjectLike(value) {
  * // => true
  */
 function isPlainObject(value) {
-  if (!isObjectLike(value) ||
-      objectToString.call(value) != objectTag || isHostObject(value)) {
+  if (!isObjectLike(value) || baseGetTag(value) != objectTag) {
     return false;
   }
   var proto = getPrototype(value);
@@ -3196,8 +2142,8 @@ function isPlainObject(value) {
     return true;
   }
   var Ctor = hasOwnProperty.call(proto, 'constructor') && proto.constructor;
-  return (typeof Ctor == 'function' &&
-    Ctor instanceof Ctor && funcToString.call(Ctor) == objectCtorString);
+  return typeof Ctor == 'function' && Ctor instanceof Ctor &&
+    funcToString.call(Ctor) == objectCtorString;
 }
 
 /**
@@ -3267,41 +2213,9 @@ function toPlainObject(value) {
  * // => { 'a': { 'b': 2, 'c': 3 } }
  */
 var defaultsDeep = baseRest(function(args) {
-  args.push(undefined, mergeDefaults);
+  args.push(undefined, customDefaultsMerge);
   return apply(mergeWith, undefined, args);
 });
-
-/**
- * Creates an array of the own enumerable property names of `object`.
- *
- * **Note:** Non-object values are coerced to objects. See the
- * [ES spec](http://ecma-international.org/ecma-262/7.0/#sec-object.keys)
- * for more details.
- *
- * @static
- * @since 0.1.0
- * @memberOf _
- * @category Object
- * @param {Object} object The object to query.
- * @returns {Array} Returns the array of property names.
- * @example
- *
- * function Foo() {
- *   this.a = 1;
- *   this.b = 2;
- * }
- *
- * Foo.prototype.c = 3;
- *
- * _.keys(new Foo);
- * // => ['a', 'b'] (iteration order is not guaranteed)
- *
- * _.keys('hi');
- * // => ['0', '1']
- */
-function keys(object) {
-  return isArrayLike(object) ? arrayLikeKeys(object) : baseKeys(object);
-}
 
 /**
  * Creates an array of the own and inherited enumerable property names of `object`.
@@ -3334,7 +2248,7 @@ function keysIn(object) {
  * This method is like `_.merge` except that it accepts `customizer` which
  * is invoked to produce the merged values of the destination and source
  * properties. If `customizer` returns `undefined`, merging is handled by the
- * method instead. The `customizer` is invoked with seven arguments:
+ * method instead. The `customizer` is invoked with six arguments:
  * (objValue, srcValue, key, object, source, stack).
  *
  * **Note:** This method mutates `object`.
@@ -3366,25 +2280,48 @@ var mergeWith = createAssigner(function(object, source, srcIndex, customizer) {
 });
 
 /**
- * This method returns a new empty array.
+ * Creates a function that returns `value`.
  *
  * @static
  * @memberOf _
- * @since 4.13.0
+ * @since 2.4.0
  * @category Util
- * @returns {Array} Returns the new empty array.
+ * @param {*} value The value to return from the new function.
+ * @returns {Function} Returns the new constant function.
  * @example
  *
- * var arrays = _.times(2, _.stubArray);
+ * var objects = _.times(2, _.constant({ 'a': 1 }));
  *
- * console.log(arrays);
- * // => [[], []]
+ * console.log(objects);
+ * // => [{ 'a': 1 }, { 'a': 1 }]
  *
- * console.log(arrays[0] === arrays[1]);
- * // => false
+ * console.log(objects[0] === objects[1]);
+ * // => true
  */
-function stubArray() {
-  return [];
+function constant(value) {
+  return function() {
+    return value;
+  };
+}
+
+/**
+ * This method returns the first argument it receives.
+ *
+ * @static
+ * @since 0.1.0
+ * @memberOf _
+ * @category Util
+ * @param {*} value Any value.
+ * @returns {*} Returns `value`.
+ * @example
+ *
+ * var object = { 'a': 1 };
+ *
+ * console.log(_.identity(object) === object);
+ * // => true
+ */
+function identity(value) {
+  return value;
 }
 
 /**
@@ -3406,8 +2343,774 @@ function stubFalse() {
 
 module.exports = defaultsDeep;
 
-},{}],24:[function(require,module,exports){
-!function(){"use strict";function t(t,n){return J.call(arguments,2).reduce(t,n)}function n(t,n){if(n)for(var r=F(n),e=0;e<r[V];e++)t[r[e]]=n[r[e]];return t}function r(t){return"function"==typeof t}function e(t){return t&&typeof t==R||r(t)}function o(t){return t&&typeof t==R&&t.__proto__==q.prototype}function i(t,n){if(n===d)return t;if(w(n))return(w(t)?t:[]).concat(n);if(!o(n))return n;for(var r,e=F(n),u=0;u<e[V];)r=e[u++],n[r]!==d&&(t[r]=i(o(t[r])||w(n[r])?t[r]:{},n[r]));return t}function u(){return h=H.apply([],arguments).filter(function(t,n,e){return r(t)&&e.indexOf(t)===n}),h[V]?h:d}function p(t){return b={},b[E]=t[E]||d,h=t[v],m=t.props,b[v]=e(h||m)?K({},m,h):d,b[z]=u(t.init,t[z]),b[I]=u(t[I]),h=t[P],m=t[D],b[P]=e(h||m)?L({},m,h):d,b[g]=t[g],h=t[A],m=t.statics,b[A]=e(h||m)?K({},m,h):d,h=t[O],m=t[S],b[O]=e(h||m)?L({},m,h):d,b[j]=t[j],h=t[x],m=t.conf,b[x]=e(h||m)?K({},m,h):d,h=t[C],m=t[k],_=e(h||m)?L({},m,h):d,b[C]=_,b}function c(){return function Stamp(t){var n,e,o=Stamp[N]||{},i={__proto__:o[E]},u=o[z],p=J.apply(arguments),c=o[P];if(c&&L(i,c),c=o[v],c&&K(i,c),c=o[g],c&&B(i,c),!u||!u[V])return i;for(t===d&&(t={}),o=0;o<u[V];)n=u[o++],r(n)&&(e=n.call(i,t,{instance:i,stamp:Stamp,args:p}),i=e===d?i:e);return i}}function f(t){return h=c(),m=t[O],m&&L(h,m),m=t[A],m&&K(h,m),m=t[j],m&&B(h,m),m=r(h[N])?h[N]:a,K(h[N]=function(){return m.apply(this,arguments)},t),h}function s(t,n){function r(r,o){e(n[r])&&(e(t[r])||(t[r]={}),(o||K)(t[r],n[r]))}function o(r){(h=u(t[r],n[r]))&&(t[r]=h)}return n&&e(n=n[N]||n)&&(r(E),r(v),r(P,L),r(g),r(A),r(O,L),r(j),r(x),r(C,L),o(z),o(I)),t}function a(){return f(H.apply([this],arguments).reduce(s,{}))}function l(t){return r(t)&&r(t[N])}function y(t,n){return function(){return b={},b[t]=n.apply(d,H.apply([{}],arguments)),h=this,(h&&h[N]||m).call(h,b)}}var d,h="roperties",m="ropertyDescriptors",_="static",b="onfiguration",v="p"+h,P="deepP"+h,g="p"+m,A=_+"P"+h,O=_+"DeepP"+h,j=_+"P"+m,x="c"+b,C="deepC"+b,D="deepProps",S="deepStatics",k="deepConf",z="initializers",E="methods",I="composers",N="compose",R="object",V="length",q=Object,w=Array.isArray,B=q.defineProperties,F=q.keys,G=Array.prototype,H=G.concat,J=G.slice,K=q.assign||t.bind(0,n),L=t.bind(0,i),M={};M[E]=y(E,K),M[v]=M.props=y(v,K),M[z]=M.init=y(z,u),M[I]=y(I,u),M[P]=M[D]=y(P,L),M[A]=M.statics=y(A,K),M[O]=M[S]=y(O,L),M[x]=M.conf=y(x,K),M[C]=M[k]=y(C,L),M[g]=y(g,K),M[j]=y(j,K),m=M[N]=K(function stampit(){for(var t,n=0,r=[],o=arguments,i=this;n<o[V];)t=o[n++],e(t)&&r.push(l(t)?t:p(t));if(t=a.apply(i||G,r),i&&r.unshift(i),o=t[N][I],w(o))for(n=0;n<o[V];)i=o[n++]({stamp:t,composables:r}),t=l(i)?i:t;return t},M),M.create=function(){return this.apply(d,arguments)},b={},b[A]=M,G=a(b),m[N]=m.bind(),m.version="4.1.2",typeof d!=typeof module?module.exports=m:self.stampit=m}();
+},{}],4:[function(require,module,exports){
+!function(){"use strict";function t(t,n){return J.call(arguments,2).reduce(t,n)}function n(t,n){if(n)for(var r=F(n),e=0;e<r[V];e++)t[r[e]]=n[r[e]];return t}function r(t){return"function"==typeof t}function e(t){return t&&typeof t==R||r(t)}function o(t){return t&&typeof t==R&&t.__proto__==q.prototype}function i(t,n){if(n===d)return t;if(w(n))return(w(t)?t:[]).concat(n);if(!o(n))return n;for(var r,e=F(n),u=0;u<e[V];)r=e[u++],n[r]!==d&&(t[r]=i(o(t[r])||w(n[r])?t[r]:{},n[r]));return t}function u(){return m=H.apply([],arguments).filter(function(t,n,e){return r(t)&&e.indexOf(t)===n}),m[V]?m:d}function p(t){return v={},v[E]=t[E]||d,m=t[b],h=t.props,v[b]=e(m||h)?K({},h,m):d,v[z]=u(t.init,t[z]),v[I]=u(t[I]),m=t[P],h=t[D],v[P]=e(m||h)?L({},h,m):d,v[g]=t[g],m=t[A],h=t.statics,v[A]=e(m||h)?K({},h,m):d,m=t[O],h=t[S],v[O]=e(m||h)?L({},h,m):d,m=t[j],h=t.name&&{name:{value:t.name}},v[j]=e(h||m)?K({},m,h):d,m=t[x],h=t.conf,v[x]=e(m||h)?K({},h,m):d,m=t[C],h=t[k],v[C]=e(m||h)?L({},h,m):d,v}function c(){return function Stamp(t){var n,e,o=Stamp[N]||{},i={__proto__:o[E]},u=o[z],p=J.apply(arguments),c=o[P];if(c&&L(i,c),c=o[b],c&&K(i,c),c=o[g],c&&B(i,c),!u||!u[V])return i;for(t===d&&(t={}),o=0;o<u[V];)n=u[o++],r(n)&&(e=n.call(i,t,{instance:i,stamp:Stamp,args:p}),i=e===d?i:e);return i}}function f(t){return m=c(),h=t[O],h&&L(m,h),h=t[A],h&&K(m,h),h=t[j],h&&B(m,h),h=r(m[N])?m[N]:a,K(m[N]=function(){return h.apply(this,arguments)},t),m}function s(t,n){function r(r,o){e(n[r])&&(e(t[r])||(t[r]={}),(o||K)(t[r],n[r]))}function o(r){(m=u(t[r],n[r]))&&(t[r]=m)}return n&&e(n=n[N]||n)&&(r(E),r(b),r(P,L),r(g),r(A),r(O,L),r(j),r(x),r(C,L),o(z),o(I)),t}function a(){return f(H.apply([this],arguments).reduce(s,{}))}function l(t){return r(t)&&r(t[N])}function y(t,n){return function(){return v={},v[t]=n.apply(d,H.apply([{}],arguments)),m=this,(m&&m[N]||h).call(m,v)}}var d,m="roperties",h="ropertyDescriptors",_="static",v="onfiguration",b="p"+m,P="deepP"+m,g="p"+h,A=_+"P"+m,O=_+"DeepP"+m,j=_+"P"+h,x="c"+v,C="deepC"+v,D="deepProps",S="deepStatics",k="deepConf",z="initializers",E="methods",I="composers",N="compose",R="object",V="length",q=Object,w=Array.isArray,B=q.defineProperties,F=q.keys,G=Array.prototype,H=G.concat,J=G.slice,K=q.assign||t.bind(0,n),L=t.bind(0,i),M={};M[E]=y(E,K),M[b]=M.props=y(b,K),M[z]=M.init=y(z,u),M[I]=y(I,u),M[P]=M[D]=y(P,L),M[A]=M.statics=y(A,K),M[O]=M[S]=y(O,L),M[x]=M.conf=y(x,K),M[C]=M[k]=y(C,L),M[g]=y(g,K),M[j]=y(j,K),h=M[N]=K(function stampit(){for(var t,n=0,r=[],o=arguments,i=this;n<o[V];)t=o[n++],e(t)&&r.push(l(t)?t:p(t));if(t=a.apply(i||G,r),i&&r.unshift(i),o=t[N][I],w(o))for(n=0;n<o[V];)i=o[n++]({stamp:t,composables:r}),t=l(i)?i:t;return t},M),M.create=function(){return this.apply(d,arguments)},v={},v[A]=M,G=a(v),h[N]=h.bind(),h.version="4.2.0",typeof d!=typeof module?module.exports=h:self.stampit=h}();
 
-},{}]},{},[3])(3)
+},{}],5:[function(require,module,exports){
+'use strict'
+
+function createError (responseError, errors) {
+  const error = new Error(responseError.error)
+  if (responseError.code) { error.code = responseError.code }
+  if (responseError.moreInfo) { error.moreInfo = responseError.moreInfo }
+  if (errors && errors.length > 1) { error.errors = errors }
+  return error
+}
+
+module.exports = function getResponseError (resp) {
+  if (!resp) {
+    return null
+  } else if (resp.errors) {
+    return createError(resp.errors[0], resp.errors)
+  } else if (resp instanceof Array) {
+    // Учитывается только первая ошибка
+    const errorItem = resp.find(item => item.errors)
+    return errorItem ? createError(errorItem.errors[0], errorItem.errors) : null
+  } else {
+    return null
+  }
+}
+
+},{}],6:[function(require,module,exports){
+'use strict'
+
+const have = require('have2')
+const matchers = require('./matchers')
+
+module.exports = have.with(matchers)
+
+},{"./matchers":8,"have2":2}],7:[function(require,module,exports){
+/*
+ * moysklad
+ * Клиент для JSON API МойСклад
+ *
+ * Copyright (c) 2017, Vitaliy V. Makeev
+ * Licensed under MIT.
+ */
+
+'use strict'
+
+const stampit = require('stampit')
+const have = require('./have')
+
+// methods
+const getTimeString = require('./tools/getTimeString')
+const parseTimeString = require('./tools/parseTimeString')
+const getAuthHeader = require('./methods/getAuthHeader')
+const buildUrl = require('./methods/buildUrl')
+const parseUrl = require('./methods/parseUrl')
+const fetchUrl = require('./methods/fetchUrl')
+const GET = require('./methods/GET')
+const POST = require('./methods/POST')
+const PUT = require('./methods/PUT')
+const DELETE = require('./methods/DELETE')
+
+// TODO Remove old methods
+module.exports = stampit({
+  methods: {
+    getAuthHeader,
+    buildUrl,
+    buildUri (...args) {
+      console.log('Warning: метод buildUri переименован в buildUrl.')
+      return this.buildUrl(...args)
+    },
+    parseUrl,
+    parseUri (...args) {
+      console.log('Warning: метод parseUri переименован в parseUrl.')
+      return this.parseUrl(...args)
+    },
+    fetchUrl,
+    fetchUri (...args) {
+      console.log('Warning: метод fetchUri переименован в fetchUrl.')
+      return this.fetchUrl(...args)
+    },
+    GET,
+    POST,
+    PUT,
+    DELETE
+  },
+  statics: {
+    getTimeString,
+    parseTimeString
+  }
+})
+  .init(function (options) {
+    let _options
+
+    have(options, {
+      endpoint: 'opt str',
+      api: 'opt str',
+      apiVersion: 'opt str'
+
+      // TODO fix have object arguments parsing
+      // login: 'opt str',
+      // password: 'opt str',
+      // fetch: 'opt function'
+      // queue: 'opt bool',
+      // emitter: 'opt obj'
+    })
+
+    if (options.fetch) {
+      this.fetch = options.fetch
+    } else if (typeof window !== 'undefined' && window.fetch) {
+      this.fetch = window.fetch.bind(window)
+    } else if (typeof fetch !== 'undefined') {
+      this.fetch = fetch
+    } else {
+      throw new Error('Не указан Fetch API модуль' +
+       ' (cм. подробнее https://github.com/wmakeev/moysklad#Установка).')
+    }
+
+    if (options.emitter) {
+      this.emitter = options.emitter
+    }
+
+    _options = Object.assign({
+      endpoint: 'https://online.moysklad.ru/api',
+      api: 'remap',
+      apiVersion: '1.1'
+    }, options)
+
+    this.getOptions = function () {
+      return _options
+    }
+  })
+
+},{"./have":6,"./methods/DELETE":9,"./methods/GET":10,"./methods/POST":11,"./methods/PUT":12,"./methods/buildUrl":13,"./methods/fetchUrl":14,"./methods/getAuthHeader":15,"./methods/parseUrl":16,"./tools/getTimeString":19,"./tools/parseTimeString":24,"stampit":4}],8:[function(require,module,exports){
+'use strict'
+
+const UUID_REGEX = /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/
+
+const urlMatcher = url => typeof url === 'string' && url.substring(0, 8) === 'https://'
+const uuidMatcher = uuid => typeof uuid === 'string' && UUID_REGEX.test(uuid)
+
+// TODO Убедиться что указан необходимый минимум полей для сущностей
+module.exports = {
+  entity: ent => !!(ent && ent.id && uuidMatcher(ent.id) && ent.meta && ent.meta.type),
+  uuid: uuidMatcher,
+  url: urlMatcher,
+  // 'uuid/uuid': id => {
+  //   if (typeof id !== 'string') { return false }
+  //   let [dicId, entId] = id.split('/')
+  //   return UUID_REGEX.test(dicId) && UUID_REGEX.test(entId)
+  // },
+  'Moysklad.Collection': col => !!(col && col.meta && col.meta.type && urlMatcher(col.meta.href) &&
+    typeof col.meta.size === 'number')
+}
+
+// TODO Проверка типов "Moysklad." на основании модели
+
+},{}],9:[function(require,module,exports){
+'use strict'
+
+const have = require('../have')
+
+module.exports = function DELETE (...args) {
+  const { path, options = {} } = have.strict(args, [
+    { path: 'str or str arr', options: 'opt Object' },
+    have.argumentsObject
+  ])
+
+  const uri = this.buildUrl(path)
+
+  return this.fetchUrl(uri, { ...options, method: 'DELETE', rawResponse: true })
+}
+
+},{"../have":6}],10:[function(require,module,exports){
+'use strict'
+
+const have = require('../have')
+
+module.exports = function GET (...args) {
+  const { path, query, options = {} } = have.strict(args, [
+    { path: 'str or str arr', query: 'opt Object', options: 'opt Object' },
+    have.argumentsObject
+  ])
+
+  const uri = this.buildUrl(path, query)
+
+  return this.fetchUrl(uri, { ...options, method: 'GET' })
+}
+
+},{"../have":6}],11:[function(require,module,exports){
+'use strict'
+
+const have = require('../have')
+
+module.exports = function POST (...args) {
+  // TODO Test payload: 'Object or Object arr'
+  const { path, payload, query, options = {} } = have.strict(args, [
+    {
+      path: 'str or str arr',
+      payload: 'opt Object or Object arr',
+      query: 'opt Object',
+      options: 'opt Object'
+    },
+    have.argumentsObject
+  ])
+
+  const uri = this.buildUrl(path, query)
+  const fetchOptions = { method: 'POST' }
+  if (payload) fetchOptions.body = JSON.stringify(payload)
+
+  return this.fetchUrl(uri, { ...options, ...fetchOptions })
+}
+
+},{"../have":6}],12:[function(require,module,exports){
+'use strict'
+
+const have = require('../have')
+
+module.exports = function PUT (...args) {
+  const { path, payload, query, options = {} } = have.strict(args, [
+    {
+      path: 'str or str arr',
+      payload: 'opt Object',
+      query: 'opt Object',
+      options: 'opt Object'
+    },
+    have.argumentsObject
+  ])
+
+  const uri = this.buildUrl(path, query)
+  const fetchOptions = { method: 'PUT' }
+  if (payload) fetchOptions.body = JSON.stringify(payload)
+
+  return this.fetchUrl(uri, { ...options, ...fetchOptions })
+}
+
+},{"../have":6}],13:[function(require,module,exports){
+'use strict'
+
+const have = require('../have')
+const buildQuery = require('../tools/buildQuery')
+const normalizeUrl = require('../tools/normalizeUrl')
+
+module.exports = function buildUrl (...args) {
+  let { url, path, query } = have.strict(args, [
+    { url: 'url', query: 'opt Object' },
+    { path: 'str or str arr', query: 'opt Object' },
+    have.argumentsObject
+  ])
+
+  if (url) {
+    const parsedUrl = this.parseUrl(url)
+    path = parsedUrl.path
+    query = {
+      ...parsedUrl.query,
+      ...query
+    }
+  }
+
+  const { endpoint, api, apiVersion } = this.getOptions()
+
+  let resultUrl = normalizeUrl([endpoint, api, apiVersion].concat(path).join('/'))
+
+  if (query) {
+    const queryString = buildQuery(query)
+    resultUrl = resultUrl + (queryString ? `?${queryString}` : '')
+  }
+
+  return resultUrl
+}
+
+},{"../have":6,"../tools/buildQuery":18,"../tools/normalizeUrl":22}],14:[function(require,module,exports){
+'use strict'
+
+const defaultsDeep = require('lodash.defaultsdeep')
+
+const have = require('../have')
+const getResponseError = require('../getResponseError')
+
+module.exports = async function fetchUrl (uri, options = {}) {
+  have.strict(arguments, { url: 'url', options: 'opt Object' })
+
+  let resBodyJson, error
+
+  // Специфические параметры (не передаются в опции fetch)
+  let rawResponse = false
+  let muteErrors = false
+
+  const emit = this.emitter ? this.emitter.emit.bind(this.emitter) : null
+
+  const fetchOptions = defaultsDeep({ ...options }, {
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    redirect: 'manual'
+  })
+
+  if (!fetchOptions.headers.Authorization) {
+    fetchOptions.credentials = 'include'
+  }
+
+  // получаем специфичные параметры
+  if (fetchOptions.rawResponse) {
+    rawResponse = true
+    delete fetchOptions.rawResponse
+  }
+  if (fetchOptions.muteErrors) {
+    muteErrors = true
+    delete fetchOptions.muteErrors
+  }
+
+  // X-Lognex
+  if (fetchOptions.millisecond) {
+    fetchOptions.headers['X-Lognex-Format-Millisecond'] = 'true'
+    delete fetchOptions.millisecond
+  }
+  if (fetchOptions.precision) {
+    fetchOptions.headers['X-Lognex-Precision'] = 'true'
+    delete fetchOptions.precision
+  }
+  if (fetchOptions.webHookDisable) {
+    fetchOptions.headers['X-Lognex-WebHook-Disable'] = 'true'
+    delete fetchOptions.webHookDisable
+  }
+
+  const authHeader = this.getAuthHeader()
+  if (authHeader) {
+    fetchOptions.headers.Authorization = this.getAuthHeader()
+  }
+
+  if (emit) emit('request', { uri, options: fetchOptions })
+
+  /** @type {Response} */
+  const response = await this.fetch(uri, fetchOptions)
+
+  if (emit) emit('response', { uri, options: fetchOptions, response })
+
+  if (rawResponse && muteErrors) return response
+
+  if (!response.ok) {
+    error = new Error(`${response.status} ${response.statusText}`)
+  } else if (rawResponse) {
+    return response
+  }
+
+  // разбираем тело запроса
+  if (
+    response.headers.has('Content-Type') &&
+    response.headers.get('Content-Type').indexOf('application/json') !== -1
+  ) {
+    // response.json() может вызвать ошибку, если тело ответа пустое
+    try {
+      resBodyJson = await response.json()
+    } catch (e) {}
+
+    if (emit) emit('response:body', { uri, options: fetchOptions, response, body: resBodyJson })
+    error = getResponseError(resBodyJson) || error
+  }
+
+  if (error && !muteErrors) {
+    if (emit) emit('error', error)
+    throw error
+  }
+
+  return rawResponse ? response : resBodyJson
+}
+
+},{"../getResponseError":5,"../have":6,"lodash.defaultsdeep":3}],15:[function(require,module,exports){
+'use strict'
+
+/* global MOYSKLAD_LOGIN, MOYSKLAD_PASSWORD */
+
+const base64encode = require('@wmakeev/base64encode')
+
+module.exports = function getAuthHeader () {
+  let login
+  let password
+  const options = this.getOptions()
+
+  if (options.login && options.password) {
+    login = options.login
+    password = options.password
+  } else if (typeof process !== 'undefined' && process.env && process.env.MOYSKLAD_LOGIN &&
+    process.env.MOYSKLAD_PASSWORD) {
+    login = process.env.MOYSKLAD_LOGIN
+    password = process.env.MOYSKLAD_PASSWORD
+  } else if (typeof MOYSKLAD_LOGIN !== 'undefined' && typeof MOYSKLAD_PASSWORD !== 'undefined') {
+    login = MOYSKLAD_LOGIN
+    password = MOYSKLAD_PASSWORD
+  } else {
+    return null
+  }
+
+  return 'Basic ' + base64encode(`${login}:${password}`)
+}
+
+},{"@wmakeev/base64encode":1}],16:[function(require,module,exports){
+'use srict'
+
+const have = require('../have')
+const normalizeUrl = require('../tools/normalizeUrl')
+const parseQueryString = require('../tools/parseQueryString')
+
+const PATH_QUERY_REGEX = /([^?]+)(?:\?(.+))?$/
+
+module.exports = function parseUrl (...args) {
+  const { url, path } = have.strict(arguments, [
+    { url: 'url' },
+    { path: 'str or str arr' }
+  ])
+
+  const { endpoint, api, apiVersion } = this.getOptions()
+
+  if (path instanceof Array) {
+    return {
+      endpoint,
+      api,
+      apiVersion,
+      path: normalizeUrl(path.join('/')).split(/\//g),
+      query: {}
+    }
+  }
+
+  let pathAndQuery
+
+  if (url) {
+    const baseUrl = normalizeUrl([endpoint, api, apiVersion].join('/'))
+    if (url.indexOf(baseUrl) !== 0) {
+      throw new Error('Url не соответствует указанной в настройках точке доступа ' + baseUrl)
+    }
+    pathAndQuery = url.substring(baseUrl.length + 1)
+  } else {
+    pathAndQuery = path
+  }
+
+  const [, pathStr, queryStr] = PATH_QUERY_REGEX.exec(pathAndQuery)
+
+  if (!pathStr) throw new Error('Не указан путь запроса')
+
+  // TODO Parse query.filter
+
+  return {
+    endpoint,
+    api,
+    apiVersion,
+    path: normalizeUrl(pathStr).split(/\//g),
+    query: parseQueryString(queryStr) || {}
+  }
+}
+
+},{"../have":6,"../tools/normalizeUrl":22,"../tools/parseQueryString":23}],17:[function(require,module,exports){
+'use strict'
+
+const getTimeString = require('./getTimeString')
+const isPlainObject = require('./isPlainObject')
+const isSimpleValue = require('./isSimpleValue')
+
+const createValueSelector = selector => (path, value) => {
+  if (!isSimpleValue(value)) {
+    throw new TypeError(`value must to be string, number, date or null`)
+  }
+  return [[path, selector, value]]
+}
+
+const createCollectionSelector = selector => {
+  const sel = createValueSelector(selector)
+  return (path, value) => {
+    if (!(value instanceof Array)) {
+      throw new TypeError(`selector value must to be an array`)
+    }
+    return value.reduce((res, v) => res.concat(sel(path, v)), [])
+  }
+}
+
+// Comparison selectors
+const selectors = {
+  eq: { operator: '=' },
+  gt: { operator: '>' },
+  gte: { operator: '>=' },
+  lt: { operator: '<' },
+  lte: { operator: '<=' },
+  ne: { operator: '!=' },
+  contains: { operator: '~' },
+  st: { operator: '~=' },
+  et: { operator: '=~' },
+  in: { operator: '=', collection: true },
+  nin: { operator: '!=', collection: true }
+}
+
+Object.keys(selectors).forEach(key => {
+  selectors[key].name = `$${key}`
+})
+
+selectors.eq.not = selectors.ne
+selectors.gt.not = selectors.lte
+selectors.gte.not = selectors.lt
+selectors.lt.not = selectors.gte
+selectors.lte.not = selectors.gt
+selectors.ne.not = selectors.eq
+selectors.in.not = selectors.nin
+selectors.nin.not = selectors.in
+
+const comparisonSelectors = Object.keys(selectors).reduce((res, key) => {
+  const op = selectors[key]
+  res['$' + key] = (op.collection ? createCollectionSelector : createValueSelector)(op)
+  return res
+}, {})
+
+// Logical selectors
+const invertFilterPart = fp => {
+  if (!fp[1].not) {
+    throw new Error(`${fp[1].name} not support negation like $not`)
+  }
+  return [fp[0], fp[1].not, fp[2]]
+}
+
+function getFilterParts (path, value) {
+  const pathLen = path.length
+  const curKey = pathLen ? path[pathLen - 1] : null
+
+  switch (true) {
+    // Mongo logical selectors
+    case curKey === '$and':
+      if (!(value instanceof Array)) {
+        throw new TypeError(`$and: selector value must to be an array`)
+      }
+      return value.reduce((res, val) => res
+        .concat(getFilterParts(path.slice(0, -1), val)), [])
+
+    case curKey === '$not':
+      if (!isPlainObject(value)) {
+        throw new TypeError(`$not: selector value must to be an object`)
+      }
+      const headPath = path.slice(0, -1)
+      return getFilterParts(headPath, value)
+        .map(invertFilterPart)
+        // .concat([[headPath, selectors.eq, null]])
+
+    case curKey === '$exists':
+      if (typeof value !== 'boolean') {
+        throw new TypeError(`$exists: selector value must to be boolean`)
+      }
+      return [[path.slice(0, -1), value ? selectors.ne : selectors.eq, null]]
+
+    // Mongo comparison selectors
+    case !!comparisonSelectors[curKey]:
+      let parts
+      try {
+        parts = comparisonSelectors[curKey](path.slice(0, -1), value)
+      } catch (error) {
+        throw new Error(`${curKey}: ${error.message}`)
+      }
+      return parts
+
+    // Array
+    case value instanceof Array:
+      return value.reduce((res, val) => res
+        .concat(getFilterParts(path, val)), [])
+
+    // Object
+    case !isSimpleValue(value):
+      return Object.keys(value).reduce((res, key) => res
+        .concat(getFilterParts(path.concat(key), value[key])), [])
+
+    // some other value
+    default:
+      return [[path, selectors.eq, value]]
+  }
+}
+
+module.exports = function buildFilter (filter) {
+  if (!isPlainObject(filter)) {
+    throw new TypeError('filter must to be an object')
+  }
+
+  let filterParts = getFilterParts([], filter)
+
+  // преобразование ключа в строку
+  filterParts = filterParts.map(part => [part[0].join('.'), part[1], part[2]])
+
+  return filterParts
+    // конвертация операторов и значений в строку
+    .map(part => {
+      const key = part[0]
+      const operator = part[1].operator
+      const value = part[2]
+      switch (true) {
+        case value === undefined:
+          throw new TypeError(`filter "${key}" key value is undefined`)
+
+        case value === null:
+          return [key, operator, '']
+
+        case value instanceof Date:
+          return [key, operator, getTimeString(value)]
+
+        case typeof value === 'string':
+        case typeof value === 'number':
+        case typeof value === 'boolean':
+          return [key, operator, value]
+
+        default:
+          throw new TypeError(`filter "${key}" key value is incorrect`)
+      }
+    })
+    .map(part => `${part[0]}${part[1]}${part[2]}`)
+    .sort((p1, p2) => {
+      if (p1 > p2) { return 1 }
+      if (p1 < p2) { return -1 }
+      return 0
+    })
+    .join(';')
+}
+
+},{"./getTimeString":19,"./isPlainObject":20,"./isSimpleValue":21}],18:[function(require,module,exports){
+'use strict'
+
+const buildFilter = require('./buildFilter')
+const isPlainObject = require('./isPlainObject')
+
+const addQueryPart = (res, key) => val => {
+  if (val === null) {
+    res.push([key, ''])
+  } else if (val === undefined) {
+    return undefined
+  } else if (['string', 'number', 'boolean'].indexOf(typeof val) === -1) {
+    throw new TypeError(
+      'url query key value must to be string, number, boolean, null or undefined')
+  } else {
+    res.push([key, encodeURIComponent(val)])
+  }
+}
+
+module.exports = function buildQuery (query) {
+  return Object.keys(query)
+    .reduce((res, key) => {
+      const addPart = addQueryPart(res, key)
+
+      switch (true) {
+        case key === 'filter':
+          if (isPlainObject(query.filter)) addPart(buildFilter(query.filter))
+          else if (typeof query.filter === 'string') addPart(query.filter)
+          else throw new TypeError('query.filter must to be string or object')
+          break
+
+        case query[key] instanceof Array:
+          query[key].forEach(addPart)
+          break
+
+        default:
+          addPart(query[key])
+      }
+
+      return res
+    }, [])
+    .map(kv => `${kv[0]}=${kv[1]}`)
+    .join('&')
+}
+
+},{"./buildFilter":17,"./isPlainObject":20}],19:[function(require,module,exports){
+'use strict'
+
+const MSK_TIMEZONE_OFFSET = 180 * 60 * 1000
+
+/**
+ * Возвращает дату для фильтра в часовом поясе Москвы
+ * @param {Date} date Конвертируемая дата
+ * @param {boolean} includeMs Отображать миллисекунды
+ * @returns {string} Дата ввиде строки
+ */
+module.exports = function getTimeString (date, includeMs) {
+  const mskTime = new Date(+date + MSK_TIMEZONE_OFFSET)
+
+  return mskTime.toJSON()
+    .replace('T', ' ')
+    .replace(includeMs ? /Z$/ : /(\.\d{3})?Z$/, '')
+}
+
+},{}],20:[function(require,module,exports){
+'use strict'
+
+module.exports = function isPlainObject (value) {
+  return Object.prototype.toString.call(value) === '[object Object]'
+}
+
+},{}],21:[function(require,module,exports){
+'use strict'
+
+module.exports = function isSimpleValue (value) {
+  return typeof value !== 'object' || value instanceof Date || value === null
+}
+
+},{}],22:[function(require,module,exports){
+'use strict'
+
+const URI_EXTRA_SLASH_REGEX = /([^:]\/)\/+/g
+const TRIM_SLASH = /^\/+|\/+$/g
+
+module.exports = function normalizeUrl (url) {
+  return url.replace(TRIM_SLASH, '').replace(URI_EXTRA_SLASH_REGEX, '$1').toLowerCase()
+}
+
+},{}],23:[function(require,module,exports){
+'use strict'
+
+function extractQueryValue (str) {
+  if (str === '') { return null }
+  const asBool = Boolean(str)
+  if (asBool.toString() === str) {
+    return asBool
+  }
+
+  const asNum = parseInt(str)
+  if (asNum.toString() === str) {
+    return asNum
+  }
+
+  return decodeURIComponent(str)
+}
+
+function extractQueryValues (str) {
+  return str.indexOf(',') !== -1
+    ? str.split(',').map(v => extractQueryValue(v))
+    : [extractQueryValue(str)]
+}
+
+module.exports = function parseQueryString (queryString) {
+  if (queryString == null || queryString === '') { return void 0 }
+  queryString = queryString.trim()
+  if (!queryString) { return void 0 }
+
+  const kvMap = queryString.split('&').reduce((res, queryPart) => {
+    const kv = queryPart.split('=')
+    const key = kv[0]
+    const value = extractQueryValues(kv[1])
+    const resValue = res.get(key)
+    return res.set(key, resValue ? resValue.concat(value) : value)
+  }, new Map())
+
+  const result = {}
+  for (const entry of kvMap.entries()) {
+    const [key, value] = entry
+    result[key] = value.length > 1 ? value : value[0]
+  }
+
+  return result
+}
+
+},{}],24:[function(require,module,exports){
+'use strict'
+
+// https://regex101.com/r/Bxq7dZ/2
+const MS_TIME_REGEX =
+  new RegExp(/^(\d{4})-(\d{2})-(\d{2})\s(\d{2}):(\d{2}):(\d{2})(?:\.(\d{3}))?$/)
+
+/**
+ * Преобразует строку времени МойСклад в объект даты (с учетом временной зоны)
+ * @param {string} timeString Время в формате МойСклад ("2017-04-08 13:33:00.123")
+ * @returns {Date} Дата
+ */
+module.exports = function parseTimeString (timeString) {
+  // 2017-04-08 13:33:00.123
+  const m = MS_TIME_REGEX.exec(timeString)
+  if (!m || m.length < 7 || m.length > 8) {
+    throw new Error(`Некорректный формат даты "${timeString}"`)
+  }
+  return new Date(`${m[1]}-${m[2]}-${m[3]}T${m[4]}:${m[5]}:${m[6]}${m[7] ? '.' + m[7] : ''}+03:00`)
+}
+
+},{}]},{},[7])(7)
 });

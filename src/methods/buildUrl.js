@@ -12,7 +12,7 @@ module.exports = function buildUrl (...args) {
   ])
 
   if (url) {
-    let parsedUrl = this.parseUrl(url)
+    const parsedUrl = this.parseUrl(url)
     path = parsedUrl.path
     query = {
       ...parsedUrl.query,
@@ -20,12 +20,12 @@ module.exports = function buildUrl (...args) {
     }
   }
 
-  let { endpoint, api, apiVersion } = this.getOptions()
+  const { endpoint, api, apiVersion } = this.getOptions()
 
   let resultUrl = normalizeUrl([endpoint, api, apiVersion].concat(path).join('/'))
 
   if (query) {
-    let queryString = buildQuery(query)
+    const queryString = buildQuery(query)
     resultUrl = resultUrl + (queryString ? `?${queryString}` : '')
   }
 

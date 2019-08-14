@@ -1,1 +1,1 @@
-module.exports = require('../lib/tools/normalizeUrl')
+module.exports = require('../src/tools/normalizeUrl')

@@ -1,12 +1,14 @@
 'use strict'
 
 const test = require('blue-tape')
+const fetch = require('node-fetch')
+
 const Moysklad = require('..')
 
 test('PUT error', t => {
   t.plan(2)
 
-  const ms = Moysklad()
+  const ms = Moysklad({ fetch })
 
   ms.PUT('entity/product', {
     foo: 'bar'
@@ -19,7 +21,7 @@ test('PUT error', t => {
 test('POST error', t => {
   t.plan(2)
 
-  const ms = Moysklad()
+  const ms = Moysklad({ fetch })
 
   ms.POST('entity/product', [
     { foo: 'bar1' },
@@ -34,7 +36,7 @@ test('POST error', t => {
 test('POST error with muteErrors', t => {
   t.plan(2)
 
-  const ms = Moysklad()
+  const ms = Moysklad({ fetch })
 
   ms.POST('entity/product', [
     { foo: 'bar1' },

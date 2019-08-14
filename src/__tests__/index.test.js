@@ -1,6 +1,8 @@
 'use strict'
 
 const test = require('blue-tape')
+const fetch = require('node-fetch')
+
 const Moysklad = require('..')
 
 test('Moysklad constructor', t => {
@@ -14,7 +16,7 @@ test('Moysklad static methods', t => {
 })
 
 test('Moysklad instance methods', t => {
-  let ms = Moysklad()
+  const ms = Moysklad({ fetch })
   t.ok(ms)
   t.equals(typeof ms.getOptions, 'function')
   t.equals(typeof ms.getAuthHeader, 'function')
@@ -29,15 +31,16 @@ test('Moysklad instance methods', t => {
 })
 
 test('Create Moysklad instance with options', t => {
-  let options = {
+  const options = {
+    fetch,
     login: 'login',
     password: 'password'
   }
 
-  let ms = Moysklad(options)
+  const ms = Moysklad(options)
   t.ok(ms)
 
-  let msOptions = ms.getOptions()
+  const msOptions = ms.getOptions()
   t.true(msOptions !== options)
   t.equals(msOptions.login, 'login')
   t.equals(msOptions.password, 'password')
@@ -46,13 +49,13 @@ test('Create Moysklad instance with options', t => {
 })
 
 test('Moysklad#GET method', async t => {
-  let ms = Moysklad()
+  const ms = Moysklad({ fetch })
 
-  let counterparties = await ms.GET('entity/counterparty', { limit: 1 })
+  const counterparties = await ms.GET('entity/counterparty', { limit: 1 })
   t.equals(typeof counterparties, 'object', 'should return object')
   t.ok(counterparties.rows instanceof Array, 'should return counterparties collection')
 
-  let [employee, group] = await Promise.all([
+  const [employee, group] = await Promise.all([
     ms.fetchUrl(counterparties.context.employee.meta.href),
     ms.fetchUrl(counterparties.rows[0].group.meta.href)
   ])
@@ -65,10 +68,10 @@ test('Moysklad#GET method', async t => {
 })
 
 test('Moysklad#POST/PUT/DELETE', async t => {
-  let ms = Moysklad()
+  const ms = Moysklad({ fetch })
 
   let code = 'test-' + Date.now()
-  let product = {
+  const product = {
     name: 'TEST-' + Date.now(),
     code,
     attributes: [

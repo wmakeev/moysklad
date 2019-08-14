@@ -1,10 +1,12 @@
 'use strict'
 
 const test = require('blue-tape')
+const fetch = require('node-fetch')
+
 const Moysklad = require('..')
 
 test('Moysklad#buildUrl method', t => {
-  let ms = Moysklad()
+  const ms = Moysklad({ fetch })
 
   t.equals(ms.buildUrl(['/path/', 'To//My', 'Res/']),
     'https://online.moysklad.ru/api/remap/1.1/path/to/my/res')

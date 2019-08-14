@@ -5,7 +5,7 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "type": "node2",
+      "type": "node",
       "request": "launch",
       "name": "${file}",
       "program": "${file}",
@@ -20,7 +20,7 @@
     },
     {
       "name": "index.test",
-      "type": "node2",
+      "type": "node",
       "request": "launch",
       "runtimeExecutable": "node",
       "program": "${workspaceRoot}/tests/index.js",
@@ -39,27 +39,13 @@
     },
     {
       "name": "src/{some}.test",
-      "type": "node2",
+      "type": "node",
       "request": "launch",
       "runtimeExecutable": "node",
       "program": "/Users/mvv/Documents/GitHub/moysklad/src/extensions/queue/__tests__/index.test.js",
       "cwd": "${workspaceRoot}",
       "runtimeArgs": [
         "--harmony",
-        "--require",
-        "dotenv/config",
-        "--require",
-        "isomorphic-fetch"
-      ]
-    },
-    {
-      "name": "lib/{some}.test",
-      "type": "node",
-      "request": "launch",
-      "runtimeExecutable": "node",
-      "program": "/Users/mvv/Documents/GitHub/moysklad/lib/__tests__/index.test.js",
-      "cwd": "${workspaceRoot}",
-      "runtimeArgs": [
         "--require",
         "dotenv/config",
         "--require",

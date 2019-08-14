@@ -9,7 +9,7 @@ const MSK_TIMEZONE_OFFSET = 180 * 60 * 1000
  * @returns {string} Дата ввиде строки
  */
 module.exports = function getTimeString (date, includeMs) {
-  let mskTime = new Date(+date + MSK_TIMEZONE_OFFSET)
+  const mskTime = new Date(+date + MSK_TIMEZONE_OFFSET)
 
   return mskTime.toJSON()
     .replace('T', ' ')

@@ -1,13 +1,15 @@
 'use strict'
 
 const test = require('blue-tape')
+const fetch = require('node-fetch')
+
 const Moysklad = require('..')
 
 test('Moysklad#parseUrl method', t => {
-  let ms = Moysklad()
-  let { endpoint, api, apiVersion } = ms.getOptions()
+  const ms = Moysklad({ fetch })
+  const { endpoint, api, apiVersion } = ms.getOptions()
 
-  let common = { endpoint, api, apiVersion }
+  const common = { endpoint, api, apiVersion }
 
   t.deepEqual(ms.parseUrl('https://online.moysklad.ru/api/remap/1.1/path/to/my/res'), {
     ...common,

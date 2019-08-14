@@ -11,7 +11,7 @@ const MS_TIME_REGEX =
  */
 module.exports = function parseTimeString (timeString) {
   // 2017-04-08 13:33:00.123
-  let m = MS_TIME_REGEX.exec(timeString)
+  const m = MS_TIME_REGEX.exec(timeString)
   if (!m || m.length < 7 || m.length > 8) {
     throw new Error(`Некорректный формат даты "${timeString}"`)
   }

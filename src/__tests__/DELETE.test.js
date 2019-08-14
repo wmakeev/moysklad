@@ -1,10 +1,12 @@
 'use strict'
 
+const fetch = require('node-fetch')
 const test = require('blue-tape')
+
 const Moysklad = require('..')
 
 test('Moysklad#DELETE', async t => {
-  let ms = Moysklad()
+  const ms = Moysklad({ fetch })
 
   let internalorder
 

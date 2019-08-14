@@ -3,10 +3,8 @@
 	//
 	"compilerOptions": {
 		"target": "es2017",
-		"module": "es6",
+		"module": "commonjs",
 		"allowSyntheticDefaultImports": true
-	},
-	"files": [
-		"src/"
-	]
+  },
+  "exclude": ["dist/", "tests/"]
 }

@@ -22,14 +22,14 @@ test('getResponseError (empty response)', async t => {
 })
 
 test('getResponseError (multi error response)', async t => {
-  let resp = {
+  const resp = {
     errors: [
       createFooError('Ошибка 1', 1000),
       createFooError('Ошибка 2', 2000)
     ]
   }
 
-  let error = getResponseError(resp)
+  const error = getResponseError(resp)
 
   t.equal(error.message, 'Ошибка 1', 'should set error message')
   t.equal(error.code, 1000, 'should set error code')
@@ -38,20 +38,20 @@ test('getResponseError (multi error response)', async t => {
 })
 
 test('getResponseError (single error response)', async t => {
-  let resp = {
+  const resp = {
     errors: [
       createFooError('Ошибка 1', 1000)
     ]
   }
 
-  let error = getResponseError(resp)
+  const error = getResponseError(resp)
 
   t.equal(error.message, 'Ошибка 1', 'should set error message')
   t.notOk(error.errors, 'should set errors array')
 })
 
 test('getResponseError (multi error batch response)', async t => {
-  let resp = [
+  const resp = [
     { foo: 'bar1' },
     {
       errors: [
@@ -67,7 +67,7 @@ test('getResponseError (multi error batch response)', async t => {
     }
   ]
 
-  let error = getResponseError(resp)
+  const error = getResponseError(resp)
 
   t.equal(error.message, 'Ошибка 11', 'should set error message')
   t.equal(error.code, 1100, 'should set error code')

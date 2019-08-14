@@ -14,9 +14,9 @@ module.exports = async function fetchUrl (uri, options = {}) {
   let rawResponse = false
   let muteErrors = false
 
-  let emit = this.emitter ? this.emitter.emit.bind(this.emitter) : null
+  const emit = this.emitter ? this.emitter.emit.bind(this.emitter) : null
 
-  let fetchOptions = defaultsDeep({ ...options }, {
+  const fetchOptions = defaultsDeep({ ...options }, {
     headers: {
       'Content-Type': 'application/json'
     },
@@ -51,7 +51,7 @@ module.exports = async function fetchUrl (uri, options = {}) {
     delete fetchOptions.webHookDisable
   }
 
-  let authHeader = this.getAuthHeader()
+  const authHeader = this.getAuthHeader()
   if (authHeader) {
     fetchOptions.headers.Authorization = this.getAuthHeader()
   }
@@ -59,7 +59,7 @@ module.exports = async function fetchUrl (uri, options = {}) {
   if (emit) emit('request', { uri, options: fetchOptions })
 
   /** @type {Response} */
-  let response = await this.fetch(uri, fetchOptions)
+  const response = await this.fetch(uri, fetchOptions)
 
   if (emit) emit('response', { uri, options: fetchOptions, response })
 

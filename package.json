@@ -1,10 +1,9 @@
 {
   "name": "moysklad",
-  "version": "0.4.2",
+  "version": "0.5.0",
   "description": "Библиотека для работы с API сервиса МойСклад",
   "main": "index.js",
   "files": [
-    "lib",
     "dist",
     "src",
     "tools",
@@ -12,15 +11,12 @@
     "README.md"
   ],
   "scripts": {
-    "lint": "eslint src",
-    "clean-lib": "rm -rf lib || :",
+    "lint": "standard src/*/**",
     "clean-dist": "rm -rf dist || : && mkdir -p dist",
-    "transpile": "npm run clean-lib && cp -rf src lib && babel --source-maps --optional runtime --out-dir lib ./src",
-    "build": "npm run transpile && npm run clean-dist && browserify --no-builtins --detect-globals false -s MoyskladCore -o dist/moysklad.js lib/index.js",
-    "test-src": "node --harmony -r dotenv/config -r isomorphic-fetch `which blue-tape` src/**/*.test.js | tap-spec",
-    "test-lib": "blue-tape -r dotenv/config -r isomorphic-fetch lib/**/*.test.js | tap-spec",
-    "test": "npm run lint && npm run build && npm run test-lib",
-    "coverage": "nyc --silent node --harmony -r dotenv/config -r isomorphic-fetch `which blue-tape` src/**/*.test.js | tap-spec && nyc report --reporter=text --reporter=lcov",
+    "build-dist": "npm run clean-dist && browserify --no-builtins --detect-globals false -s MoyskladCore -o dist/moysklad.js src/index.js",
+    "test-src": "node -r dotenv/config ./tests --src src | tap-spec",
+    "test": "npm run lint && npm run build-dist && npm run test-src",
+    "coverage": "nyc --silent node -r dotenv/config ./tests --src src | tap-spec && nyc report --reporter=text --reporter=lcov",
     "coverage-report": "nyc report --reporter=text-lcov | coveralls"
   },
   "repository": {
@@ -47,38 +43,22 @@
   "dependencies": {
     "@wmakeev/base64encode": "^1.0.0",
     "have2": "1.0.0-beta.1",
-    "lodash.defaultsdeep": "^4.6.0",
-    "stampit": "^4.1.2"
+    "lodash.defaultsdeep": "^4.6.1",
+    "stampit": "^4.2.0"
   },
   "devDependencies": {
-    "babel-plugin-transform-async-to-generator": "^6.24.1",
-    "babel-plugin-transform-es2015-destructuring": "^6.23.0",
-    "babel-plugin-transform-es2015-function-name": "^6.24.1",
-    "babel-plugin-transform-es2015-modules-commonjs": "^6.26.2",
-    "babel-plugin-transform-es2015-parameters": "^6.24.1",
-    "babel-plugin-transform-es2015-shorthand-properties": "^6.24.1",
-    "babel-plugin-transform-es2015-spread": "^6.22.0",
-    "babel-plugin-transform-es2015-sticky-regex": "^6.24.1",
-    "babel-plugin-transform-es2015-unicode-regex": "^6.24.1",
-    "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "blue-tape": "^1.0.0",
-    "browserify": "^16.2.2",
-    "coveralls": "^3.0.2",
-    "debug": "^3.1.0",
-    "dotenv": "^6.0.0",
-    "eslint": "^5.4.0",
-    "eslint-config-standard": "^11.0.0",
-    "eslint-plugin-import": "^2.14.0",
-    "eslint-plugin-node": "^7.0.1",
-    "eslint-plugin-promise": "^4.0.0",
-    "eslint-plugin-standard": "^3.1.0",
-    "isomorphic-fetch": "^2.2.1",
-    "node-fetch": "^2.2.0",
-    "nyc": "^12.0.2",
+    "browserify": "^16.5.0",
+    "coveralls": "^3.0.6",
+    "debug": "^4.1.1",
+    "dotenv": "^8.0.0",
+    "node-fetch": "^2.6.0",
+    "nyc": "^14.1.1",
+    "standard": "^13.1.0",
     "tap-spec": "^5.0.0",
-    "walkdir": "0.0.12"
+    "walkdir": "0.4.1"
   },
   "engines": {
-    "node": ">=4.3.2"
+    "node": ">=8.10"
   }
 }

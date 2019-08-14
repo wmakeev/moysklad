@@ -7,7 +7,7 @@ const base64encode = require('@wmakeev/base64encode')
 module.exports = function getAuthHeader () {
   let login
   let password
-  let options = this.getOptions()
+  const options = this.getOptions()
 
   if (options.login && options.password) {
     login = options.login

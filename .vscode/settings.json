@@ -5,10 +5,5 @@
   "files.trimTrailingWhitespace": true,
   "files.insertFinalNewline": true,
   "vsicons.presets.angular": false,
-  "files.exclude": {
-    "dist/**": true,
-    "lib/**": true,
-    ".idea/**": true
-  },
   "files.eol": "\n"
 }

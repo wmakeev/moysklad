@@ -3,7 +3,7 @@
 const have = require('../have')
 
 module.exports = function PUT (...args) {
-  let { path, payload, query, options = {} } = have.strict(args, [
+  const { path, payload, query, options = {} } = have.strict(args, [
     {
       path: 'str or str arr',
       payload: 'opt Object',
@@ -13,8 +13,8 @@ module.exports = function PUT (...args) {
     have.argumentsObject
   ])
 
-  let uri = this.buildUrl(path, query)
-  let fetchOptions = { method: 'PUT' }
+  const uri = this.buildUrl(path, query)
+  const fetchOptions = { method: 'PUT' }
   if (payload) fetchOptions.body = JSON.stringify(payload)
 
   return this.fetchUrl(uri, { ...options, ...fetchOptions })

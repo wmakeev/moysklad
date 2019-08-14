@@ -1,13 +1,11 @@
 'use strict'
 
 const test = require('blue-tape')
-const nodeFetch = require('node-fetch')
+const fetch = require('node-fetch')
 const Moysklad = require('..')
 
 test('Response with muteErrors option', t => {
-  const ms = Moysklad({
-    fetch: nodeFetch
-  })
+  const ms = Moysklad({ fetch })
 
   return ms.GET('entity/demand2', null, { muteErrors: true })
     .then(async res => {
@@ -16,16 +14,14 @@ test('Response with muteErrors option', t => {
 })
 
 test('Response with rawResponse option', t => {
-  const ms = Moysklad({
-    fetch: nodeFetch
-  })
+  const ms = Moysklad({ fetch })
 
   return ms.GET('entity/demand', { limit: 2 }, { rawResponse: true })
     .then(async res => {
-      let { status: code } = res
+      const { status: code } = res
       t.equal(code, 200, 'should return code 200')
 
-      let json = await res.json()
+      const json = await res.json()
       t.ok(json.meta, 'should return entity')
       t.equal(json.rows.length, 2, 'should return 2 rows in collection')
     })
@@ -34,9 +30,7 @@ test('Response with rawResponse option', t => {
 test('Response with rawResponse option (with error)', t => {
   t.plan(4)
 
-  const ms = Moysklad({
-    fetch: nodeFetch
-  })
+  const ms = Moysklad({ fetch })
 
   ms.GET('entity/demand2', null, { rawResponse: true })
     .catch(err => {
@@ -49,11 +43,9 @@ test('Response with rawResponse option (with error)', t => {
 })
 
 test('Response with rawResponse and muteErrors options', async t => {
-  const ms = Moysklad({
-    fetch: nodeFetch
-  })
+  const ms = Moysklad({ fetch })
 
-  let body = {
+  const body = {
     template: {
       meta: {
         href: 'https://online.moysklad.ru/api/remap/1.1/entity/demand/metadata/customtemplate/' +
@@ -65,7 +57,7 @@ test('Response with rawResponse and muteErrors options', async t => {
     extension: 'pdf'
   }
 
-  let { headers, status: code } = await ms
+  const { headers, status: code } = await ms
     .POST('entity/demand/773e16c5-ef53-11e6-7a69-9711001669c5/export/', body, null, {
       rawResponse: true,
       muteErrors: true
@@ -81,9 +73,7 @@ test('Response with rawResponse and muteErrors options', async t => {
 test('Response with millisecond option', t => {
   t.plan(1)
 
-  const ms = Moysklad({
-    fetch: nodeFetch
-  })
+  const ms = Moysklad({ fetch })
 
   const { parseTimeString } = Moysklad
 

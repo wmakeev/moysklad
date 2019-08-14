@@ -4,14 +4,14 @@ const getTimeString = require('./getTimeString')
 const isPlainObject = require('./isPlainObject')
 const isSimpleValue = require('./isSimpleValue')
 
-let createValueSelector = selector => (path, value) => {
+const createValueSelector = selector => (path, value) => {
   if (!isSimpleValue(value)) {
     throw new TypeError(`value must to be string, number, date or null`)
   }
   return [[path, selector, value]]
 }
 
-let createCollectionSelector = selector => {
+const createCollectionSelector = selector => {
   const sel = createValueSelector(selector)
   return (path, value) => {
     if (!(value instanceof Array)) {
@@ -50,7 +50,7 @@ selectors.in.not = selectors.nin
 selectors.nin.not = selectors.in
 
 const comparisonSelectors = Object.keys(selectors).reduce((res, key) => {
-  let op = selectors[key]
+  const op = selectors[key]
   res['$' + key] = (op.collection ? createCollectionSelector : createValueSelector)(op)
   return res
 }, {})
@@ -80,7 +80,7 @@ function getFilterParts (path, value) {
       if (!isPlainObject(value)) {
         throw new TypeError(`$not: selector value must to be an object`)
       }
-      let headPath = path.slice(0, -1)
+      const headPath = path.slice(0, -1)
       return getFilterParts(headPath, value)
         .map(invertFilterPart)
         // .concat([[headPath, selectors.eq, null]])
@@ -130,9 +130,9 @@ module.exports = function buildFilter (filter) {
   return filterParts
     // конвертация операторов и значений в строку
     .map(part => {
-      let key = part[0]
-      let operator = part[1].operator
-      let value = part[2]
+      const key = part[0]
+      const operator = part[1].operator
+      const value = part[2]
       switch (true) {
         case value === undefined:
           throw new TypeError(`filter "${key}" key value is undefined`)

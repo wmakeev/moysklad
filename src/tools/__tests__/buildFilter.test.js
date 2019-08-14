@@ -10,7 +10,7 @@ test('buildFilter', t => {
 })
 
 test('buildFilter with simple filter', t => {
-  let filter = {
+  const filter = {
     name: 'foo',
     value: 3,
     moment: new Date('2017-01-09T19:15:06.556Z'),
@@ -30,7 +30,7 @@ test('buildFilter with simple filter', t => {
 })
 
 test('buildFilter with simple deep and many condition filter', t => {
-  let filter = {
+  const filter = {
     name: 'foo',
     value: 0,
     moment: new Date('2017-01-09T19:15:06.556Z'),
@@ -55,7 +55,7 @@ test('buildFilter with simple deep and many condition filter', t => {
 })
 
 test('buildFilter with mogo query comparison selectors', t => {
-  let filter = {
+  const filter = {
     name: {
       $eq: 'foo'
     },
@@ -118,7 +118,7 @@ test('buildFilter with mogo query comparison selectors', t => {
 })
 
 test('buildFilter with mogo query logical selectors', t => {
-  let filter = {
+  const filter = {
     name: {
       $and: [
         { $eq: 'foo' },
@@ -151,7 +151,7 @@ test('buildFilter with mogo query logical selectors', t => {
 })
 
 test('buildFilter with query selectors combined with sub fields', t => {
-  let filter = {
+  const filter = {
     id: 5,
     name: {
       $gt: 15,

@@ -1,8 +1,8 @@
-const nodeFetch = require('node-fetch')
+const fetch = require('node-fetch')
 const MoyskladCore = require('moysklad')
 
 const ms = MoyskladCore({
-  fetch: nodeFetch,
+  fetch,
   login: 'login',
   password: 'password'
 })

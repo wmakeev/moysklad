@@ -1,1 +1,1 @@
-module.exports = require('../lib/tools/sleep')
+module.exports = require('../src/tools/sleep')

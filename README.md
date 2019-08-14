@@ -127,8 +127,11 @@ ms.GET('entity/customerorder', {
 ```
 ## Параметры инициализации
 
+Все параметры опциональные (имеют значения по умолчанию)
+
 Параметр | Значение по умолчанию | Описание
 ---------|--------------|----------
+`fetch` | глобальный fetch | Функция с интерфейсом [Fetch API](https://developer.mozilla.org/ru/docs/Web/API/Fetch_API). Если глобальный fetch не найден, то будет выброшена ошибка.
 `endpoint` | `https://online.moysklad.ru/api` | Точка досупа к API
 `api` | `remap` | Раздел API
 `apiVersion` | `1.1` | Версия API
@@ -157,8 +160,8 @@ const moysklad = Moysklad({ apiVersion: '1.2' })
 `key: { $st: value }` | `key~=value` | начинается со строки
 `key: { $et: value }` | `key=~value` | заканчивается строкой
 `key: { $contains: value }` | `key~value` | содержит строку
-`key: { $in: [..] }` или `key: [..]`| `key=value1;key=value2;...` | содержит
-`key: { $nin: [..] }` | `key!=value1;key!=value2;...` | не содержит
+`key: { $in: [..] }` или `key: [..]`| `key=value1;key=value2;...` | входит в
+`key: { $nin: [..] }` | `key!=value1;key!=value2;...` | не входит в
 `key: { $exists: true }` | `key!=` | наличие значения (не null)
 `key: { $exists: false }` | `key=` | пустое значение (null)
 `key: { $and: [{..}, ..] }` |  | объединение условий
@@ -185,7 +188,7 @@ const filter = {
 const MoyskladCore = require('moysklad')
 const MoyskladQueueExtension = require('moysklad-extension-queue')
 
-const Moysklad = MoyskladCore.compose(MoyskladQueue)
+const Moysklad = MoyskladCore.compose(MoyskladQueueExtension)
 
 const moysklad = Moysklad({
   queue: true // включение очереди запросов
@@ -241,9 +244,9 @@ assert.equal(parsedDate.toISOString(), '2017-04-08T10:33:00.123Z')
 
 > GET запрос
 
-- `moysklad.GET(path: string | Array<string>, query?: object, options?: object) : Promise`
+- `ms.GET(path: string | string[], query?: object, options?: object) : Promise`
 
-- `moysklad.GET(args: object) : Promise`
+- `ms.GET(args: object) : Promise`
 
 **Параметры:**
 
@@ -256,18 +259,18 @@ assert.equal(parsedDate.toISOString(), '2017-04-08T10:33:00.123Z')
 **Пример использования:**
 
 ```js
-const productsCollection = await moysklad.GET('entity/product', { limit: 50 })
+const productsCollection = await ms.GET('entity/product', { limit: 50 })
 
-const order = await moysklad.GET(['entity', 'customerorder', orderId], { expand: 'positions' })
+const order = await ms.GET(['entity', 'customerorder', orderId], { expand: 'positions' })
 ```
 
 #### POST
 
 > POST запрос
 
-- `moysklad.POST(path: string | Array<string>, payload?: object|Array<object>, query?: object, options?: object) : Promise`
+- `ms.POST(path: string | string[], payload?: object|Array<object>, query?: object, options?: object) : Promise`
 
-- `moysklad.POST(args: object) : Promise`
+- `ms.POST(args: object) : Promise`
 
 **Параметры:**
 
@@ -282,16 +285,16 @@ const order = await moysklad.GET(['entity', 'customerorder', orderId], { expand:
 **Пример использования:**
 
 ```js
-const newProduct = await moysklad.POST('entity/product', { name: 'Новый товар' })
+const newProduct = await ms.POST('entity/product', { name: 'Новый товар' })
 ```
 
 #### PUT
 
 > PUT запрос
 
-- `moysklad.PUT(path: string | Array<string>, payload?: object, query?: object, options?: object) : Promise`
+- `ms.PUT(path: string | string[], payload?: object, query?: object, options?: object) : Promise`
 
-- `moysklad.PUT(args: object) : Promise`
+- `ms.PUT(args: object) : Promise`
 
 **Параметры:**
 
@@ -306,16 +309,16 @@ const newProduct = await moysklad.POST('entity/product', { name: 'Новый т�
 **Пример использования:**
 
 ```js
-const updatedProduct = await moysklad.PUT(['entity/product', id], product)
+const updatedProduct = await ms.PUT(['entity/product', id], product)
 ```
 
 #### DELETE
 
 > DELETE запрос
 
-- `moysklad.DELETE(path: string | Array<string>, options?: object) : Promise`
+- `ms.DELETE(path: string | string[], options?: object) : Promise`
 
-- `moysklad.DELETE(args: object) : Promise`
+- `ms.DELETE(args: object) : Promise`
 
 **Параметры:**
 
@@ -328,7 +331,7 @@ const updatedProduct = await moysklad.PUT(['entity/product', id], product)
 **Пример использования:**
 
 ```js
-await moysklad.DELETE(['entity/product', product.id])
+await ms.DELETE(['entity/product', product.id])
 ```
 
 #### getOptions
@@ -356,11 +359,11 @@ assert.equal(msOptions.password, 'password')
 
 > Формирует url запроса
 
-- `moysklad.buildUrl(url: string, query?: object) : string`
+- `ms.buildUrl(url: string, query?: object) : string`
 
-- `moysklad.buildUrl(path: string | Array<string>, query?: object) : string`
+- `ms.buildUrl(path: string | string[], query?: object) : string`
 
-- `moysklad.buildUrl(args: object) : string`
+- `ms.buildUrl(args: object) : string`
 
 **Параметры:**
 
@@ -373,19 +376,19 @@ assert.equal(msOptions.password, 'password')
 **Пример использования:**
 
 ```js
-const url = moysklad.buildUrl('https://online.moysklad.ru/api/remap/1.1/entity/customerorder?expand=positions', { limit: 100 })
+const url = ms.buildUrl('https://online.moysklad.ru/api/remap/1.1/entity/customerorder?expand=positions', { limit: 100 })
 
 assert.equal(url, 'https://online.moysklad.ru/api/remap/1.1/entity/customerorder?expand=positions&limit=100')
 ```
 
 ```js
-const url = moysklad.buildUrl('entity/customerorder', { expand: 'positions' })
+const url = ms.buildUrl('entity/customerorder', { expand: 'positions' })
 
 assert.equal(url, 'https://online.moysklad.ru/api/remap/1.1/entity/customerorder?expand=positions')
 ```
 
 ```js
-const url = moysklad.buildUrl(['entity', 'customerorder'], { expand: 'positions' })
+const url = ms.buildUrl(['entity', 'customerorder'], { expand: 'positions' })
 
 assert.equal(url, 'https://online.moysklad.ru/api/remap/1.1/entity/customerorder?expand=positions')
 ```
@@ -394,7 +397,7 @@ assert.equal(url, 'https://online.moysklad.ru/api/remap/1.1/entity/customerorder
 
 > Разбор url на составные компоненты
 
-- `moysklad.parseUrl(url: string) : object`
+- `ms.parseUrl(url: string) : object`
 
 **Параметры:**
 
@@ -403,7 +406,7 @@ assert.equal(url, 'https://online.moysklad.ru/api/remap/1.1/entity/customerorder
 **Пример использования:**
 
 ```js
-const parsedUri = moysklad.parseUrl('https://online.moysklad.ru/api/remap/1.1/entity/customerorder?expand=positions')
+const parsedUri = ms.parseUrl('https://online.moysklad.ru/api/remap/1.1/entity/customerorder?expand=positions')
 
 assert.deepEqual(parsedUri, {
   endpoint: 'https://online.moysklad.ru/api',
@@ -418,9 +421,9 @@ assert.deepEqual(parsedUri, {
 
 #### fetchUrl
 
-> Выполнить запрос по указанному uri
+> Выполнить запрос по указанному url
 
-- `moysklad.fetchUrl(url: string, options?: object) : Promise`
+- `ms.fetchUrl(url: string, options?: object) : Promise`
 
 **Параметры:**
 
@@ -431,7 +434,14 @@ assert.deepEqual(parsedUri, {
 **Пример использования:**
 
 ```js
-const order = await moysklad.fetchUrl('https://online.moysklad.ru/api/remap/1.1/entity/customerorder/eb7bcc22-ae8d-11e3-9e32-002590a28eca')
+const url = `https://online.moysklad.ru/api/remap/1.1/entity/customerorder/eb7bcc22-ae8d-11e3-9e32-002590a28eca`
+
+const patch = { applicable: false }
+
+const updatedOrder = await ms.fetchUrl(url, {
+  method: 'PUT',
+  body: JSON.stringify(patch)
+})
 ```
 
 #### Основные аргументы
@@ -503,9 +513,9 @@ const query = {
 ---------|-----|---------
 `rawResponse` | `boolean` | Если `true`, то метод вернет результат в виде объекта [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response)
 `muteErrors` | `boolean` | Если `true`, то все ошибки будут проигнорированы (метод не будет генерировать ошибку если код ответа сервера не в диапазоне 200-299 и/или тело ответа содержит описание ошибки МойСклад).
-`millisecond` | `boolean` | Если `true`, то включает в запрос заголовок `X-Lognex-Format-Millisecond` со значением `true` (все даты объекта будут возвращены с учетом миллисекунд).
-`precision` | `boolean` | Если `true`, то включает в запрос заголовок `X-Lognex-Precision` со значением `true` (отключение окгругления цен и себестоимости до копеек).
-`webHookDisable` | `boolean` | Если `true`, то включает в запрос заголовок `X-Lognex-WebHook-Disable` со значением `true` (отключить уведомления вебхуков в контексте данного запроса).
+`millisecond` | `boolean` | Если `true`, то в запрос будет включен заголовок `X-Lognex-Format-Millisecond` со значением `true` (все даты объекта будут возвращены с учетом миллисекунд).
+`precision` | `boolean` | Если `true`, то в запрос будет включен заголовок `X-Lognex-Precision` со значением `true` (отключение округления цен и себестоимости до копеек).
+`webHookDisable` | `boolean` | Если `true`, то в запрос будет включен заголовок `X-Lognex-WebHook-Disable` со значением `true` (отключить уведомления вебхуков в контексте данного запроса).
 
 **Примеры:**
 
@@ -567,15 +577,15 @@ const query = {
 
 #### `request`
 
-  ``` { uri, options } ```
+  ``` { url, options } ```
 
 #### `response`
 
-  ``` { uri, options, response } ```
+  ``` { url, options, response } ```
 
 #### `response:body`
 
-  ``` { uri, options, response, body } ```
+  ``` { url, options, response, body } ```
 
 #### `error`
 
@@ -587,7 +597,7 @@ const query = {
 
   ```js
   // получение объекта запроса (запрос к сервису еще не выполнен)
-  const request1 = moysklad.GET(['entity/customerorder', someId])
+  const request1 = ms.GET(['entity/customerorder', someId])
 
   // установка заголовка (возвращается новый объекта запроса)
   request2 = request1.setHeader('X-Lognex-Format-Millisecond', true)

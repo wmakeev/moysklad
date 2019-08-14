@@ -10,7 +10,7 @@ moysklad
 
 > Библиотека для взаимодействия с JSON API сервиса МойСклад для node.js и браузера.
 
-> **ВНИМАНИЕ!** Библиотека находится в стадии разработки. Не весь код протестирован. API к релизной версии будет немного изменен.
+> **ВНИМАНИЕ!** Библиотека находится в стадии разработки и становления функционала. Не весь код протестирован. API к релизной версии может быть изменен. Перед обновлением версии смотрите [историю изменений](https://github.com/wmakeev/moysklad/blob/master/CHANGELOG.md).
 
 ## Содержание
 
@@ -46,10 +46,8 @@ moysklad
     - [`response:body`](#responsebody)
     - [`error`](#error)
 - [Вероятные изменения API в следующих версиях](#вероятные-изменения-api-в-следующих-версиях)
-- [История изменений](#история-изменений)
-  - [0.4.2](#042)
-  - [0.4.1](#041)
-  - [0.4.0](#040)
+- [TODO](#todo)
+- [[История изменений](https://github.com/wmakeev/moysklad/blob/master/CHANGELOG.md)](#история-измененийhttpsgithubcomwmakeevmoyskladblobmasterchangelogmd)
 
 <!-- /TOC -->
 
@@ -61,7 +59,7 @@ moysklad
 
 ## Установка
 
-Поддерживаются версии node.js 4.x и выше
+> Поддерживаются версии node.js >=8.10
 
 ```
 $ npm install moysklad
@@ -169,7 +167,7 @@ const moysklad = Moysklad({ apiVersion: '1.2' })
 На один ключ можно использовать несколько селекторов
 
 ```js
-let filter = {
+const filter = {
   key: {
     $eq: 'value',
     $exists: true
@@ -213,8 +211,8 @@ const moysklad = Moysklad({
 **Пример использования:**
 
 ```js
-let date = new Date('2017-02-01T07:10:11.123Z')
-let timeString = Moysklad.getTimeString(date, true)
+const date = new Date('2017-02-01T07:10:11.123Z')
+const timeString = Moysklad.getTimeString(date, true)
 
 assert.equal(timeString, '2017-02-01 10:10:11.123')
 ```
@@ -232,7 +230,7 @@ assert.equal(timeString, '2017-02-01 10:10:11.123')
 **Пример использования:**
 
 ```js
-let parsedDate = Moysklad.parseTimeString('2017-04-08 13:33:00.123')
+const parsedDate = Moysklad.parseTimeString('2017-04-08 13:33:00.123')
 
 assert.equal(parsedDate.toISOString(), '2017-04-08T10:33:00.123Z')
 ```
@@ -258,9 +256,9 @@ assert.equal(parsedDate.toISOString(), '2017-04-08T10:33:00.123Z')
 **Пример использования:**
 
 ```js
-let productsCollection = await moysklad.GET('entity/product', { limit: 50 })
+const productsCollection = await moysklad.GET('entity/product', { limit: 50 })
 
-let order = await moysklad.GET(['entity', 'customerorder', orderId], { expand: 'positions' })
+const order = await moysklad.GET(['entity', 'customerorder', orderId], { expand: 'positions' })
 ```
 
 #### POST
@@ -284,7 +282,7 @@ let order = await moysklad.GET(['entity', 'customerorder', orderId], { expand: '
 **Пример использования:**
 
 ```js
-let newProduct = await moysklad.POST('entity/product', { name: 'Новый товар' })
+const newProduct = await moysklad.POST('entity/product', { name: 'Новый товар' })
 ```
 
 #### PUT
@@ -308,16 +306,16 @@ let newProduct = await moysklad.POST('entity/product', { name: 'Новый то�
 **Пример использования:**
 
 ```js
-let updatedProduct = await moysklad.PUT(['entity/product', id], product)
+const updatedProduct = await moysklad.PUT(['entity/product', id], product)
 ```
 
 #### DELETE
 
 > DELETE запрос
 
-- `moysklad.DELETE(path: string | Array<string>, options?: object) : Promise<Response>`
+- `moysklad.DELETE(path: string | Array<string>, options?: object) : Promise`
 
-- `moysklad.DELETE(args: object) : Promise<Response>`
+- `moysklad.DELETE(args: object) : Promise`
 
 **Параметры:**
 
@@ -325,7 +323,7 @@ let updatedProduct = await moysklad.PUT(['entity/product', id], product)
 
 `options` - [опции запроса](#options-параметры-запроса)
 
-Метод `DELETE` возвращает объект [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response) текущего запроса.
+Метод `DELETE` возвращает `undefined` при успешном запросе.
 
 **Пример использования:**
 
@@ -347,7 +345,7 @@ const options = {
 
 const ms = Moysklad(options)
 
-let msOptions = ms.getOptions()
+const msOptions = ms.getOptions()
 
 assert.ok(msOptions !== options)
 assert.equal(msOptions.login, 'login')
@@ -375,19 +373,19 @@ assert.equal(msOptions.password, 'password')
 **Пример использования:**
 
 ```js
-let url = moysklad.buildUrl('https://online.moysklad.ru/api/remap/1.1/entity/customerorder?expand=positions', { limit: 100 })
+const url = moysklad.buildUrl('https://online.moysklad.ru/api/remap/1.1/entity/customerorder?expand=positions', { limit: 100 })
 
 assert.equal(url, 'https://online.moysklad.ru/api/remap/1.1/entity/customerorder?expand=positions&limit=100')
 ```
 
 ```js
-let url = moysklad.buildUrl('entity/customerorder', { expand: 'positions' })
+const url = moysklad.buildUrl('entity/customerorder', { expand: 'positions' })
 
 assert.equal(url, 'https://online.moysklad.ru/api/remap/1.1/entity/customerorder?expand=positions')
 ```
 
 ```js
-let url = moysklad.buildUrl(['entity', 'customerorder'], { expand: 'positions' })
+const url = moysklad.buildUrl(['entity', 'customerorder'], { expand: 'positions' })
 
 assert.equal(url, 'https://online.moysklad.ru/api/remap/1.1/entity/customerorder?expand=positions')
 ```
@@ -405,7 +403,7 @@ assert.equal(url, 'https://online.moysklad.ru/api/remap/1.1/entity/customerorder
 **Пример использования:**
 
 ```js
-let parsedUri = moysklad.parseUrl('https://online.moysklad.ru/api/remap/1.1/entity/customerorder?expand=positions')
+const parsedUri = moysklad.parseUrl('https://online.moysklad.ru/api/remap/1.1/entity/customerorder?expand=positions')
 
 assert.deepEqual(parsedUri, {
   endpoint: 'https://online.moysklad.ru/api',
@@ -433,7 +431,7 @@ assert.deepEqual(parsedUri, {
 **Пример использования:**
 
 ```js
-let order = await moysklad.fetchUrl('https://online.moysklad.ru/api/remap/1.1/entity/customerorder/eb7bcc22-ae8d-11e3-9e32-002590a28eca')
+const order = await moysklad.fetchUrl('https://online.moysklad.ru/api/remap/1.1/entity/customerorder/eb7bcc22-ae8d-11e3-9e32-002590a28eca')
 ```
 
 #### Основные аргументы
@@ -516,7 +514,7 @@ const query = {
   ```js
   const ms = Moysklad({ fetch: require('node-fetch') })
 
-  let body = {
+  const body = {
     template: {
       meta: {
         href: ms.buildUrl(['entity/demand/metadata/customtemplate', TEMPLATE_ID]),
@@ -527,7 +525,7 @@ const query = {
     extension: 'pdf'
   }
 
-  let { headers, status } = await ms
+  const { headers, status } = await ms
     .POST(['entity/demand', DEMAND_ID, 'export'], body, null, {
       rawResponse: true, // вернуть результат запроса без предварительного разбора
       muteErrors: true   // не обрабатывать ошибки, если код ответа сервера не в диапазоне 200-299
@@ -535,7 +533,7 @@ const query = {
 
   assert.equal(status, 307)
 
-  let location = headers.get('location')
+  const location = headers.get('location')
   assert.true(/https:\/\/120708.selcdn.ru\/prod-files/.test(location))
   ```
 
@@ -585,37 +583,23 @@ const query = {
 
 > Ниже описаны изменения которые могут быть в следующих версиях библиотеки
 
-- Метод `fetchUrl` и все остальные завязанные на него методы (`GET`, `POST`), будут возвращать специальный объект с набором методов для более тонкого управления запросом. При этом запрос к сервису будет выполнен только после вызова одного из определенных методов.
+- Метод `fetchUrl` и все остальные завязанные на него методы (`GET`, `POST` и пр.), ;**вероятно** будут возвращать специальный объект с набором методов для более тонкого управления запросом. При этом запрос к сервису будет выполнен только после вызова одного из специальных методов.
 
   ```js
   // получение объекта запроса (запрос к сервису еще не выполнен)
-  let requestObj = moysklad.GET(['entity/customerorder', someId])
+  const request1 = moysklad.GET(['entity/customerorder', someId])
 
   // установка заголовка (возвращается новый объекта запроса)
-  requestObj = requestObj.setHeader('X-Lognex-Format-Millisecond', true)
+  request2 = request1.setHeader('X-Lognex-Format-Millisecond', true)
 
   // получение данных по текущему запросу (метод может быть вызван повторно с тем же результатом)
-  let order = await requestObj.data()
+  const order = await request2.data()
   ```
 
 - Часть функционала библиотеки будет выненеса в отдельные модули-плагины и дальнейшее добавление новых фич будет происходить преимущественно путем написания соответствующих плагинов.
 
-## История изменений
+## TODO
 
-### 0.4.2
+Фичи, которые могут быть включены в следующие версии, описаны в [TODO.md](https://github.com/wmakeev/moysklad/blob/master/TODO.md)
 
-- ✏️ дополнение документации
-- 🔬(query): дополнительные тесты
-- 🛠(query): исправление неточностей в логике построения строки запроса
-
-### 0.4.1
-
-- ⚠️ исправление ошибки: селектор `$exists` обрабатывался всегда как `!=`, вне зависимости от значения
-
-### 0.4.0
-
-- ⚠️ исправление ошибки: селектор `$lte` работал не верно (обрабатывался как `$gte`)
-- 🔧 исправление в работе селектора `$not`
-- ➕ добавление селекторов `$st`, `$et`, `$contains`
-- 🔄 обновление зависимости и удаление файла package-lock.json
-- ✏️ дополнение документации
+## [История изменений](https://github.com/wmakeev/moysklad/blob/master/CHANGELOG.md)

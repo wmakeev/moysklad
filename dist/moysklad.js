@@ -2435,8 +2435,6 @@ module.exports = stampit({
   }
 })
   .init(function (options) {
-    let _options
-
     have(options, {
       endpoint: 'opt str',
       api: 'opt str',
@@ -2455,6 +2453,7 @@ module.exports = stampit({
     } else if (typeof window !== 'undefined' && window.fetch) {
       this.fetch = window.fetch.bind(window)
     } else if (typeof fetch !== 'undefined') {
+      /* eslint no-undef:0 */
       this.fetch = fetch
     } else {
       throw new Error('Не указан Fetch API модуль' +
@@ -2465,7 +2464,7 @@ module.exports = stampit({
       this.emitter = options.emitter
     }
 
-    _options = Object.assign({
+    const _options = Object.assign({
       endpoint: 'https://online.moysklad.ru/api',
       api: 'remap',
       apiVersion: '1.1'

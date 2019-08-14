@@ -1,13 +1,15 @@
 {
   "name": "moysklad",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Библиотека для работы с API сервиса МойСклад",
   "main": "index.js",
+  "types": "index.d.ts",
   "files": [
     "dist",
     "src",
     "tools",
     "index.js",
+    "index.d.ts",
     "README.md"
   ],
   "scripts": {

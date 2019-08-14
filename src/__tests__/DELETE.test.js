@@ -3,7 +3,7 @@
 const fetch = require('node-fetch')
 const test = require('blue-tape')
 
-const Moysklad = require('..')
+const Moysklad = require('../..')
 
 test('Moysklad#DELETE', async t => {
   t.plan(4)

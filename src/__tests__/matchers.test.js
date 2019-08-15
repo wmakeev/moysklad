@@ -17,8 +17,8 @@ test('matchers', t => {
   t.false(matchers.uuid('123-456'), 'should *not* match incorrect uuid')
   t.false(matchers.uuid(123), 'should *not* match incorrect uuid')
 
-  t.ok(matchers.url('https://path/to'), 'should match uri')
-  t.false(matchers.url('abc://path/to'), 'should *not* match incorrect uri')
+  t.ok(matchers.url('https://path/to'), 'should match url')
+  t.false(matchers.url('abc://path/to'), 'should *not* match incorrect url')
 
   t.ok(matchers['Moysklad.Collection']({
     meta: {

@@ -14,9 +14,9 @@ module.exports = function POST (...args) {
     have.argumentsObject
   ])
 
-  const uri = this.buildUrl(path, query)
+  const url = this.buildUrl(path, query)
   const fetchOptions = { method: 'POST' }
   if (payload) fetchOptions.body = JSON.stringify(payload)
 
-  return this.fetchUrl(uri, { ...options, ...fetchOptions })
+  return this.fetchUrl(url, { ...options, ...fetchOptions })
 }

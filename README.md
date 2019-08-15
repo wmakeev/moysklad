@@ -1,5 +1,5 @@
-moysklad
-========
+![moysklad](https://wmakeev-public-files.s3-eu-west-1.amazonaws.com/images/logos/logoMS500x350.png)
+===========
 
 [![npm](https://img.shields.io/npm/v/moysklad.svg?maxAge=1800&style=flat-square)](https://www.npmjs.com/package/moysklad)
 [![Travis](https://img.shields.io/travis/wmakeev/moysklad.svg?maxAge=1800&style=flat-square)](https://travis-ci.org/wmakeev/moysklad)
@@ -41,10 +41,6 @@ moysklad
       - [`query`](#query)
       - [`options` (параметры запроса)](#options-параметры-запроса)
   - [События](#события)
-    - [`request`](#request)
-    - [`response`](#response)
-    - [`response:body`](#responsebody)
-    - [`error`](#error)
 - [Вероятные изменения API в следующих версиях](#вероятные-изменения-api-в-следующих-версиях)
 - [TODO](#todo)
 - [История изменений](#история-изменений)
@@ -125,6 +121,9 @@ ms.GET('entity/customerorder', {
   })
 })
 ```
+
+> С другими примерами использования можно ознакомиться в папке [examples](https://github.com/wmakeev/moysklad/tree/master/tools)
+
 ## Параметры инициализации
 
 Все параметры опциональные (имеют значения по умолчанию)
@@ -135,6 +134,7 @@ ms.GET('entity/customerorder', {
 `endpoint` | `https://online.moysklad.ru/api` | Точка досупа к API
 `api` | `remap` | Раздел API
 `apiVersion` | `1.1` | Версия API
+`emitter` | `undefined` | экземляр [EventEmitter](https://nodejs.org/api/events.html#events_class_eventemitter) для передачи [событий библиотеки](#события)
 
 Пример использования:
 
@@ -573,21 +573,33 @@ const query = {
 
 ### События
 
-> Описание
+Событие         | Передаваемый объект | Момент наступления
+----------------|---------------------|---------
+`request`       | `{ url, options }`  | Отправлен http запрос
+`response`      | `{ url, options, response }` | Получен ответ на запрос
+`response:body` | `{ url, options, response, body }` | Загружено тело ответа
+`error`         | `Error`             | Ошибка при выполнении запроса
 
-#### `request`
+Пример использования:
 
-  ``` { url, options } ```
+```js
+const fetch = require('node-fetch')
+const Moysklad = require('moysklad')
+const { EventEmitter } = require('events')
 
-#### `response`
+const emitter = new EventEmitter()
+const ms = Moysklad({ fetch, emitter })
 
-  ``` { url, options, response } ```
+emitter.on('request', ({ url, options }) => {
+  console.log(`${options.method} ${url}`)
+})
 
-#### `response:body`
+ms.GET('entity/customerorder', { limit: 1 }).then(res => {
+  console.log('Order name: ' + res.rows[0].name)
+})
+```
 
-  ``` { url, options, response, body } ```
-
-#### `error`
+Более подробный пример смотрите в [examples/events.js](https://github.com/wmakeev/moysklad/blob/master/examples/events.js).
 
 ## Вероятные изменения API в следующих версиях
 

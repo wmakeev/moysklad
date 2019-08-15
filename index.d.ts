@@ -202,6 +202,54 @@ declare namespace Moysklad {
      */
     apiVersion?: string
 
+    /**
+     * Экземляр [EventEmitter](https://nodejs.org/api/events.html#events_class_eventemitter) для получения событий
+     *
+     * Пример использования:
+     *
+     * ```js
+     * const fetch = require('node-fetch')
+     * const { EventEmitter } = require('events')
+     *
+     * const Moysklad = require('..')
+     *
+     * const emitter = new EventEmitter()
+     *
+     * const ms = Moysklad({ fetch, emitter })
+     *
+     * const startTime = Date.now()
+     *
+     * emitter
+     *   .on('request', ({ url, options }) => {
+     *     console.log(`${options.method} ${url} (+${Date.now() - startTime}ms)`)
+     *   })
+     *   .on('response', ({ url, options: { method }, response: { statusText, status } }) => {
+     *     console.log(`${method} ${statusText} ${status} ${url} (+${Date.now() - startTime}ms)`)
+     *   })
+     *   .on('response:body', ({ url, options: { method }, response, body }) => {
+     *     console.log(`${method} BODY ${url} (+${Date.now() - startTime}ms)`)
+     *   })
+     *   .on('error', (...args) => {
+     *     console.log(args)
+     *   })
+     *
+     * ms.GET('entity/customerorder', { limit: 1 }).then(res => {
+     *   console.log('Order name: ' + res.rows[0].name)
+     * })
+     * ```
+     *
+     * Вывод в консоли:
+     *
+     * ```text
+     * GET https://online.moysklad.ru/api/remap/1.1/entity/customerorder?limit=1 (+4ms)
+     * GET OK 200 https://online.moysklad.ru/api/remap/1.1/entity/customerorder?limit=1 (+575ms)
+     * GET BODY https://online.moysklad.ru/api/remap/1.1/entity/customerorder?limit=1 (+580ms)
+     * Order name: 00600
+     * ```
+     *
+     */
+    emitter?: any
+
     [option: string]: any
   }
 

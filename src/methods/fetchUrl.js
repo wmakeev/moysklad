@@ -5,7 +5,7 @@ const defaultsDeep = require('lodash.defaultsdeep')
 const have = require('../have')
 const getResponseError = require('../getResponseError')
 
-module.exports = async function fetchUrl (uri, options = {}) {
+module.exports = async function fetchUrl (url, options = {}) {
   have.strict(arguments, { url: 'url', options: 'opt Object' })
 
   let resBodyJson, error
@@ -56,12 +56,12 @@ module.exports = async function fetchUrl (uri, options = {}) {
     fetchOptions.headers.Authorization = this.getAuthHeader()
   }
 
-  if (emit) emit('request', { uri, options: fetchOptions })
+  if (emit) emit('request', { url, options: fetchOptions })
 
   /** @type {Response} */
-  const response = await this.fetch(uri, fetchOptions)
+  const response = await this.fetch(url, fetchOptions)
 
-  if (emit) emit('response', { uri, options: fetchOptions, response })
+  if (emit) emit('response', { url, options: fetchOptions, response })
 
   if (rawResponse && muteErrors) return response
 
@@ -81,7 +81,7 @@ module.exports = async function fetchUrl (uri, options = {}) {
       resBodyJson = await response.json()
     } catch (e) {}
 
-    if (emit) emit('response:body', { uri, options: fetchOptions, response, body: resBodyJson })
+    if (emit) emit('response:body', { url, options: fetchOptions, response, body: resBodyJson })
     error = getResponseError(resBodyJson) || error
   }
 

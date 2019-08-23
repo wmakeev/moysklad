@@ -2456,8 +2456,12 @@ module.exports = stampit({
       /* eslint no-undef:0 */
       this.fetch = fetch
     } else {
-      throw new Error('Не указан Fetch API модуль' +
-       ' (cм. подробнее https://github.com/wmakeev/moysklad#Установка).')
+      this.fetch = function () {
+        throw new Error(
+          'Нельзя выполнить http запрос, т.к. при инициализации' +
+          ' экземпляра библиотеки не указан Fetch API модуль' +
+          ' (cм. подробнее https://github.com/wmakeev/moysklad#Установка).')
+      }
     }
 
     if (options.emitter) {
@@ -2510,9 +2514,9 @@ module.exports = function DELETE (...args) {
     have.argumentsObject
   ])
 
-  const uri = this.buildUrl(path)
+  const url = this.buildUrl(path)
 
-  return this.fetchUrl(uri, { ...options, method: 'DELETE' })
+  return this.fetchUrl(url, { ...options, method: 'DELETE' })
 }
 
 },{"../have":6}],10:[function(require,module,exports){
@@ -2526,9 +2530,9 @@ module.exports = function GET (...args) {
     have.argumentsObject
   ])
 
-  const uri = this.buildUrl(path, query)
+  const url = this.buildUrl(path, query)
 
-  return this.fetchUrl(uri, { ...options, method: 'GET' })
+  return this.fetchUrl(url, { ...options, method: 'GET' })
 }
 
 },{"../have":6}],11:[function(require,module,exports){
@@ -2548,11 +2552,11 @@ module.exports = function POST (...args) {
     have.argumentsObject
   ])
 
-  const uri = this.buildUrl(path, query)
+  const url = this.buildUrl(path, query)
   const fetchOptions = { method: 'POST' }
   if (payload) fetchOptions.body = JSON.stringify(payload)
 
-  return this.fetchUrl(uri, { ...options, ...fetchOptions })
+  return this.fetchUrl(url, { ...options, ...fetchOptions })
 }
 
 },{"../have":6}],12:[function(require,module,exports){
@@ -2571,11 +2575,11 @@ module.exports = function PUT (...args) {
     have.argumentsObject
   ])
 
-  const uri = this.buildUrl(path, query)
+  const url = this.buildUrl(path, query)
   const fetchOptions = { method: 'PUT' }
   if (payload) fetchOptions.body = JSON.stringify(payload)
 
-  return this.fetchUrl(uri, { ...options, ...fetchOptions })
+  return this.fetchUrl(url, { ...options, ...fetchOptions })
 }
 
 },{"../have":6}],13:[function(require,module,exports){
@@ -2621,7 +2625,7 @@ const defaultsDeep = require('lodash.defaultsdeep')
 const have = require('../have')
 const getResponseError = require('../getResponseError')
 
-module.exports = async function fetchUrl (uri, options = {}) {
+module.exports = async function fetchUrl (url, options = {}) {
   have.strict(arguments, { url: 'url', options: 'opt Object' })
 
   let resBodyJson, error
@@ -2672,12 +2676,12 @@ module.exports = async function fetchUrl (uri, options = {}) {
     fetchOptions.headers.Authorization = this.getAuthHeader()
   }
 
-  if (emit) emit('request', { uri, options: fetchOptions })
+  if (emit) emit('request', { url, options: fetchOptions })
 
   /** @type {Response} */
-  const response = await this.fetch(uri, fetchOptions)
+  const response = await this.fetch(url, fetchOptions)
 
-  if (emit) emit('response', { uri, options: fetchOptions, response })
+  if (emit) emit('response', { url, options: fetchOptions, response })
 
   if (rawResponse && muteErrors) return response
 
@@ -2697,7 +2701,7 @@ module.exports = async function fetchUrl (uri, options = {}) {
       resBodyJson = await response.json()
     } catch (e) {}
 
-    if (emit) emit('response:body', { uri, options: fetchOptions, response, body: resBodyJson })
+    if (emit) emit('response:body', { url, options: fetchOptions, response, body: resBodyJson })
     error = getResponseError(resBodyJson) || error
   }
 
@@ -2713,29 +2717,72 @@ module.exports = async function fetchUrl (uri, options = {}) {
 'use strict'
 
 /* global MOYSKLAD_LOGIN, MOYSKLAD_PASSWORD */
+/* eslint no-undef:0 */
 
 const base64encode = require('@wmakeev/base64encode')
 
+const bearerAuth = token => `Bearer ${token}`
+const basicAuth = (login, password) => 'Basic ' + base64encode(`${login}:${password}`)
+
+const getEnvKey = (() => {
+  if (
+    typeof process !== 'undefined' &&
+    process.env
+  ) {
+    return key => process.env[key]
+  } else {
+    return () => null
+  }
+})()
+
 module.exports = function getAuthHeader () {
+  let token
   let login
   let password
+
   const options = this.getOptions()
 
-  if (options.login && options.password) {
-    login = options.login
-    password = options.password
-  } else if (typeof process !== 'undefined' && process.env && process.env.MOYSKLAD_LOGIN &&
-    process.env.MOYSKLAD_PASSWORD) {
-    login = process.env.MOYSKLAD_LOGIN
-    password = process.env.MOYSKLAD_PASSWORD
-  } else if (typeof MOYSKLAD_LOGIN !== 'undefined' && typeof MOYSKLAD_PASSWORD !== 'undefined') {
-    login = MOYSKLAD_LOGIN
-    password = MOYSKLAD_PASSWORD
-  } else {
-    return null
+  switch (true) {
+    case options.token != null:
+      token = options.token
+      break
+
+    case options.login != null:
+      login = options.login
+      password = options.password
+      break
+
+    case getEnvKey('MOYSKLAD_TOKEN') != null:
+      token = getEnvKey('MOYSKLAD_TOKEN')
+      break
+
+    case getEnvKey('MOYSKLAD_LOGIN') != null:
+      login = getEnvKey('MOYSKLAD_LOGIN')
+      password = getEnvKey('MOYSKLAD_PASSWORD')
+      break
+
+    case typeof MOYSKLAD_TOKEN !== 'undefined':
+      token = MOYSKLAD_TOKEN
+      break
+
+    case typeof MOYSKLAD_LOGIN !== 'undefined':
+      login = MOYSKLAD_LOGIN
+      if (typeof MOYSKLAD_PASSWORD !== 'undefined') {
+        password = MOYSKLAD_PASSWORD
+      }
+      break
+
+    default:
+      return undefined
   }
 
-  return 'Basic ' + base64encode(`${login}:${password}`)
+  if (token) {
+    return bearerAuth(token)
+  } else if (password) {
+    return basicAuth(login, password)
+  } else {
+    throw new Error('Не указан пароль для доступа к API')
+  }
 }
 
 },{"@wmakeev/base64encode":1}],16:[function(require,module,exports){

@@ -12,6 +12,7 @@ test('Moysklad constructor', t => {
 
 test('Moysklad static methods', t => {
   t.equals(typeof Moysklad.getTimeString, 'function')
+  t.equals(typeof Moysklad.parseTimeString, 'function')
   t.end()
 })
 

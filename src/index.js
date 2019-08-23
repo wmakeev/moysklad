@@ -74,8 +74,12 @@ module.exports = stampit({
       /* eslint no-undef:0 */
       this.fetch = fetch
     } else {
-      throw new Error('Не указан Fetch API модуль' +
-       ' (cм. подробнее https://github.com/wmakeev/moysklad#Установка).')
+      this.fetch = function () {
+        throw new Error(
+          'Нельзя выполнить http запрос, т.к. при инициализации' +
+          ' экземпляра библиотеки не указан Fetch API модуль' +
+          ' (cм. подробнее https://github.com/wmakeev/moysklad#Установка).')
+      }
     }
 
     if (options.emitter) {

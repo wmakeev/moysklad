@@ -49,6 +49,26 @@ test('Create Moysklad instance with options', t => {
   t.end()
 })
 
+test('Request without fetch', async t => {
+  t.plan(1)
+
+  const options = {
+    login: 'login',
+    password: 'password'
+  }
+
+  const ms = Moysklad(options)
+
+  try {
+    await ms.GET('entity/counterparty', { limit: 1 })
+  } catch (err) {
+    t.ok(
+      err.message.indexOf('Нельзя выполнить http запрос') === 0,
+      'should throw error'
+    )
+  }
+})
+
 test('Moysklad#GET method', async t => {
   const ms = Moysklad({ fetch })
 

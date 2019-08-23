@@ -6,7 +6,7 @@ export = Moysklad
  * Создает экземпляр клиента для рабты с API МойСклад
  * @param options Параметры инициализации экземпляра
  */
-declare function Moysklad (options: Moysklad.Options): Moysklad.Instance
+declare function Moysklad (options?: Moysklad.Options): Moysklad.Instance
 
 declare namespace Moysklad {
   export interface Instance {
@@ -16,15 +16,19 @@ declare namespace Moysklad {
      * @param query Строка запроса
      * @param options Опции запроса
      */
-    GET<T> (path: string | string[], query?: Query, options?: RequestOptions): Promise<T>
-    GET<T> (params: {
+    GET (
+      path: string | string[],
+      query?: Query,
+      options?: RequestOptions
+    ): Promise<any>
+    GET (params: {
       /** Путь к ресурсу */
       path: string | string[]
       /** Строка запроса */
       query?: Query
       /** Опции запроса */
       options?: RequestOptions
-    }): Promise<T>
+    }): Promise<any>
 
     /**
      * Выполняет POST запрос по указанному ресурсу
@@ -33,17 +37,21 @@ declare namespace Moysklad {
      * @param query Строка запроса
      * @param options Опции запроса
      */
-    POST<T> (path: string | string[], payload: Object | Object[], query?: Query, options?: RequestOptions): Promise<T>
-    POST<T> (params: {
+    POST (
+      path: string | string[],
+      payload: any,
+      query?: Query, options?: RequestOptions
+    ): Promise<any>
+    POST (params: {
       /** Путь к ресурсу */
       path: string | string[]
       /** Тело запроса */
-      payload: Object | Object[]
+      payload: any
       /** Строка запроса */
       query?: Query
       /** Опции запроса */
       options?: RequestOptions
-    }): Promise<T>
+    }): Promise<any>
 
     /**
      * Выполняет PUT запрос по указанному ресурсу
@@ -52,30 +60,37 @@ declare namespace Moysklad {
      * @param query Строка запроса
      * @param options Опции запроса
      */
-    PUT<T> (path: string | string[], payload: Object | Object[], query?: Query, options?: RequestOptions): Promise<T>
-    PUT<T> (params: {
+    PUT (
+      path: string | string[],
+      payload: any,
+      query?: Query, options?: RequestOptions
+    ): Promise<any>
+    PUT (params: {
       /** Путь к ресурсу */
       path: string | string[]
       /** Тело запроса */
-      payload: Object | Object[]
+      payload: any
       /** Строка запроса */
       query?: Query
       /** Опции запроса */
       options?: RequestOptions
-    }): Promise<T>
+    }): Promise<any>
 
     /**
      * Выполняет DELETE запрос по указанному ресурсу
      * @param path Путь к ресурсу
      * @param options Опции запроса
      */
-    DELETE<T> (path: string | string[], options?: RequestOptions): Promise<any>
-    DELETE<T> (params: {
+    DELETE (
+      path: string | string[],
+      options?: RequestOptions
+    ): Promise<any>
+    DELETE (params: {
       /** Путь к ресурсу */
       path: string | string[]
       /** Опции запроса */
       options?: RequestOptions
-    }): Promise<T>
+    }): Promise<any>
 
     /**
      * Возвращает параметры с которыми был инициализирован текущий клиент
@@ -167,7 +182,14 @@ declare namespace Moysklad {
      * })
      * ```
      */
-    fetchUrl<T> (url: string, options?: RequestOptions): Promise<T>
+    fetchUrl (url: string, options?: RequestOptions): Promise<any>
+
+    /**
+     * Возвращает значение HTTP заголовка Authorization
+     *
+     * Если указан ло
+     */
+    getAuthHeader (): string
   }
 
   /**
@@ -201,6 +223,30 @@ declare namespace Moysklad {
      * по умолчанию `1.1`
      */
     apiVersion?: string
+
+    /**
+     * Токен для доступа к API
+     *
+     * Можно передать через глобальную переменную или переменную окружения `MOYSKLAD_TOKEN`
+     * (см. [Аутентификация](https://github.com/wmakeev/moysklad#аутентификация))
+     */
+    token?: string
+
+    /**
+     * Логин
+     *
+     * Можно передать через глобальную переменную или переменную окружения `MOYSKLAD_LOGIN`
+     * (см. [Аутентификация](https://github.com/wmakeev/moysklad#аутентификация))
+     */
+    login?: string
+
+    /**
+     * Пароль
+     *
+     * Можно передать через глобальную переменную или переменную окружения `MOYSKLAD_PASSWORD`
+     * (см. [Аутентификация](https://github.com/wmakeev/moysklad#аутентификация))
+     */
+    password?: string
 
     /**
      * Экземляр [EventEmitter](https://nodejs.org/api/events.html#events_class_eventemitter) для получения событий

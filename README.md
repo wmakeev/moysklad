@@ -4,9 +4,9 @@
 [![npm](https://img.shields.io/npm/v/moysklad.svg?maxAge=1800&style=flat-square)](https://www.npmjs.com/package/moysklad)
 [![Travis](https://img.shields.io/travis/wmakeev/moysklad.svg?maxAge=1800&style=flat-square)](https://travis-ci.org/wmakeev/moysklad)
 [![Coveralls](https://img.shields.io/coveralls/wmakeev/moysklad.svg?maxAge=1800&style=flat-square)](https://coveralls.io/github/wmakeev/moysklad)
-[![Code Climate](https://img.shields.io/codeclimate/maintainability-percentage/wmakeev/moysklad.svg?style=flat-square)](https://codeclimate.com/github/wmakeev/moysklad/maintainability)
-[![Code Climate](https://img.shields.io/codeclimate/tech-debt/wmakeev/moysklad.svg?style=flat-square)](https://codeclimate.com/github/wmakeev/moysklad/maintainability)
-[![JavaScript Style Guide](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square)](http://standardjs.com/)
+[![Code Climate](https://img.shields.io/codeclimate/maintainability-percentage/wmakeev/moysklad.svg?maxAge=1800&style=flat-square)](https://codeclimate.com/github/wmakeev/moysklad/maintainability)
+[![Code Climate](https://img.shields.io/codeclimate/tech-debt/wmakeev/moysklad.svg?maxAge=1800&style=flat-square)](https://codeclimate.com/github/wmakeev/moysklad)
+[![JavaScript Style Guide](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?maxAge=1800&style=flat-square)](http://standardjs.com/)
 
 > Библиотека для взаимодействия с JSON API сервиса МойСклад для node.js и браузера.
 

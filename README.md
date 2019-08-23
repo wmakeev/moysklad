@@ -1,12 +1,12 @@
 ![moysklad](https://wmakeev-public-files.s3-eu-west-1.amazonaws.com/images/logos/logoMS500x350.png)
 ===========
 
-[![npm](https://img.shields.io/npm/v/moysklad.svg?maxAge=1800&style=flat-square)](https://www.npmjs.com/package/moysklad)
-[![Travis](https://img.shields.io/travis/wmakeev/moysklad.svg?maxAge=1800&style=flat-square)](https://travis-ci.org/wmakeev/moysklad)
-[![Coveralls](https://img.shields.io/coveralls/wmakeev/moysklad.svg?maxAge=1800&style=flat-square)](https://coveralls.io/github/wmakeev/moysklad)
-[![Code Climate](https://img.shields.io/codeclimate/maintainability-percentage/wmakeev/moysklad.svg?maxAge=1800&style=flat-square)](https://codeclimate.com/github/wmakeev/moysklad/maintainability)
-[![Code Climate](https://img.shields.io/codeclimate/tech-debt/wmakeev/moysklad.svg?maxAge=1800&style=flat-square)](https://codeclimate.com/github/wmakeev/moysklad)
-[![JavaScript Style Guide](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?maxAge=1800&style=flat-square)](http://standardjs.com/)
+[![npm](https://img.shields.io/npm/v/moysklad.svg?cacheSeconds=1800&style=flat-square)](https://www.npmjs.com/package/moysklad)
+[![Travis](https://img.shields.io/travis/wmakeev/moysklad.svg?cacheSeconds=1800&style=flat-square)](https://travis-ci.org/wmakeev/moysklad)
+[![Coveralls](https://img.shields.io/coveralls/wmakeev/moysklad.svg?cacheSeconds=1800&style=flat-square)](https://coveralls.io/github/wmakeev/moysklad)
+[![Code Climate](https://img.shields.io/codeclimate/maintainability-percentage/wmakeev/moysklad.svg?cacheSeconds=1800&style=flat-square)](https://codeclimate.com/github/wmakeev/moysklad/maintainability)
+[![Code Climate](https://img.shields.io/codeclimate/tech-debt/wmakeev/moysklad.svg?cacheSeconds=1800&style=flat-square)](https://codeclimate.com/github/wmakeev/moysklad)
+[![JavaScript Style Guide](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?cacheSeconds=1800&style=flat-square)](http://standardjs.com/)
 
 > Библиотека для взаимодействия с JSON API сервиса МойСклад для node.js и браузера.
 

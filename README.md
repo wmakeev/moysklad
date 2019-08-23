@@ -21,6 +21,7 @@
 - [Установка](#установка)
 - [Использование](#использование)
 - [Параметры инициализации](#параметры-инициализации)
+- [Аутентификация](#аутентификация)
 - [Фильтрация](#фильтрация)
 - [Расширения](#расширения)
 - [API](#api)
@@ -105,10 +106,7 @@ const ms = Moysklad({ login, password })
 ms.GET('entity/customerorder', {
   filter: {
     applicable: true,
-    sum: {
-      $gt: 1000000,
-      $lt: 2000000
-    }
+    sum: { $gt: 1000000, $lt: 2000000 }
   },
   limit: 10,
   order: 'moment,desc',
@@ -130,11 +128,16 @@ ms.GET('entity/customerorder', {
 
 Параметр | Значение по умолчанию | Описание
 ---------|--------------|----------
-`fetch` | глобальный fetch | Функция с интерфейсом [Fetch API](https://developer.mozilla.org/ru/docs/Web/API/Fetch_API). Если глобальный fetch не найден, то будет выброшена ошибка.
-`endpoint` | `https://online.moysklad.ru/api` | Точка досупа к API
-`api` | `remap` | Раздел API
-`apiVersion` | `1.1` | Версия API
+`fetch` | глобальный fetch | Функция с интерфейсом [Fetch API](https://developer.mozilla.org/ru/docs/Web/API/Fetch_API). Если глобальный fetch не найден, то будет выброшена ошибка при попытке осуществить http запрос.
+`endpoint` | `"https://online.moysklad.ru/api"` | Точка досупа к API
+`api` | `"remap"` | Раздел API
+`apiVersion` | `"1.1"` | Версия API
+`token` | `undefined` | Токен доступа к API (см. [Аутентификация](#аутентификация))
+`login` | `undefined` | Логин для доступа к API (см. [Аутентификация](#аутентификация))
+`password` | `undefined` | Пароль для доступа к API (см. [Аутентификация](#аутентификация))
 `emitter` | `undefined` | экземляр [EventEmitter](https://nodejs.org/api/events.html#events_class_eventemitter) для передачи [событий библиотеки](#события)
+
+Некоторые [внешние расширения](#расширения) могут добавлять свои дополнительные параметры.
 
 Пример использования:
 
@@ -144,6 +147,37 @@ const Moysklad = require('moysklad')
 // Явное указание используемой версии API
 const moysklad = Moysklad({ apiVersion: '1.2' })
 ```
+
+## Аутентификация
+
+Есть несколько способов передачи параметров аутентификации:
+
+1. Напрямую при инициализации экземпляра
+
+    ```js
+    // Аутентификация по логину и паролю
+    const moysklad = Moysklad({ login, password })
+    ```
+
+    ```js
+    // Аутентификация по токену
+    const moysklad = Moysklad({ token })
+    ```
+
+2. Через глобальные переменные или переменные окружения
+
+    Если параметры аутентификации не указаны при инициализации клиента,
+
+    ```js
+    const moysklad = Moysklad()
+    ```
+
+    то будет проведен поиск параметров в следующем порядке:
+
+      1. Переменная окружения `process.env.MOYSKLAD_TOKEN`
+      2. Переменные окружения `process.env.MOYSKLAD_LOGIN` и `process.env.MOYSKLAD_PASSWORD`
+      3. Глобальная переменная `global.MOYSKLAD_TOKEN`
+      4. Глобальные переменные `global.MOYSKLAD_LOGIN` и `global.MOYSKLAD_PASSWORD`
 
 ## Фильтрация
 

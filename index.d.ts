@@ -407,14 +407,12 @@ declare namespace Moysklad {
     $nin?: QueryValue[]
 
     /**
-     * Наличие значения (не null) `key!=`
+     * Наличие значения (не null)
+     *
+     * true - `key!=`
+     * false - `key=`
      */
-    $exists?: true
-
-    /**
-     * Пустое значение (null) `key=`
-     */
-    $exists?: false
+    $exists?: boolean
 
     /**
      * Объединение нескольких условий
@@ -429,7 +427,7 @@ declare namespace Moysklad {
     /**
      * Равно `key=value`
      */
-    [key: string]: QueryValue | QueryValue[] | QueryObject
+    [key: string]: QueryValue | QueryValue[] | QueryObject | QueryObject[]
   }
 
   /**
@@ -478,7 +476,7 @@ declare namespace Moysklad {
      */
     order?: string
 
-    [key: string]: QueryValue | QueryValue[]
+    [key: string]: any
   }
 
   /**

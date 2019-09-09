@@ -120,7 +120,7 @@ ms.GET('entity/customerorder', {
 })
 ```
 
-> С другими примерами использования можно ознакомиться в папке [examples](https://github.com/wmakeev/moysklad/tree/master/tools)
+> С другими примерами использования можно ознакомиться в папке [examples](https://github.com/wmakeev/moysklad/tree/master/examples)
 
 ## Параметры инициализации
 

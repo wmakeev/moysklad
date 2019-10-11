@@ -156,8 +156,11 @@ test('buildFilter with query selectors combined with sub fields', t => {
     name: {
       $gt: 15,
       $eq: 'foo',
-      sub: 'bar'
-    }
+      $lte: undefined,
+      sub: 'bar',
+      empty: undefined
+    },
+    empty: undefined
   }
 
   t.deepEqual(buildFilter(filter), 'id=5;name.sub=bar;name=foo;name>15')
@@ -169,10 +172,6 @@ test('buildFilter errors', t => {
   t.throws(() => {
     buildFilter()
   }, /filter must to be an object/)
-
-  t.throws(() => {
-    buildFilter({ foo: undefined })
-  }, /filter "foo" key value is undefined/)
 
   t.throws(() => {
     buildFilter({ foo: Symbol('foo') })

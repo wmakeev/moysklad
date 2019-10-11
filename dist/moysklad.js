@@ -2977,7 +2977,7 @@ module.exports = function buildFilter (filter) {
       const value = part[2]
       switch (true) {
         case value === undefined:
-          throw new TypeError(`filter "${key}" key value is undefined`)
+          return null
 
         case value === null:
           return [key, operator, '']
@@ -2994,6 +2994,7 @@ module.exports = function buildFilter (filter) {
           throw new TypeError(`filter "${key}" key value is incorrect`)
       }
     })
+    .filter(it => it)
     .map(part => `${part[0]}${part[1]}${part[2]}`)
     .sort((p1, p2) => {
       if (p1 > p2) { return 1 }

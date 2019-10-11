@@ -36,6 +36,8 @@
 
 - [ ] Подключить matchers отдельным модулем (?)
 
+- [ ] Добавить ссылку на сборку в [unpkg.com](https://unpkg.com/browse/moysklad@0.6.0/dist/moysklad.js) + .min.js версия
+
 
 
 

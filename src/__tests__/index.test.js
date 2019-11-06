@@ -74,18 +74,27 @@ test('Moysklad#GET method', async t => {
 
   const counterparties = await ms.GET('entity/counterparty', { limit: 1 })
   t.equals(typeof counterparties, 'object', 'should return object')
-  t.ok(counterparties.rows instanceof Array, 'should return counterparties collection')
+  t.ok(
+    counterparties.rows instanceof Array,
+    'should return counterparties collection'
+  )
 
   const [employee, group] = await Promise.all([
     ms.fetchUrl(counterparties.context.employee.meta.href),
     ms.fetchUrl(counterparties.rows[0].group.meta.href)
   ])
 
-  t.equals(typeof employee, 'object',
-    'Moysklad#fetchUrl method should fetch employee object by href')
+  t.equals(
+    typeof employee,
+    'object',
+    'Moysklad#fetchUrl method should fetch employee object by href'
+  )
 
-  t.equals(typeof group, 'object',
-    'Moysklad#fetchUrl method should fetch group object by href')
+  t.equals(
+    typeof group,
+    'object',
+    'Moysklad#fetchUrl method should fetch group object by href'
+  )
 })
 
 test('Moysklad#POST/PUT/DELETE', async t => {
@@ -101,6 +110,20 @@ test('Moysklad#POST/PUT/DELETE', async t => {
         name: 'Вид товара',
         value: {
           name: 'Рюкзак'
+        }
+      },
+      {
+        id: '14538d43-ea5b-11e9-0a80-0505000d881a',
+        name: 'Пол',
+        value: {
+          name: 'Женский'
+        }
+      },
+      {
+        id: 'c18ca61c-eac1-11e9-0a80-042800177f42',
+        name: 'Возраст',
+        value: {
+          name: 'Взрослый'
         }
       },
       {
@@ -141,5 +164,8 @@ test('Moysklad#POST/PUT/DELETE', async t => {
 
   await ms.DELETE(['entity/product', newProduct.id])
 
-  await t.shouldFail((() => ms.GET(['entity/product', newProduct.id]))(), /не найден/i)
+  await t.shouldFail(
+    (() => ms.GET(['entity/product', newProduct.id]))(),
+    /не найден/i
+  )
 })

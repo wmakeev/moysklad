@@ -47,17 +47,17 @@
     "@wmakeev/base64encode": "^1.0.0",
     "have2": "1.0.0-beta.1",
     "lodash.defaultsdeep": "^4.6.1",
-    "stampit": "^4.2.0"
+    "stampit": "^4.3.1"
   },
   "devDependencies": {
     "blue-tape": "^1.0.0",
     "browserify": "^16.5.0",
-    "coveralls": "^3.0.6",
+    "coveralls": "^3.0.9",
     "debug": "^4.1.1",
-    "dotenv": "^8.0.0",
+    "dotenv": "^8.2.0",
     "node-fetch": "^2.6.0",
-    "nyc": "^14.1.1",
-    "standard": "^13.1.0",
+    "nyc": "^15.0.0",
+    "standard": "^14.3.1",
     "tap-spec": "^5.0.0",
     "walkdir": "0.4.1"
   },

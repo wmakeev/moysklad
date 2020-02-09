@@ -1,5 +1,3 @@
-import { Stamp } from 'stampit'
-
 export = Moysklad
 
 /**
@@ -348,7 +346,7 @@ declare namespace Moysklad {
     [option: string]: any
   }
 
-  export type QueryValue = string | number | boolean | Date | null
+  export type QueryValue = string | number | boolean | Date
 
   export interface QueryObject {
     /**
@@ -427,7 +425,7 @@ declare namespace Moysklad {
     /**
      * Равно `key=value`
      */
-    [key: string]: QueryValue | QueryValue[] | QueryObject | QueryObject[]
+    [key: string]: QueryValue | QueryValue[] | QueryObject | QueryObject[] | undefined
   }
 
   /**
@@ -449,7 +447,7 @@ declare namespace Moysklad {
      * ```
      */
     filter?: {
-      [key: string]: QueryValue | QueryObject
+      [key: string]: QueryValue | QueryValue[] | QueryObject
     } | string
 
     /**
@@ -494,7 +492,7 @@ declare namespace Moysklad {
 
   /**
    * Метод используется для расширения библиотеки внешними модулями
-   * @param stamp Модуль расширения
+   * @param extension Модуль расширения
    */
-  export function compose (extension: Stamp): typeof Moysklad
+  export function compose (extension: Function): typeof Moysklad
 }

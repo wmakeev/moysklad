@@ -2344,7 +2344,7 @@ function stubFalse() {
 module.exports = defaultsDeep;
 
 },{}],4:[function(require,module,exports){
-!function(){"use strict";function t(t,n){return J.call(arguments,2).reduce(t,n)}function n(t,n){if(n)for(var r=F(n),e=0;e<r[V];e++)t[r[e]]=n[r[e]];return t}function r(t){return"function"==typeof t}function e(t){return t&&typeof t==R||r(t)}function o(t){return t&&typeof t==R&&t.__proto__==q.prototype}function i(t,n){if(n===d)return t;if(w(n))return(w(t)?t:[]).concat(n);if(!o(n))return n;for(var r,e=F(n),u=0;u<e[V];)r=e[u++],n[r]!==d&&(t[r]=i(o(t[r])||w(n[r])?t[r]:{},n[r]));return t}function u(){return m=H.apply([],arguments).filter(function(t,n,e){return r(t)&&e.indexOf(t)===n}),m[V]?m:d}function p(t){return v={},v[E]=t[E]||d,m=t[b],h=t.props,v[b]=e(m||h)?K({},h,m):d,v[z]=u(t.init,t[z]),v[I]=u(t[I]),m=t[P],h=t[D],v[P]=e(m||h)?L({},h,m):d,v[g]=t[g],m=t[A],h=t.statics,v[A]=e(m||h)?K({},h,m):d,m=t[O],h=t[S],v[O]=e(m||h)?L({},h,m):d,m=t[j],h=t.name&&{name:{value:t.name}},v[j]=e(h||m)?K({},m,h):d,m=t[x],h=t.conf,v[x]=e(m||h)?K({},h,m):d,m=t[C],h=t[k],v[C]=e(m||h)?L({},h,m):d,v}function c(){return function Stamp(t){var n,e,o=Stamp[N]||{},i={__proto__:o[E]},u=o[z],p=J.apply(arguments),c=o[P];if(c&&L(i,c),c=o[b],c&&K(i,c),c=o[g],c&&B(i,c),!u||!u[V])return i;for(t===d&&(t={}),o=0;o<u[V];)n=u[o++],r(n)&&(e=n.call(i,t,{instance:i,stamp:Stamp,args:p}),i=e===d?i:e);return i}}function f(t){return m=c(),h=t[O],h&&L(m,h),h=t[A],h&&K(m,h),h=t[j],h&&B(m,h),h=r(m[N])?m[N]:a,K(m[N]=function(){return h.apply(this,arguments)},t),m}function s(t,n){function r(r,o){e(n[r])&&(e(t[r])||(t[r]={}),(o||K)(t[r],n[r]))}function o(r){(m=u(t[r],n[r]))&&(t[r]=m)}return n&&e(n=n[N]||n)&&(r(E),r(b),r(P,L),r(g),r(A),r(O,L),r(j),r(x),r(C,L),o(z),o(I)),t}function a(){return f(H.apply([this],arguments).reduce(s,{}))}function l(t){return r(t)&&r(t[N])}function y(t,n){return function(){return v={},v[t]=n.apply(d,H.apply([{}],arguments)),m=this,(m&&m[N]||h).call(m,v)}}var d,m="roperties",h="ropertyDescriptors",_="static",v="onfiguration",b="p"+m,P="deepP"+m,g="p"+h,A=_+"P"+m,O=_+"DeepP"+m,j=_+"P"+h,x="c"+v,C="deepC"+v,D="deepProps",S="deepStatics",k="deepConf",z="initializers",E="methods",I="composers",N="compose",R="object",V="length",q=Object,w=Array.isArray,B=q.defineProperties,F=q.keys,G=Array.prototype,H=G.concat,J=G.slice,K=q.assign||t.bind(0,n),L=t.bind(0,i),M={};M[E]=y(E,K),M[b]=M.props=y(b,K),M[z]=M.init=y(z,u),M[I]=y(I,u),M[P]=M[D]=y(P,L),M[A]=M.statics=y(A,K),M[O]=M[S]=y(O,L),M[x]=M.conf=y(x,K),M[C]=M[k]=y(C,L),M[g]=y(g,K),M[j]=y(j,K),h=M[N]=K(function stampit(){for(var t,n=0,r=[],o=arguments,i=this;n<o[V];)t=o[n++],e(t)&&r.push(l(t)?t:p(t));if(t=a.apply(i||G,r),i&&r.unshift(i),o=t[N][I],w(o))for(n=0;n<o[V];)i=o[n++]({stamp:t,composables:r}),t=l(i)?i:t;return t},M),M.create=function(){return this.apply(d,arguments)},v={},v[A]=M,G=a(v),h[N]=h.bind(),h.version="4.2.0",typeof d!=typeof module?module.exports=h:self.stampit=h}();
+!function(){"use strict";var f,p="roperties",c="ropertyDescriptors",t="static",a="onfiguration",s="p"+p,l="deepP"+p,y="p"+c,d=t+"P"+p,m=t+"DeepP"+p,v=t+"P"+c,h="c"+a,P="deepC"+a,_="deepProps",b="deepStatics",g="deepConf",O="initializers",w="methods",A="composers",D="compose",r="object",S="length",n=Object,j=Array.isArray,x=n.defineProperties,C=n.defineProperty,N=n.getOwnPropertyDescriptor,e=n.getOwnPropertySymbols,z=Array.prototype,o=z.concat,E=z.slice;function I(t){return n.getOwnPropertyNames(t).concat(e?e(t):[])}function i(t,r){return E.call(arguments,2).reduce(t,r)}var R=i.bind(0,function t(r,n){if(n)for(var e,o=I(n),i=0;i<o.length;i+=1)e=N(n,o[i]),C(r,o[i],e);return r});function V(t){return"function"==typeof t}function k(t){return t&&typeof t==r||V(t)}function q(t){return t&&typeof t==r&&t.__proto__==n.prototype}var B=i.bind(0,function t(r,n){if(n===f)return r;if(j(n))return(j(r)?r:[]).concat(n);if(!q(n))return n;for(var e,o,i=I(n),u=0;u<i[S];)e=i[u++],(o=N(n,e)).hasOwnProperty("value")?o.value!==f&&(r[e]=t(q(r[e])||j(n[e])?r[e]:{},n[e])):C(r,e,o);return r});function F(){return(p=o.apply([],arguments).filter(function(t,r,n){return V(t)&&n.indexOf(t)===r}))[S]?p:f}function u(t){return p=function t(){return function t(r){var n,e,o=t[D]||{},i={__proto__:o[w]},u=o[O],p=E.apply(arguments),c=o[l];if(c&&B(i,c),(c=o[s])&&R(i,c),(c=o[y])&&x(i,c),!u||!u[S])return i;for(r===f&&(r={}),o=0;o<u[S];)V(n=u[o++])&&(i=(e=n.call(i,r,{instance:i,stamp:t,args:p}))===f?i:e);return i}}(),(c=t[m])&&B(p,c),(c=t[d])&&R(p,c),(c=t[v])&&x(p,c),c=V(p[D])?p[D]:H,R(p[D]=function(){return c.apply(this,arguments)},t),p}function G(n,e){function t(t,r){k(e[t])&&(k(n[t])||(n[t]={}),(r||R)(n[t],e[t]))}function r(t){(p=F(n[t],e[t]))&&(n[t]=p)}return e&&k(e=e[D]||e)&&(t(w),t(s),t(l,B),t(y),t(d),t(m,B),t(v),t(h),t(P,B),r(O),r(A)),n}function H(){return u(o.apply([this],arguments).reduce(G,{}))}function J(t){return V(t)&&V(t[D])}var K={};function L(t,r){return function(){return(a={})[t]=r.apply(f,o.apply([{}],arguments)),((p=this)&&p[D]||c).call(p,a)}}K[w]=L(w,R),K[s]=K.props=L(s,R),K[O]=K.init=L(O,F),K[A]=L(A,F),K[l]=K[_]=L(l,B),K[d]=K.statics=L(d,R),K[m]=K[b]=L(m,B),K[h]=K.conf=L(h,R),K[P]=K[g]=L(P,B),K[y]=L(y,R),K[v]=L(v,R),c=K[D]=R(function t(){for(var r,n,e=0,o=[],i=arguments,u=this;e<i[S];)k(r=i[e++])&&o.push(J(r)?r:((a={})[w]=(n=r)[w]||f,c=n.props,a[s]=k((p=n[s])||c)?R({},c,p):f,a[O]=F(n.init,n[O]),a[A]=F(n[A]),c=n[_],a[l]=k((p=n[l])||c)?B({},c,p):f,a[y]=n[y],c=n.statics,a[d]=k((p=n[d])||c)?R({},c,p):f,c=n[b],a[m]=k((p=n[m])||c)?B({},c,p):f,p=n[v],a[v]=k((c=n.name&&{name:{value:n.name}})||p)?R({},p,c):f,c=n.conf,a[h]=k((p=n[h])||c)?R({},c,p):f,c=n[g],a[P]=k((p=n[P])||c)?B({},c,p):f,a));if(r=H.apply(u||z,o),u&&o.unshift(u),j(i=r[D][A]))for(e=0;e<i[S];)r=J(u=i[e++]({stamp:r,composables:o}))?u:r;return r},K),K["create"]=function(){return this.apply(f,arguments)},(a={})[d]=K,z=H(a),c[D]=c.bind(),c.version="4.3.1",typeof f!=typeof module?module.exports=c:self.stampit=c}();
 
 },{}],5:[function(require,module,exports){
 'use strict'
@@ -2848,7 +2848,7 @@ const isSimpleValue = require('./isSimpleValue')
 
 const createValueSelector = selector => (path, value) => {
   if (!isSimpleValue(value)) {
-    throw new TypeError(`value must to be string, number, date or null`)
+    throw new TypeError('value must to be string, number, date or null')
   }
   return [[path, selector, value]]
 }
@@ -2857,7 +2857,7 @@ const createCollectionSelector = selector => {
   const sel = createValueSelector(selector)
   return (path, value) => {
     if (!(value instanceof Array)) {
-      throw new TypeError(`selector value must to be an array`)
+      throw new TypeError('selector value must to be an array')
     }
     return value.reduce((res, v) => res.concat(sel(path, v)), [])
   }
@@ -2893,7 +2893,9 @@ selectors.nin.not = selectors.in
 
 const comparisonSelectors = Object.keys(selectors).reduce((res, key) => {
   const op = selectors[key]
-  res['$' + key] = (op.collection ? createCollectionSelector : createValueSelector)(op)
+  res['$' + key] = (op.collection
+    ? createCollectionSelector
+    : createValueSelector)(op)
   return res
 }, {})
 
@@ -2913,45 +2915,47 @@ function getFilterParts (path, value) {
     // Mongo logical selectors
     case curKey === '$and':
       if (!(value instanceof Array)) {
-        throw new TypeError(`$and: selector value must to be an array`)
+        throw new TypeError('$and: selector value must to be an array')
       }
-      return value.reduce((res, val) => res
-        .concat(getFilterParts(path.slice(0, -1), val)), [])
+      return value.reduce(
+        (res, val) => res.concat(getFilterParts(path.slice(0, -1), val)),
+        []
+      )
 
     case curKey === '$not':
       if (!isPlainObject(value)) {
-        throw new TypeError(`$not: selector value must to be an object`)
+        throw new TypeError('$not: selector value must to be an object')
       }
-      const headPath = path.slice(0, -1)
-      return getFilterParts(headPath, value)
-        .map(invertFilterPart)
-        // .concat([[headPath, selectors.eq, null]])
+      // .concat([[headPath, selectors.eq, null]])
+      return getFilterParts(path.slice(0, -1), value).map(invertFilterPart)
 
     case curKey === '$exists':
       if (typeof value !== 'boolean') {
-        throw new TypeError(`$exists: selector value must to be boolean`)
+        throw new TypeError('$exists: selector value must to be boolean')
       }
       return [[path.slice(0, -1), value ? selectors.ne : selectors.eq, null]]
 
     // Mongo comparison selectors
     case !!comparisonSelectors[curKey]:
-      let parts
       try {
-        parts = comparisonSelectors[curKey](path.slice(0, -1), value)
+        return comparisonSelectors[curKey](path.slice(0, -1), value)
       } catch (error) {
         throw new Error(`${curKey}: ${error.message}`)
       }
-      return parts
 
     // Array
     case value instanceof Array:
-      return value.reduce((res, val) => res
-        .concat(getFilterParts(path, val)), [])
+      return value.reduce(
+        (res, val) => res.concat(getFilterParts(path, val)),
+        []
+      )
 
     // Object
     case !isSimpleValue(value):
-      return Object.keys(value).reduce((res, key) => res
-        .concat(getFilterParts(path.concat(key), value[key])), [])
+      return Object.keys(value).reduce(
+        (res, key) => res.concat(getFilterParts(path.concat(key), value[key])),
+        []
+      )
 
     // some other value
     default:
@@ -2969,39 +2973,45 @@ module.exports = function buildFilter (filter) {
   // преобразование ключа в строку
   filterParts = filterParts.map(part => [part[0].join('.'), part[1], part[2]])
 
-  return filterParts
-    // конвертация операторов и значений в строку
-    .map(part => {
-      const key = part[0]
-      const operator = part[1].operator
-      const value = part[2]
-      switch (true) {
-        case value === undefined:
-          return null
+  return (
+    filterParts
+      // конвертация операторов и значений в строку
+      .map(part => {
+        const key = part[0]
+        const operator = part[1].operator
+        const value = part[2]
+        switch (true) {
+          case value === undefined:
+            return null
 
-        case value === null:
-          return [key, operator, '']
+          case value === null:
+            return [key, operator, '']
 
-        case value instanceof Date:
-          return [key, operator, getTimeString(value)]
+          case value instanceof Date:
+            return [key, operator, getTimeString(value)]
 
-        case typeof value === 'string':
-        case typeof value === 'number':
-        case typeof value === 'boolean':
-          return [key, operator, value]
+          case typeof value === 'string':
+          case typeof value === 'number':
+          case typeof value === 'boolean':
+            return [key, operator, value]
 
-        default:
-          throw new TypeError(`filter "${key}" key value is incorrect`)
-      }
-    })
-    .filter(it => it)
-    .map(part => `${part[0]}${part[1]}${part[2]}`)
-    .sort((p1, p2) => {
-      if (p1 > p2) { return 1 }
-      if (p1 < p2) { return -1 }
-      return 0
-    })
-    .join(';')
+          default:
+            throw new TypeError(`filter "${key}" key value is incorrect`)
+        }
+      })
+      .filter(it => it)
+      .map(part => `${part[0]}${part[1]}${part[2]}`)
+      .sort((p1, p2) => {
+        if (p1 > p2) {
+          return 1
+        }
+        if (p1 < p2) {
+          return -1
+        }
+        return 0
+      })
+      .join(';')
+  )
 }
 
 },{"./getTimeString":19,"./isPlainObject":20,"./isSimpleValue":21}],18:[function(require,module,exports){
@@ -3096,7 +3106,9 @@ module.exports = function normalizeUrl (url) {
 'use strict'
 
 function extractQueryValue (str) {
-  if (str === '') { return null }
+  if (str === '') {
+    return null
+  }
   const asBool = Boolean(str)
   if (asBool.toString() === str) {
     return asBool
@@ -3117,9 +3129,13 @@ function extractQueryValues (str) {
 }
 
 module.exports = function parseQueryString (queryString) {
-  if (queryString == null || queryString === '') { return void 0 }
+  if (queryString == null || queryString === '') {
+    return undefined
+  }
   queryString = queryString.trim()
-  if (!queryString) { return void 0 }
+  if (!queryString) {
+    return undefined
+  }
 
   const kvMap = queryString.split('&').reduce((res, queryPart) => {
     const kv = queryPart.split('=')

@@ -6,7 +6,7 @@ const base64encode = require('@wmakeev/base64encode')
 const Moysklad = require('../..')
 
 const BEARER_AUTH = 'Bearer token'
-const BASIC_AUTH = 'Basic ' + base64encode(`login:password`)
+const BASIC_AUTH = 'Basic ' + base64encode('login:password')
 
 const MOYSKLAD_LOGIN = process.env.MOYSKLAD_LOGIN
 const MOYSKLAD_PASSWORD = process.env.MOYSKLAD_PASSWORD
@@ -53,12 +53,20 @@ test('Moysklad#getAuthHeader (options)', t => {
     'should return Basic auth with login option'
   )
 
-  t.throws(() => {
-    const msWoPass = Moysklad({ login: 'login' })
-    msWoPass.getAuthHeader()
-  }, /пароль/, 'should throw Error on empty password')
+  t.throws(
+    () => {
+      const msWoPass = Moysklad({ login: 'login' })
+      msWoPass.getAuthHeader()
+    },
+    /пароль/,
+    'should throw Error on empty password'
+  )
 
-  const msToken = Moysklad({ token: 'token', login: 'login', password: 'password' })
+  const msToken = Moysklad({
+    token: 'token',
+    login: 'login',
+    password: 'password'
+  })
   t.equal(
     msToken.getAuthHeader(),
     BEARER_AUTH,
@@ -82,10 +90,14 @@ test('Moysklad#getAuthHeader (env)', t => {
     )
 
     delete process.env.MOYSKLAD_PASSWORD
-    t.throws(() => {
-      const msWoPass = Moysklad()
-      msWoPass.getAuthHeader()
-    }, /пароль/, 'should throw Error on empty MOYSKLAD_PASSWORD env')
+    t.throws(
+      () => {
+        const msWoPass = Moysklad()
+        msWoPass.getAuthHeader()
+      },
+      /пароль/,
+      'should throw Error on empty MOYSKLAD_PASSWORD env'
+    )
 
     process.env.MOYSKLAD_TOKEN = 'token'
     const msToken = Moysklad()
@@ -115,10 +127,14 @@ test('Moysklad#getAuthHeader (global)', t => {
     )
 
     delete global.MOYSKLAD_PASSWORD
-    t.throws(() => {
-      const msWoPass = Moysklad()
-      msWoPass.getAuthHeader()
-    }, /пароль/, 'should throw Error on empty MOYSKLAD_PASSWORD global')
+    t.throws(
+      () => {
+        const msWoPass = Moysklad()
+        msWoPass.getAuthHeader()
+      },
+      /пароль/,
+      'should throw Error on empty MOYSKLAD_PASSWORD global'
+    )
 
     delete global.MOYSKLAD_LOGIN
     global.MOYSKLAD_TOKEN = 'token'

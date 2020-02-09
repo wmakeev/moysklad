@@ -1,7 +1,9 @@
 'use strict'
 
 function extractQueryValue (str) {
-  if (str === '') { return null }
+  if (str === '') {
+    return null
+  }
   const asBool = Boolean(str)
   if (asBool.toString() === str) {
     return asBool
@@ -22,9 +24,13 @@ function extractQueryValues (str) {
 }
 
 module.exports = function parseQueryString (queryString) {
-  if (queryString == null || queryString === '') { return void 0 }
+  if (queryString == null || queryString === '') {
+    return undefined
+  }
   queryString = queryString.trim()
-  if (!queryString) { return void 0 }
+  if (!queryString) {
+    return undefined
+  }
 
   const kvMap = queryString.split('&').reduce((res, queryPart) => {
     const kv = queryPart.split('=')

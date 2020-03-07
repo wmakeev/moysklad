@@ -154,10 +154,10 @@ module.exports = function buildFilter (filter) {
             return [key, operator, value]
 
           default:
-            throw new TypeError(`filter "${key}" key value is incorrect`)
+            throw new TypeError(`filter field "${key}" value is incorrect`)
         }
       })
-      .filter(it => it)
+      .filter(it => it != null)
       .map(part => `${part[0]}${part[1]}${part[2]}`)
       .sort((p1, p2) => {
         if (p1 > p2) {

@@ -14,12 +14,12 @@ declare namespace Moysklad {
      * @param query Строка запроса
      * @param options Опции запроса
      */
-    GET (
+    GET(
       path: string | string[],
       query?: Query,
       options?: RequestOptions
     ): Promise<any>
-    GET (params: {
+    GET(params: {
       /** Путь к ресурсу */
       path: string | string[]
       /** Строка запроса */
@@ -35,12 +35,13 @@ declare namespace Moysklad {
      * @param query Строка запроса
      * @param options Опции запроса
      */
-    POST (
+    POST(
       path: string | string[],
       payload: any,
-      query?: Query, options?: RequestOptions
+      query?: Query,
+      options?: RequestOptions
     ): Promise<any>
-    POST (params: {
+    POST(params: {
       /** Путь к ресурсу */
       path: string | string[]
       /** Тело запроса */
@@ -58,12 +59,13 @@ declare namespace Moysklad {
      * @param query Строка запроса
      * @param options Опции запроса
      */
-    PUT (
+    PUT(
       path: string | string[],
       payload: any,
-      query?: Query, options?: RequestOptions
+      query?: Query,
+      options?: RequestOptions
     ): Promise<any>
-    PUT (params: {
+    PUT(params: {
       /** Путь к ресурсу */
       path: string | string[]
       /** Тело запроса */
@@ -79,11 +81,8 @@ declare namespace Moysklad {
      * @param path Путь к ресурсу
      * @param options Опции запроса
      */
-    DELETE (
-      path: string | string[],
-      options?: RequestOptions
-    ): Promise<any>
-    DELETE (params: {
+    DELETE(path: string | string[], options?: RequestOptions): Promise<any>
+    DELETE(params: {
       /** Путь к ресурсу */
       path: string | string[]
       /** Опции запроса */
@@ -104,7 +103,7 @@ declare namespace Moysklad {
      *
      * ```
      */
-    getOptions (): Options
+    getOptions(): Options
 
     /**
      * Возвращает полный url для указанных параметров
@@ -120,13 +119,15 @@ declare namespace Moysklad {
      * // https://online.moysklad.ru/api/remap/1.1/entity/customerorder/foo-id
      * ```
      */
-    buildUrl (path: string | string[], query?: Query): string
+    buildUrl(path: string | string[], query?: Query): string
 
     /**
      * Разбирает url ресурса API МойСклад на составные части
      * @param url url ресурса API МойСклад
      */
-    parseUrl (url: string): {
+    parseUrl(
+      url: string
+    ): {
       /**
        * Точка досупа к API
        *
@@ -180,14 +181,14 @@ declare namespace Moysklad {
      * })
      * ```
      */
-    fetchUrl (url: string, options?: RequestOptions): Promise<any>
+    fetchUrl(url: string, options?: RequestOptions): Promise<any>
 
     /**
      * Возвращает значение HTTP заголовка Authorization
      *
      * Если указан ло
      */
-    getAuthHeader (): string
+    getAuthHeader(): string
   }
 
   /**
@@ -425,7 +426,12 @@ declare namespace Moysklad {
     /**
      * Равно `key=value`
      */
-    [key: string]: QueryValue | QueryValue[] | QueryObject | QueryObject[] | undefined
+    [key: string]:
+      | QueryValue
+      | QueryValue[]
+      | QueryObject
+      | QueryObject[]
+      | undefined
   }
 
   /**
@@ -446,16 +452,21 @@ declare namespace Moysklad {
      * }
      * ```
      */
-    filter?: {
-      [key: string]: QueryValue | QueryValue[] | QueryObject
-    } | string
+    filter?:
+      | {
+          [key: string]: QueryValue | QueryValue[] | QueryObject
+        }
+      | string
+
+    /** TODO */
+    search?: string
 
     /**
      * Используется для раскрытия ссылок на связанные объекты
      *
      * Пример: `agent,positions.assortment`
      */
-    expand?: string,
+    expand?: string
 
     /** Задает ограничение на кол-во возвращаемых элементов в коллекции */
     limit?: number

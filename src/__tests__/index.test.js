@@ -45,6 +45,68 @@ test('Create Moysklad instance with options', t => {
   t.true(msOptions !== options)
   t.equals(msOptions.login, 'login')
   t.equals(msOptions.password, 'password')
+  t.equals(msOptions.api, 'remap')
+  t.equals(msOptions.apiVersion, '1.1')
+
+  t.end()
+})
+
+test.only('Create Moysklad instance with default api versions', t => {
+  let ms = Moysklad({
+    fetch,
+    token: 'token',
+    api: 'phone'
+  })
+  t.ok(ms)
+
+  const msOptions = ms.getOptions()
+  t.equals(msOptions.token, 'token')
+  t.equals(msOptions.api, 'phone')
+  t.equals(msOptions.apiVersion, '1.0')
+
+  t.throws(() => {
+    Moysklad({
+      fetch,
+      token: 'token',
+      api: 'foo'
+    })
+  }, /Не указана версия foo API/)
+
+  t.doesNotThrow(() => {
+    Moysklad({
+      fetch,
+      token: 'token',
+      api: 'bar',
+      apiVersion: '0.0'
+    })
+  })
+
+  let barOpt
+
+  t.doesNotThrow(() => {
+    global.MOYSKLAD_BAR_API_VERSION = '3.0'
+    const ms = Moysklad({
+      fetch,
+      token: 'token',
+      api: 'bar',
+      apiVersion: '0.0'
+    })
+    barOpt = ms.getOptions()
+    delete global.MOYSKLAD_BAR_API_VERSION
+  })
+  t.equal(barOpt.apiVersion, '0.0')
+
+  t.doesNotThrow(() => {
+    global.MOYSKLAD_BAR_BAZ__API_VERSION = '3.0'
+    const ms = Moysklad({
+      fetch,
+      token: 'token',
+      api: 'bar/baz*'
+    })
+    barOpt = ms.getOptions()
+    delete global.MOYSKLAD_BAR_BAZ__API_VERSION
+  })
+  t.equal(barOpt.apiVersion, '3.0')
 
   t.end()
 })

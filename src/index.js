@@ -9,7 +9,10 @@
 'use strict'
 
 const stampit = require('stampit')
+
 const have = require('./have')
+const { MoyskladError } = require('./errors')
+const getApiDefaultVersion = require('./getApiDefaultVersion')
 
 // methods
 const getTimeString = require('./tools/getTimeString')
@@ -51,48 +54,59 @@ module.exports = stampit({
     getTimeString,
     parseTimeString
   }
-})
-  .init(function (options) {
-    have(options, {
-      endpoint: 'opt str',
-      api: 'opt str',
-      apiVersion: 'opt str'
+}).init(function (options) {
+  have(options, {
+    endpoint: 'opt str',
+    api: 'opt str',
+    apiVersion: 'opt str'
 
-      // TODO fix have object arguments parsing
-      // login: 'opt str',
-      // password: 'opt str',
-      // fetch: 'opt function'
-      // queue: 'opt bool',
-      // emitter: 'opt obj'
-    })
-
-    if (options.fetch) {
-      this.fetch = options.fetch
-    } else if (typeof window !== 'undefined' && window.fetch) {
-      this.fetch = window.fetch.bind(window)
-    } else if (typeof fetch !== 'undefined') {
-      /* eslint no-undef:0 */
-      this.fetch = fetch
-    } else {
-      this.fetch = function () {
-        throw new Error(
-          'Нельзя выполнить http запрос, т.к. при инициализации' +
-          ' экземпляра библиотеки не указан Fetch API модуль' +
-          ' (cм. подробнее https://github.com/wmakeev/moysklad#Установка).')
-      }
-    }
-
-    if (options.emitter) {
-      this.emitter = options.emitter
-    }
-
-    const _options = Object.assign({
-      endpoint: 'https://online.moysklad.ru/api',
-      api: 'remap',
-      apiVersion: '1.1'
-    }, options)
-
-    this.getOptions = function () {
-      return _options
-    }
+    // TODO fix have object arguments parsing
+    // login: 'opt str',
+    // password: 'opt str',
+    // fetch: 'opt function'
+    // queue: 'opt bool',
+    // emitter: 'opt obj'
   })
+
+  if (options.fetch) {
+    this.fetch = options.fetch
+  } else if (typeof window !== 'undefined' && window.fetch) {
+    this.fetch = window.fetch.bind(window)
+  } else if (typeof fetch !== 'undefined') {
+    /* eslint no-undef:0 */
+    this.fetch = fetch
+  } else {
+    this.fetch = function () {
+      throw new Error(
+        'Нельзя выполнить http запрос, т.к. при инициализации' +
+          ' экземпляра библиотеки не указан Fetch API модуль' +
+          ' (cм. подробнее https://github.com/wmakeev/moysklad#Установка).'
+      )
+    }
+  }
+
+  if (options.emitter) {
+    this.emitter = options.emitter
+  }
+
+  const _options = Object.assign(
+    {
+      endpoint: 'https://online.moysklad.ru/api',
+      api: 'remap'
+    },
+    options
+  )
+
+  if (!_options.apiVersion) {
+    const apiVersion = getApiDefaultVersion(_options.api)
+    if (apiVersion) {
+      _options.apiVersion = apiVersion
+    } else {
+      throw new MoyskladError(`Не указана версия ${_options.api} API`)
+    }
+  }
+
+  this.getOptions = function () {
+    return _options
+  }
+})

@@ -1,23 +1,20 @@
 'use strict'
 
-function createError (responseError, errors) {
-  const error = new Error(responseError.error)
-  if (responseError.code) { error.code = responseError.code }
-  if (responseError.moreInfo) { error.moreInfo = responseError.moreInfo }
-  if (errors && errors.length > 1) { error.errors = errors }
-  return error
-}
+const { MoyskladApiError } = require('./errors')
 
 module.exports = function getResponseError (resp) {
-  if (!resp) {
-    return null
+  let errors
+
+  if (!resp) return null
+
+  if (resp instanceof Array) {
+    errors = resp
+      .filter(item => item.errors)
+      .map(errItem => errItem.errors)
+      .reduce((res, errors) => res.concat(errors), [])
   } else if (resp.errors) {
-    return createError(resp.errors[0], resp.errors)
-  } else if (resp instanceof Array) {
-    // Учитывается только первая ошибка
-    const errorItem = resp.find(item => item.errors)
-    return errorItem ? createError(errorItem.errors[0], errorItem.errors) : null
-  } else {
-    return null
+    errors = resp.errors
   }
+
+  return errors && errors.length ? new MoyskladApiError(errors) : null
 }

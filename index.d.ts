@@ -512,4 +512,21 @@ declare namespace Moysklad {
    * @param extension Модуль расширения
    */
   export function compose (extension: Function): typeof Moysklad
+
+  interface ApiErrorInfo {
+    error: string
+    code: number
+    moreInfo: string
+    column?: number
+    line?: number
+    error_message?: string
+  }
+
+  export interface MoyskladError extends Error {}
+
+  export interface MoyskladApiError extends MoyskladError {
+    code: number
+    moreInfo: string
+    errors: ApiErrorInfo[]
+  }
 }

@@ -4,6 +4,7 @@ const defaultsDeep = require('lodash.defaultsdeep')
 
 const have = require('../have')
 const getResponseError = require('../getResponseError')
+const { MoyskladError } = require('../errors')
 
 module.exports = async function fetchUrl (url, options = {}) {
   have.strict(arguments, { url: 'url', options: 'opt Object' })
@@ -16,12 +17,15 @@ module.exports = async function fetchUrl (url, options = {}) {
 
   const emit = this.emitter ? this.emitter.emit.bind(this.emitter) : null
 
-  const fetchOptions = defaultsDeep({ ...options }, {
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    redirect: 'manual'
-  })
+  const fetchOptions = defaultsDeep(
+    { ...options },
+    {
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      redirect: 'manual'
+    }
+  )
 
   if (!fetchOptions.headers.Authorization) {
     fetchOptions.credentials = 'include'
@@ -65,8 +69,9 @@ module.exports = async function fetchUrl (url, options = {}) {
 
   if (rawResponse && muteErrors) return response
 
+  // response.ok → res.status >= 200 && res.status < 300
   if (!response.ok) {
-    error = new Error(`${response.status} ${response.statusText}`)
+    error = new MoyskladError(`${response.status} ${response.statusText}`)
   } else if (rawResponse) {
     return response
   }
@@ -81,7 +86,13 @@ module.exports = async function fetchUrl (url, options = {}) {
       resBodyJson = await response.json()
     } catch (e) {}
 
-    if (emit) emit('response:body', { url, options: fetchOptions, response, body: resBodyJson })
+    if (emit)
+      emit('response:body', {
+        url,
+        options: fetchOptions,
+        response,
+        body: resBodyJson
+      })
     error = getResponseError(resBodyJson) || error
   }
 

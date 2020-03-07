@@ -5,14 +5,14 @@
 
 const base64encode = require('@wmakeev/base64encode')
 
+const getEnvVar = require('../getEnvVar')
+
 const bearerAuth = token => `Bearer ${token}`
-const basicAuth = (login, password) => 'Basic ' + base64encode(`${login}:${password}`)
+const basicAuth = (login, password) =>
+  'Basic ' + base64encode(`${login}:${password}`)
 
 const getEnvKey = (() => {
-  if (
-    typeof process !== 'undefined' &&
-    process.env
-  ) {
+  if (typeof process !== 'undefined' && process.env) {
     return key => process.env[key]
   } else {
     return () => null
@@ -36,24 +36,13 @@ module.exports = function getAuthHeader () {
       password = options.password
       break
 
-    case getEnvKey('MOYSKLAD_TOKEN') != null:
-      token = getEnvKey('MOYSKLAD_TOKEN')
+    case getEnvVar('MOYSKLAD_TOKEN') != null:
+      token = getEnvVar('MOYSKLAD_TOKEN')
       break
 
-    case getEnvKey('MOYSKLAD_LOGIN') != null:
-      login = getEnvKey('MOYSKLAD_LOGIN')
-      password = getEnvKey('MOYSKLAD_PASSWORD')
-      break
-
-    case typeof MOYSKLAD_TOKEN !== 'undefined':
-      token = MOYSKLAD_TOKEN
-      break
-
-    case typeof MOYSKLAD_LOGIN !== 'undefined':
-      login = MOYSKLAD_LOGIN
-      if (typeof MOYSKLAD_PASSWORD !== 'undefined') {
-        password = MOYSKLAD_PASSWORD
-      }
+    case getEnvVar('MOYSKLAD_LOGIN') != null:
+      login = getEnvVar('MOYSKLAD_LOGIN')
+      password = getEnvVar('MOYSKLAD_PASSWORD')
       break
 
     default:

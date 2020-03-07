@@ -18,6 +18,7 @@ const clearEnv = () => {
   delete global.MOYSKLAD_LOGIN
   delete global.MOYSKLAD_PASSWORD
   delete global.MOYSKLAD_TOKEN
+  delete global.window
 }
 
 const restoreEnv = () => {
@@ -27,6 +28,7 @@ const restoreEnv = () => {
   delete global.MOYSKLAD_LOGIN
   delete global.MOYSKLAD_PASSWORD
   delete global.MOYSKLAD_TOKEN
+  delete global.window
 }
 
 test('Moysklad#getAuthHeader (no credentials)', t => {
@@ -138,6 +140,46 @@ test('Moysklad#getAuthHeader (global)', t => {
 
     delete global.MOYSKLAD_LOGIN
     global.MOYSKLAD_TOKEN = 'token'
+    const msToken = Moysklad()
+    t.equal(
+      msToken.getAuthHeader(),
+      BEARER_AUTH,
+      'should return Bearer auth with MOYSKLAD_TOKEN global'
+    )
+  } finally {
+    restoreEnv()
+  }
+
+  t.end()
+})
+
+test('Moysklad#getAuthHeader (window)', t => {
+  clearEnv()
+  global.window = {}
+
+  try {
+    global.window.MOYSKLAD_LOGIN = 'login'
+    global.window.MOYSKLAD_PASSWORD = 'password'
+
+    const msBasic = Moysklad()
+    t.equal(
+      msBasic.getAuthHeader(),
+      BASIC_AUTH,
+      'should return Basic auth with global options'
+    )
+
+    delete global.window.MOYSKLAD_PASSWORD
+    t.throws(
+      () => {
+        const msWoPass = Moysklad()
+        msWoPass.getAuthHeader()
+      },
+      /пароль/,
+      'should throw Error on empty MOYSKLAD_PASSWORD global'
+    )
+
+    delete global.window.MOYSKLAD_LOGIN
+    global.window.MOYSKLAD_TOKEN = 'token'
     const msToken = Moysklad()
     t.equal(
       msToken.getAuthHeader(),

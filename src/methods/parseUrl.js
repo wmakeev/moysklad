@@ -4,43 +4,39 @@ const have = require('../have')
 const normalizeUrl = require('../tools/normalizeUrl')
 const parseQueryString = require('../tools/parseQueryString')
 
-const PATH_QUERY_REGEX = /([^?]+)(?:\?(.+))?$/
+// https://regex101.com/r/yQgvn4/4
+const URL_REGEX = /^(https:\/\/.+\/api)\/(.+)\/(\d+\.\d+)\/([^?]+)(?:\?(.+))?$/
 
 module.exports = function parseUrl (...args) {
-  const { url, path } = have.strict(arguments, [
+  const { url, path } = have.strict(args, [
     { url: 'url' },
     { path: 'str or str arr' }
   ])
 
-  const { endpoint, api, apiVersion } = this.getOptions()
+  let { endpoint, api, apiVersion } = this.getOptions()
+
+  let pathStr = ''
+  let queryStr = ''
 
   if (path instanceof Array) {
-    return {
-      endpoint,
-      api,
-      apiVersion,
-      path: normalizeUrl(path.join('/')).split(/\//g),
-      query: {}
-    }
+    pathStr = path.join('/')
+  } else if (typeof path === 'string') {
+    pathStr = path
+  } else if (url) {
+    const [, endpoint_, api_, version_, path_, query_] =
+      URL_REGEX.exec(url) || []
+    endpoint = endpoint_
+    api = api_
+    pathStr = path_
+    apiVersion = version_
+    queryStr = query_
   }
 
-  let pathAndQuery
-
-  if (url) {
-    const baseUrl = normalizeUrl([endpoint, api, apiVersion].join('/'))
-    if (url.indexOf(baseUrl) !== 0) {
-      throw new Error('Url не соответствует указанной в настройках точке доступа ' + baseUrl)
-    }
-    pathAndQuery = url.substring(baseUrl.length + 1)
-  } else {
-    pathAndQuery = path
+  if (!endpoint || !api || !apiVersion || !pathStr) {
+    throw new Error(
+      `parseUrl: Url не соответсвует API МойСклад - ${url || path}`
+    )
   }
-
-  const [, pathStr, queryStr] = PATH_QUERY_REGEX.exec(pathAndQuery)
-
-  if (!pathStr) throw new Error('Не указан путь запроса')
-
-  // TODO Parse query.filter
 
   return {
     endpoint,

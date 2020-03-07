@@ -10,13 +10,19 @@ const addQueryPart = (res, key) => val => {
     return undefined
   } else if (['string', 'number', 'boolean'].indexOf(typeof val) === -1) {
     throw new TypeError(
-      'url query key value must to be string, number, boolean, null or undefined')
+      'url query key value must to be string, number, boolean, null or undefined'
+    )
   } else {
     res.push([key, encodeURIComponent(val)])
   }
 }
 
 module.exports = function buildQuery (query) {
+  // совместимость с remap 1.2
+  if (query.expand && query.limit == null) {
+    query.limit = 100
+  }
+
   return Object.keys(query)
     .reduce((res, key) => {
       const addPart = addQueryPart(res, key)

@@ -11,14 +11,6 @@ const bearerAuth = token => `Bearer ${token}`
 const basicAuth = (login, password) =>
   'Basic ' + base64encode(`${login}:${password}`)
 
-const getEnvKey = (() => {
-  if (typeof process !== 'undefined' && process.env) {
-    return key => process.env[key]
-  } else {
-    return () => null
-  }
-})()
-
 module.exports = function getAuthHeader () {
   let token
   let login

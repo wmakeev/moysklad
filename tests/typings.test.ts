@@ -31,3 +31,12 @@ ms.GET(
     millisecond: true
   }
 )
+
+const filter: Moysklad.QueryFilter = {
+  foo: 'bar',
+  quz: {
+    $gte: 10
+  }
+}
+
+ms.POST('foo/bar', 'any', { filter })

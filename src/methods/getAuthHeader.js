@@ -1,7 +1,7 @@
 'use strict'
 
 /* global MOYSKLAD_LOGIN, MOYSKLAD_PASSWORD */
-/* eslint no-undef:0 */
+/* eslint no-undef:0 no-unused-vars:0 */
 
 const base64encode = require('@wmakeev/base64encode')
 

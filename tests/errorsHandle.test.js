@@ -3,7 +3,7 @@
 const test = require('blue-tape')
 const fetch = require('node-fetch')
 
-const Moysklad = require('../..')
+const Moysklad = require('..')
 
 test('PUT error', t => {
   t.plan(2)
@@ -27,8 +27,10 @@ test('POST error', t => {
     { foo: 'bar1' },
     { id: 'not-id', foo: 'bar2' }
   ]).catch(err => {
-    t.equal(err.message,
-      'Ошибка сохранения объекта: поле \'name\' не может быть пустым или отсутствовать')
+    t.equal(
+      err.message,
+      "Ошибка сохранения объекта: поле 'name' не может быть пустым или отсутствовать"
+    )
     t.equal(err.code, 3000)
   })
 })
@@ -38,10 +40,12 @@ test('POST error with muteErrors', t => {
 
   const ms = Moysklad({ fetch })
 
-  ms.POST('entity/product', [
-    { foo: 'bar1' },
-    { id: 'not-id', foo: 'bar2' }
-  ], null, { muteErrors: true }).then(res => {
+  ms.POST(
+    'entity/product',
+    [{ foo: 'bar1' }, { id: 'not-id', foo: 'bar2' }],
+    null,
+    { muteErrors: true }
+  ).then(res => {
     t.ok(res instanceof Array)
     t.ok(res.every(i => i.errors instanceof Array))
   })

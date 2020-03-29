@@ -3,7 +3,7 @@
 const test = require('blue-tape')
 const fetch = require('node-fetch')
 
-const Moysklad = require('../..')
+const Moysklad = require('..')
 
 test('Moysklad#buildUrl method', t => {
   const ms = Moysklad({ fetch })
@@ -34,10 +34,19 @@ test('Moysklad#buildUrl method', t => {
   t.equals(
     ms.buildUrl(
       'https://online.moysklad.ru/api/remap/1.1/entity/purchaseorder' +
+        '/191ebffa-45df-11e6-7a69-93a7000513f8?expand=agent'
+    ),
+    'https://online.moysklad.ru/api/remap/1.1/entity/purchaseorder' +
+      '/191ebffa-45df-11e6-7a69-93a7000513f8?expand=agent&limit=100'
+  )
+
+  t.equals(
+    ms.buildUrl(
+      'https://online.moysklad.ru/api/remap/1.1/entity/purchaseorder' +
         '/191ebffa-45df-11e6-7a69-93a7000513f8/positions?expand=assortment'
     ),
     'https://online.moysklad.ru/api/remap/1.1/entity/purchaseorder' +
-      '/191ebffa-45df-11e6-7a69-93a7000513f8/positions?expand=assortment'
+      '/191ebffa-45df-11e6-7a69-93a7000513f8/positions?expand=assortment&limit=100'
   )
 
   t.equals(

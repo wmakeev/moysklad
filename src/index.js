@@ -31,18 +31,21 @@ module.exports = stampit({
   methods: {
     getAuthHeader,
     buildUrl,
+    /* istanbul ignore next */
     buildUri (...args) {
-      console.log('Warning: метод buildUri переименован в buildUrl.')
+      console.log('Warning: метод buildUri переименован в buildUrl')
       return this.buildUrl(...args)
     },
     parseUrl,
+    /* istanbul ignore next */
     parseUri (...args) {
-      console.log('Warning: метод parseUri переименован в parseUrl.')
+      console.log('Warning: метод parseUri переименован в parseUrl')
       return this.parseUrl(...args)
     },
     fetchUrl,
+    /* istanbul ignore next */
     fetchUri (...args) {
-      console.log('Warning: метод fetchUri переименован в fetchUrl.')
+      console.log('Warning: метод fetchUri переименован в fetchUrl')
       return this.fetchUrl(...args)
     },
     GET,

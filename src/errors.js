@@ -4,6 +4,7 @@ class MoyskladError extends Error {
   constructor (message) {
     super(message)
     this.name = this.constructor.name
+    /* istanbul ignore else  */
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, this.constructor)
     }

@@ -1,8 +1,8 @@
 'use strict'
 
 const test = require('blue-tape')
-const getResponseError = require('../getResponseError')
-const { MoyskladError, MoyskladApiError } = require('../errors')
+const getResponseError = require('../src/getResponseError')
+const { MoyskladError, MoyskladApiError } = require('../src/errors')
 
 const createFooError = (message, code) => ({
   meta: {

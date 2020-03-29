@@ -4,7 +4,7 @@ const test = require('blue-tape')
 const fetch = require('node-fetch')
 const { EventEmitter } = require('events')
 
-const Moysklad = require('../..')
+const Moysklad = require('..')
 
 test('Moysklad events (request)', t => {
   t.plan(9)

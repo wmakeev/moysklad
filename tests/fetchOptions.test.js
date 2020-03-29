@@ -3,7 +3,7 @@
 const test = require('blue-tape')
 const fetch = require('node-fetch')
 
-const Moysklad = require('../..')
+const Moysklad = require('..')
 
 test('Response with muteErrors option', t => {
   const ms = Moysklad({ fetch })

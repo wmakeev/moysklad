@@ -1,7 +1,7 @@
 'use strict'
 
 const test = require('blue-tape')
-const buildFilter = require('../buildFilter')
+const buildFilter = require('../../src/tools/buildFilter')
 
 test('buildFilter', t => {
   t.ok(buildFilter)
@@ -18,13 +18,16 @@ test('buildFilter with simple filter', t => {
     other: true
   }
 
-  t.deepEqual(buildFilter(filter), [
-    'moment=2017-01-09 22:15:06',
-    'name=foo',
-    'other=true',
-    'some=',
-    'value=3'
-  ].join(';'))
+  t.deepEqual(
+    buildFilter(filter),
+    [
+      'moment=2017-01-09 22:15:06',
+      'name=foo',
+      'other=true',
+      'some=',
+      'value=3'
+    ].join(';')
+  )
 
   t.end()
 })
@@ -41,15 +44,18 @@ test('buildFilter with simple deep and many condition filter', t => {
     many: [1, 'baz']
   }
 
-  t.deepEqual(buildFilter(filter), [
-    'deep.one=5',
-    'deep.tow=false',
-    'many=1',
-    'many=baz',
-    'moment=2017-01-09 22:15:06',
-    'name=foo',
-    'value=0'
-  ].join(';'))
+  t.deepEqual(
+    buildFilter(filter),
+    [
+      'deep.one=5',
+      'deep.tow=false',
+      'many=1',
+      'many=baz',
+      'moment=2017-01-09 22:15:06',
+      'name=foo',
+      'value=0'
+    ].join(';')
+  )
 
   t.end()
 })
@@ -72,7 +78,8 @@ test('buildFilter with mogo query comparison selectors', t => {
       $gt: 5
     },
     num: {
-      $gte: 5, $lt: 10
+      $gte: 5,
+      $lt: 10
     },
     moment: {
       $lte: new Date('2017-01-09T19:15:06.556Z')
@@ -95,24 +102,27 @@ test('buildFilter with mogo query comparison selectors', t => {
     }
   }
 
-  t.deepEqual(buildFilter(filter), [
-    'cont~str',
-    'deep.tow!=bar',
-    'empty=',
-    'end=~psfx',
-    'many!=',
-    'many=1',
-    'many=baz',
-    'moment<=2017-01-09 22:15:06',
-    'name=foo',
-    'notMany!=3',
-    'notMany!=6',
-    'notMany>0',
-    'num<10',
-    'num>=5',
-    'start~=prfx',
-    'value>5'
-  ].join(';'))
+  t.deepEqual(
+    buildFilter(filter),
+    [
+      'cont~str',
+      'deep.tow!=bar',
+      'empty=',
+      'end=~psfx',
+      'many!=',
+      'many=1',
+      'many=baz',
+      'moment<=2017-01-09 22:15:06',
+      'name=foo',
+      'notMany!=3',
+      'notMany!=6',
+      'notMany>0',
+      'num<10',
+      'num>=5',
+      'start~=prfx',
+      'value>5'
+    ].join(';')
+  )
 
   t.end()
 })
@@ -120,10 +130,7 @@ test('buildFilter with mogo query comparison selectors', t => {
 test('buildFilter with mogo query logical selectors', t => {
   const filter = {
     name: {
-      $and: [
-        { $eq: 'foo' },
-        { $eq: 'bar' }
-      ]
+      $and: [{ $eq: 'foo' }, { $eq: 'bar' }]
     },
     value: {
       $not: {
@@ -138,14 +145,17 @@ test('buildFilter with mogo query logical selectors', t => {
     }
   }
 
-  t.deepEqual(buildFilter(filter), [
-    'fantom=',
-    'name=bar',
-    'name=foo',
-    'value!=10',
-    'value!=5',
-    'value!=6'
-  ].join(';'))
+  t.deepEqual(
+    buildFilter(filter),
+    [
+      'fantom=',
+      'name=bar',
+      'name=foo',
+      'value!=10',
+      'value!=5',
+      'value!=6'
+    ].join(';')
+  )
 
   t.end()
 })
@@ -175,7 +185,7 @@ test('buildFilter errors', t => {
 
   t.throws(() => {
     buildFilter({ foo: Symbol('foo') })
-  }, /filter "foo" key value is incorrect/)
+  }, /filter field "foo" value is incorrect/)
 
   t.throws(() => {
     buildFilter({ foo: { $eq: { a: 1 } } })

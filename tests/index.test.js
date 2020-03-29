@@ -3,7 +3,7 @@
 const test = require('blue-tape')
 const fetch = require('node-fetch')
 
-const Moysklad = require('../..')
+const Moysklad = require('..')
 
 test('Moysklad constructor', t => {
   t.ok(Moysklad)
@@ -51,7 +51,7 @@ test('Create Moysklad instance with options', t => {
   t.end()
 })
 
-test.only('Create Moysklad instance with default api versions', t => {
+test('Create Moysklad instance with default api versions', t => {
   const ms = Moysklad({
     fetch,
     token: 'token',
@@ -128,6 +128,54 @@ test('Request without fetch', async t => {
       err.message.indexOf('Нельзя выполнить http запрос') === 0,
       'should throw error'
     )
+  }
+})
+
+test('Request with global.fetch', async t => {
+  t.plan(1)
+
+  global.fetch = async () => {
+    throw new Error('FETCH_OK')
+  }
+
+  const options = {
+    login: 'login',
+    password: 'password'
+  }
+
+  const ms = Moysklad(options)
+
+  try {
+    await ms.GET('entity/counterparty', { limit: 1 })
+  } catch (err) {
+    t.equal(err.message, 'FETCH_OK')
+  } finally {
+    delete global.fetch
+  }
+})
+
+test('Request with window.fetch', async t => {
+  t.plan(1)
+
+  global.window = {}
+
+  window.fetch = async () => {
+    throw new Error('FETCH_OK')
+  }
+
+  const options = {
+    login: 'login',
+    password: 'password'
+  }
+
+  const ms = Moysklad(options)
+
+  try {
+    await ms.GET('entity/counterparty', { limit: 1 })
+  } catch (err) {
+    t.equal(err.message, 'FETCH_OK')
+  } finally {
+    delete global.window
   }
 })
 

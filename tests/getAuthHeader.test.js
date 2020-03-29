@@ -3,7 +3,7 @@
 const test = require('blue-tape')
 const base64encode = require('@wmakeev/base64encode')
 
-const Moysklad = require('../..')
+const Moysklad = require('..')
 
 const BEARER_AUTH = 'Bearer token'
 const BASIC_AUTH = 'Basic ' + base64encode('login:password')

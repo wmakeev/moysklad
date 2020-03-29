@@ -1,11 +1,10 @@
 {
   "name": "moysklad",
-  "version": "0.6.4",
+  "version": "0.7.0",
   "description": "Библиотека для работы с API сервиса МойСклад",
   "main": "index.js",
   "types": "index.d.ts",
   "files": [
-    "dist",
     "src",
     "tools",
     "index.js",
@@ -16,8 +15,9 @@
     "lint": "standard src/*/**",
     "clean-dist": "rm -rf dist || : && mkdir -p dist",
     "build-dist": "npm run clean-dist && browserify --no-builtins --detect-globals false -s MoyskladCore -o dist/moysklad.js src/index.js",
-    "test-src": "node -r dotenv/config ./tests --src src | tap-spec",
-    "test": "npm run lint && npm run build-dist && npm run test-src",
+    "test-src": "node -r dotenv/config tests | tap-spec",
+    "test-typings": "tsc --build tests/tsconfig.json",
+    "test": "npm run lint && npm run test-typings && npm run build-dist && npm run test-src",
     "prepublish": "npm run test",
     "coverage": "nyc --silent node -r dotenv/config ./tests --src src | tap-spec && nyc report --reporter=text --reporter=lcov",
     "coverage-report": "nyc report --reporter=text-lcov | coveralls"
@@ -59,6 +59,7 @@
     "nyc": "^15.0.0",
     "standard": "^14.3.1",
     "tap-spec": "^5.0.0",
+    "typescript": "^3.8.3",
     "walkdir": "0.4.1"
   },
   "engines": {

@@ -123,7 +123,11 @@ declare namespace Moysklad {
 
     /**
      * Разбирает url ресурса API МойСклад на составные части
-     * @param url url ресурса API МойСклад
+     * @param url url, path или ref ресурса API МойСклад
+     *
+     * - url `https://...`
+     * - path `["path", "to"]`
+     * - ref `"path/to"`
      */
     parseUrl(
       url: string
@@ -344,6 +348,16 @@ declare namespace Moysklad {
       [header: string]: string | number
     }
 
+    /**
+     * Обработка редиректа
+     *
+     * Установите `follow`, если нужно автоматически обрабатывать редирект `3xx`.
+     * Например при запросе товара по Id из приложения МойСклад
+     *
+     * default: `manual`
+     */
+    redirect?: 'manual' | 'follow' | 'error'
+
     [option: string]: any
   }
 
@@ -484,12 +498,12 @@ declare namespace Moysklad {
      * Сортировка выборки
      *
      * Примеры:
-     * - `name`
-     * - `code,desc`
-     * - `name;code,desc`
-     * - `name,desc;code,asc`
+     * - `name` или `['name']`
+     * - `code,desc` или `[['code','desc']]`
+     * - `name;code,desc` или `['name', ['code','desc']]`
+     * - `name,desc;code,asc` или `['name,desc', ['code','asc']]`
      */
-    order?: string
+    order?: string | Array<string | [string] | [string, string]>
 
     [key: string]: any
   }

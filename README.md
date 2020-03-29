@@ -1,5 +1,6 @@
 ![moysklad](https://wmakeev-public-files.s3-eu-west-1.amazonaws.com/images/logos/logoMS500x350.png)
-===========
+
+# Библиотека для работы с API сервиса МойСклад
 
 [![npm](https://img.shields.io/npm/v/moysklad.svg?cacheSeconds=1800&style=flat-square)](https://www.npmjs.com/package/moysklad)
 [![Travis](https://img.shields.io/travis/wmakeev/moysklad.svg?cacheSeconds=1800&style=flat-square)](https://travis-ci.org/wmakeev/moysklad)
@@ -10,41 +11,46 @@
 
 > Библиотека для взаимодействия с JSON API сервиса МойСклад для node.js и браузера.
 
-> **ВНИМАНИЕ!** Библиотека находится в стадии разработки и становления функционала. Не весь код протестирован. API к релизной версии может быть изменен. Перед обновлением версии смотрите [историю изменений](https://github.com/wmakeev/moysklad/blob/master/CHANGELOG.md).
+> **ВНИМАНИЕ!** Библиотека находится в стадии разработки и становления. Не весь код протестирован. API к релизной версии может быть изменен. Перед обновлением версии смотрите [историю изменений](https://github.com/wmakeev/moysklad/blob/master/CHANGELOG.md).
 
 ## Содержание
 
 <!-- TOC -->
 
-- [Содержание](#содержание)
-- [Особенности](#особенности)
-- [Установка](#установка)
-- [Использование](#использование)
-- [Параметры инициализации](#параметры-инициализации)
-- [Аутентификация](#аутентификация)
-- [Фильтрация](#фильтрация)
-- [Расширения](#расширения)
-- [API](#api)
-  - [Статические методы](#статические-методы)
-    - [getTimeString](#gettimestring)
-    - [parseTimeString](#parsetimestring)
-  - [Методы экземпляра](#методы-экземпляра)
-    - [GET](#get)
-    - [POST](#post)
-    - [PUT](#put)
-    - [DELETE](#delete)
-    - [getOptions](#getoptions)
-    - [buildUrl](#buildurl)
-    - [parseUrl](#parseurl)
-    - [fetchUrl](#fetchurl)
-    - [Основные аргументы](#основные-аргументы)
-      - [`path`](#path)
-      - [`query`](#query)
-      - [`options` (параметры запроса)](#options-параметры-запроса)
-  - [События](#события)
-- [Вероятные изменения API в следующих версиях](#вероятные-изменения-api-в-следующих-версиях)
-- [TODO](#todo)
-- [История изменений](#история-изменений)
+- [Библиотека для работы с API сервиса МойСклад](#библиотека-для-работы-с-api-сервиса-мойсклад)
+  - [Содержание](#содержание)
+  - [Особенности](#особенности)
+  - [Установка](#установка)
+  - [Использование](#использование)
+  - [Параметры инициализации](#параметры-инициализации)
+  - [Аутентификация](#аутентификация)
+  - [Фильтрация](#фильтрация)
+  - [Расширения](#расширения)
+  - [API](#api)
+    - [Статические методы](#статические-методы)
+      - [getTimeString](#gettimestring)
+      - [parseTimeString](#parsetimestring)
+    - [Методы экземпляра](#методы-экземпляра)
+      - [GET](#get)
+      - [POST](#post)
+      - [PUT](#put)
+      - [DELETE](#delete)
+      - [getOptions](#getoptions)
+      - [buildUrl](#buildurl)
+      - [parseUrl](#parseurl)
+      - [fetchUrl](#fetchurl)
+      - [Основные аргументы](#основные-аргументы)
+        - [`path`](#path)
+        - [`query`](#query)
+          - [querystring](#querystring)
+          - [filter](#filter)
+          - [order](#order)
+          - [expand и limit](#expand-и-limit)
+        - [`options` (параметры запроса)](#options-параметры-запроса)
+    - [События](#события)
+  - [Вероятные изменения API в следующих версиях](#вероятные-изменения-api-в-следующих-версиях)
+  - [TODO](#todo)
+  - [История изменений](#история-изменений)
 
 <!-- /TOC -->
 
@@ -52,7 +58,7 @@
 
 Библиотека представляет максимально простой и прозрачный интерфейс к существующим методам [API МойСклад](https://online.moysklad.ru/api/remap/1.1/doc) и не выполняет никаких внутренних преобразований отправляемых и получаемых данных.
 
-При необходимости, можно расширить функционал библиотеки [внешними модулями](#расширения).
+При необходимости, можно расширить возможности библиотеки [внешними модулями](#расширения).
 
 ## Установка
 
@@ -100,7 +106,7 @@ const moysklad = Moysklad({ fetch: nodeFetch })
 ```js
 const Moysklad = require('moysklad')
 
-// Инициализировать экземпляр библиотеки можно без ключевого слова new
+// Для инициализации экземпляра библиотеки указывать ключевое слово new не нужно
 const ms = Moysklad({ login, password })
 
 ms.GET('entity/customerorder', {
@@ -112,8 +118,10 @@ ms.GET('entity/customerorder', {
   order: 'moment,desc',
   expand: 'agent'
 }).then(({ meta, rows }) => {
-  console.log(`Последние ${meta.limit} из ${meta.size} проведенных заказов ` +
-    `на сумму от 10000 до 20000 руб`)
+  console.log(
+    `Последние ${meta.limit} из ${meta.size} проведенных заказов ` +
+      `на сумму от 10000 до 20000 руб`
+  )
   rows.forEach(row => {
     console.log(`${row.name} ${row.agent.name} ${row.sum / 100}`)
   })
@@ -126,16 +134,16 @@ ms.GET('entity/customerorder', {
 
 Все параметры опциональные (имеют значения по умолчанию)
 
-Параметр | Значение по умолчанию | Описание
----------|--------------|----------
-`fetch` | глобальный fetch | Функция с интерфейсом [Fetch API](https://developer.mozilla.org/ru/docs/Web/API/Fetch_API). Если глобальный fetch не найден, то будет выброшена ошибка при попытке осуществить http запрос.
-`endpoint` | `"https://online.moysklad.ru/api"` | Точка досупа к API
-`api` | `"remap"` | Раздел API
-`apiVersion` | `"1.1"` | Версия API
-`token` | `undefined` | Токен доступа к API (см. [Аутентификация](#аутентификация))
-`login` | `undefined` | Логин для доступа к API (см. [Аутентификация](#аутентификация))
-`password` | `undefined` | Пароль для доступа к API (см. [Аутентификация](#аутентификация))
-`emitter` | `undefined` | экземляр [EventEmitter](https://nodejs.org/api/events.html#events_class_eventemitter) для передачи [событий библиотеки](#события)
+| Параметр     | Значение по умолчанию              | Описание                                                                                                                                                                                    |
+| ------------ | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `fetch`      | глобальный fetch                   | Функция с интерфейсом [Fetch API](https://developer.mozilla.org/ru/docs/Web/API/Fetch_API). Если глобальный fetch не найден, то будет выброшена ошибка при попытке осуществить http запрос. |
+| `endpoint`   | `"https://online.moysklad.ru/api"` | Точка досупа к API                                                                                                                                                                          |
+| `api`        | `"remap"`                          | Раздел API                                                                                                                                                                                  |
+| `apiVersion` | `"1.1"`                            | Версия API                                                                                                                                                                                  |
+| `token`      | `undefined`                        | Токен доступа к API (см. [Аутентификация](#аутентификация))                                                                                                                                 |
+| `login`      | `undefined`                        | Логин для доступа к API (см. [Аутентификация](#аутентификация))                                                                                                                             |
+| `password`   | `undefined`                        | Пароль для доступа к API (см. [Аутентификация](#аутентификация))                                                                                                                            |
+| `emitter`    | `undefined`                        | экземляр [EventEmitter](https://nodejs.org/api/events.html#events_class_eventemitter) для передачи [событий библиотеки](#события)                                                           |
 
 Некоторые [внешние расширения](#расширения) могут добавлять свои дополнительные параметры.
 
@@ -154,52 +162,52 @@ const moysklad = Moysklad({ apiVersion: '1.2' })
 
 1. Напрямую при инициализации экземпляра
 
-    ```js
-    // Аутентификация по логину и паролю
-    const moysklad = Moysklad({ login, password })
-    ```
+   ```js
+   // Аутентификация по логину и паролю
+   const moysklad = Moysklad({ login, password })
+   ```
 
-    ```js
-    // Аутентификация по токену
-    const moysklad = Moysklad({ token })
-    ```
+   ```js
+   // Аутентификация по токену
+   const moysklad = Moysklad({ token })
+   ```
 
 2. Через глобальные переменные или переменные окружения
 
-    Если параметры аутентификации не указаны при инициализации клиента,
+   Если параметры аутентификации не указаны при инициализации клиента,
 
-    ```js
-    const moysklad = Moysklad()
-    ```
+   ```js
+   const moysklad = Moysklad()
+   ```
 
-    то будет проведен поиск параметров в следующем порядке:
+   то будет проведен поиск параметров в следующем порядке:
 
-      1. Переменная окружения `process.env.MOYSKLAD_TOKEN`
-      2. Переменные окружения `process.env.MOYSKLAD_LOGIN` и `process.env.MOYSKLAD_PASSWORD`
-      3. Глобальная переменная `global.MOYSKLAD_TOKEN`
-      4. Глобальные переменные `global.MOYSKLAD_LOGIN` и `global.MOYSKLAD_PASSWORD`
+   1. Переменная окружения `process.env.MOYSKLAD_TOKEN`
+   2. Переменные окружения `process.env.MOYSKLAD_LOGIN` и `process.env.MOYSKLAD_PASSWORD`
+   3. Глобальная переменная `global.MOYSKLAD_TOKEN`
+   4. Глобальные переменные `global.MOYSKLAD_LOGIN` и `global.MOYSKLAD_PASSWORD`
 
 ## Фильтрация
 
 Для построения фильтра можно использовать селекторы в стиле Mongo
 
-Селектор | Фильтр МойСклад | Описание
----------|-----------------|---------
-`key: { $eq: value }` | `key=value` | равно
-`key: { $ne: value }` | `key!=value` | не равно
-`key: { $gt: value }` | `key>value` | больше
-`key: { $gte: value }` | `key>=value` | больше или равно
-`key: { $lt: value }` | `key<value` | меньше
-`key: { $lte: value }` | `key<=value` | меньше или равно
-`key: { $st: value }` | `key~=value` | начинается со строки
-`key: { $et: value }` | `key=~value` | заканчивается строкой
-`key: { $contains: value }` | `key~value` | содержит строку
-`key: { $in: [..] }` или `key: [..]`| `key=value1;key=value2;...` | входит в
-`key: { $nin: [..] }` | `key!=value1;key!=value2;...` | не входит в
-`key: { $exists: true }` | `key!=` | наличие значения (не null)
-`key: { $exists: false }` | `key=` | пустое значение (null)
-`key: { $and: [{..}, ..] }` |  | объединение условий
-`key: { $not: {..} }` |  | отрицание условия
+| Селектор                             | Фильтр МойСклад               | Описание                   |
+| ------------------------------------ | ----------------------------- | -------------------------- |
+| `key: { $eq: value }`                | `key=value`                   | равно                      |
+| `key: { $ne: value }`                | `key!=value`                  | не равно                   |
+| `key: { $gt: value }`                | `key>value`                   | больше                     |
+| `key: { $gte: value }`               | `key>=value`                  | больше или равно           |
+| `key: { $lt: value }`                | `key<value`                   | меньше                     |
+| `key: { $lte: value }`               | `key<=value`                  | меньше или равно           |
+| `key: { $st: value }`                | `key~=value`                  | начинается со строки       |
+| `key: { $et: value }`                | `key=~value`                  | заканчивается строкой      |
+| `key: { $contains: value }`          | `key~value`                   | содержит строку            |
+| `key: { $in: [..] }` или `key: [..]` | `key=value1;key=value2;...`   | входит в                   |
+| `key: { $nin: [..] }`                | `key!=value1;key!=value2;...` | не входит в                |
+| `key: { $exists: true }`             | `key!=`                       | наличие значения (не null) |
+| `key: { $exists: false }`            | `key=`                        | пустое значение (null)     |
+| `key: { $and: [{..}, ..] }`          |                               | объединение условий        |
+| `key: { $not: {..} }`                |                               | отрицание условия          |
 
 На один ключ можно использовать несколько селекторов
 
@@ -295,7 +303,9 @@ assert.equal(parsedDate.toISOString(), '2017-04-08T10:33:00.123Z')
 ```js
 const productsCollection = await ms.GET('entity/product', { limit: 50 })
 
-const order = await ms.GET(['entity', 'customerorder', orderId], { expand: 'positions' })
+const order = await ms.GET(['entity', 'customerorder', orderId], {
+  expand: 'positions'
+})
 ```
 
 #### POST
@@ -410,21 +420,33 @@ assert.equal(msOptions.password, 'password')
 **Пример использования:**
 
 ```js
-const url = ms.buildUrl('https://online.moysklad.ru/api/remap/1.1/entity/customerorder?expand=positions', { limit: 100 })
+const url = ms.buildUrl(
+  'https://online.moysklad.ru/api/remap/1.1/entity/customerorder?expand=positions',
+  { limit: 100 }
+)
 
-assert.equal(url, 'https://online.moysklad.ru/api/remap/1.1/entity/customerorder?expand=positions&limit=100')
+assert.equal(
+  url,
+  'https://online.moysklad.ru/api/remap/1.1/entity/customerorder?expand=positions&limit=100'
+)
 ```
 
 ```js
 const url = ms.buildUrl('entity/customerorder', { expand: 'positions' })
 
-assert.equal(url, 'https://online.moysklad.ru/api/remap/1.1/entity/customerorder?expand=positions')
+assert.equal(
+  url,
+  'https://online.moysklad.ru/api/remap/1.1/entity/customerorder?expand=positions'
+)
 ```
 
 ```js
 const url = ms.buildUrl(['entity', 'customerorder'], { expand: 'positions' })
 
-assert.equal(url, 'https://online.moysklad.ru/api/remap/1.1/entity/customerorder?expand=positions')
+assert.equal(
+  url,
+  'https://online.moysklad.ru/api/remap/1.1/entity/customerorder?expand=positions'
+)
 ```
 
 #### parseUrl
@@ -489,14 +511,22 @@ const updatedOrder = await ms.fetchUrl(url, {
 ```js
 // Три запроса ниже аналогичны
 
-ms.GET(`https://online.moysklad.ru/api/remap/1.1/entity/customerorder/${ORDER_ID}/positions/${POSITION_ID}?expand=assortment`)
+ms.GET(
+  `https://online.moysklad.ru/api/remap/1.1/entity/customerorder/${ORDER_ID}/positions/${POSITION_ID}?expand=assortment`
+)
 
-ms.GET(`entity/customerorder/${ORDER_ID}/positions/${POSITION_ID}`, { expand: 'assortment' })
+ms.GET(`entity/customerorder/${ORDER_ID}/positions/${POSITION_ID}`, {
+  expand: 'assortment'
+})
 
-ms.GET(['entity/customerorder', ORDER_ID, 'positions', POSITION_ID], { expand: 'assortment' })
+ms.GET(['entity/customerorder', ORDER_ID, 'positions', POSITION_ID], {
+  expand: 'assortment'
+})
 ```
 
 ##### `query`
+
+###### querystring
 
 Все поля объекта запроса преобразуются в соответствующую строку запроса url. Некоторые поля (поле `filter`) подвергаются преобразованию.
 
@@ -515,6 +545,8 @@ const query = {
 // https://online.moysklad.ru/api/remap/1.1/entity/demand?str=some%20string&num=1&bool=true&nil=&arr=str&arr=1&arr=true&arr=
 ms.GET('entity/demand', query)
 ```
+
+###### filter
 
 Если поле `filter` объект, то вложенные поля `filter` преобразуется в параметры фильтра в соответствии со следующими правилами:
 
@@ -537,19 +569,36 @@ const query = {
 }
 ```
 
+###### order
+
+Если поле `order` массив, то произойдет преобразование записи из формы массива в строку.
+
+Примеры:
+
+- `['name']` → `'name'`
+- `[['code','desc']]` → `'code,desc'`
+- `['name', ['code','desc']]` → `'name;code,desc'`
+- `['name,desc', ['code','asc'], ['moment']]` → `'name,desc;code,asc;moment'`
+
+###### expand и limit
+
+Если указано значение expand, но не указан limit, то в поле limit по умолчанию будет подставлено значение `100`. Это важно, т.к. в версии API remap 1.2 expand не работает, если не указан limit.
+
 ##### `options` (параметры запроса)
 
 Все опции переданные в объекте `options` (за исключением описанных ниже) передаются напрямую в опции метода `fetch` ([Fetch API](http://github.github.io/fetch/)) при осуществлении запроса.
 
-Поля специфичные для библиотеки (не передаются в `fetch`):
+С опциями fetch API можно ознакомиться по [этой ссылке](https://github.com/node-fetch/node-fetch#options)
 
-Поле | Тип | Описание
----------|-----|---------
-`rawResponse` | `boolean` | Если `true`, то метод вернет результат в виде объекта [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response)
-`muteErrors` | `boolean` | Если `true`, то все ошибки будут проигнорированы (метод не будет генерировать ошибку если код ответа сервера не в диапазоне 200-299 и/или тело ответа содержит описание ошибки МойСклад).
-`millisecond` | `boolean` | Если `true`, то в запрос будет включен заголовок `X-Lognex-Format-Millisecond` со значением `true` (все даты объекта будут возвращены с учетом миллисекунд).
-`precision` | `boolean` | Если `true`, то в запрос будет включен заголовок `X-Lognex-Precision` со значением `true` (отключение округления цен и себестоимости до копеек).
-`webHookDisable` | `boolean` | Если `true`, то в запрос будет включен заголовок `X-Lognex-WebHook-Disable` со значением `true` (отключить уведомления вебхуков в контексте данного запроса).
+Опции специфичные для библиотеки moysklad (не передаются в `fetch`):
+
+| Поле             | Тип       | Описание                                                                                                                                                                                  |
+| ---------------- | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `rawResponse`    | `boolean` | Если `true`, то метод вернет результат в виде объекта [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response)                                                               |
+| `muteErrors`     | `boolean` | Если `true`, то все ошибки будут проигнорированы (метод не будет генерировать ошибку если код ответа сервера не в диапазоне 200-299 и/или тело ответа содержит описание ошибки МойСклад). |
+| `millisecond`    | `boolean` | Если `true`, то в запрос будет включен заголовок `X-Lognex-Format-Millisecond` со значением `true` (все даты объекта будут возвращены с учетом миллисекунд).                              |
+| `precision`      | `boolean` | Если `true`, то в запрос будет включен заголовок `X-Lognex-Precision` со значением `true` (отключение округления цен и себестоимости до копеек).                                          |
+| `webHookDisable` | `boolean` | Если `true`, то в запрос будет включен заголовок `X-Lognex-WebHook-Disable` со значением `true` (отключить уведомления вебхуков в контексте данного запроса).                             |
 
 **Примеры:**
 
@@ -561,7 +610,10 @@ const query = {
   const body = {
     template: {
       meta: {
-        href: ms.buildUrl(['entity/demand/metadata/customtemplate', TEMPLATE_ID]),
+        href: ms.buildUrl([
+          'entity/demand/metadata/customtemplate',
+          TEMPLATE_ID
+        ]),
         type: 'customtemplate',
         mediaType: 'application/json'
       }
@@ -569,11 +621,15 @@ const query = {
     extension: 'pdf'
   }
 
-  const { headers, status } = await ms
-    .POST(['entity/demand', DEMAND_ID, 'export'], body, null, {
+  const { headers, status } = await ms.POST(
+    ['entity/demand', DEMAND_ID, 'export'],
+    body,
+    null,
+    {
       rawResponse: true, // вернуть результат запроса без предварительного разбора
-      muteErrors: true   // не обрабатывать ошибки, если код ответа сервера не в диапазоне 200-299
-    })
+      muteErrors: true // не обрабатывать ошибки, если код ответа сервера не в диапазоне 200-299
+    }
+  )
 
   assert.equal(status, 307)
 
@@ -595,24 +651,53 @@ const query = {
   }
 
   // Указываем кастомный заголовок X-Lognex-WebHook-Disable для PUT запроса
-  const updatedFolder = await ms.PUT(['entity/productfolder', FOLDER_ID], folder, null, {
-    // вместо этого можно использовать webHookDisable: true
-    headers: {
-      'X-Lognex-WebHook-Disable' : true
+  const updatedFolder = await ms.PUT(
+    ['entity/productfolder', FOLDER_ID],
+    folder,
+    null,
+    {
+      // вместо этого можно использовать webHookDisable: true
+      headers: {
+        'X-Lognex-WebHook-Disable': true
+      }
     }
-  })
+  )
 
   assert.equal(updatedFolder.description, folder.description)
   ```
 
+- Автоматический редирект
+
+  Идентификаторы товаров в приложении МойСклад отличаются от идентификаторов в API. Поэтому, при запросе товара по id из приложения, будет выполнен редирект на другой href.
+
+  ```js
+  const ms = Moysklad({ fetch })
+
+  // https://online.moysklad.ru/app/#good/edit?id=cb277549-34f4-4029-b9de-7b37e8e25a54
+  const PRODUCT_UI_ID = 'cb277549-34f4-4029-b9de-7b37e8e25a54'
+
+  // Error: 308 Permanent Redirect
+  await ms.fetchUrl(
+    ms.buildUrl(['entity/product', PRODUCT_UI_ID]
+  )
+
+  // Указана опция redirect
+  const product = await ms.fetchUrl(
+    ms.buildUrl(['entity/product', PRODUCT_UI_ID]),
+    { redirect: 'follow'}
+  )
+
+  assert.ok(product) // OK
+  ```
+
 ### События
 
-Событие         | Передаваемый объект | Момент наступления
-----------------|---------------------|---------
-`request`       | `{ url, options }`  | Отправлен http запрос
-`response`      | `{ url, options, response }` | Получен ответ на запрос
-`response:body` | `{ url, options, response, body }` | Загружено тело ответа
-`error`         | `Error`             | Ошибка при выполнении запроса
+| Событие         | Передаваемый объект                | Момент наступления            |
+| --------------- | ---------------------------------- | ----------------------------- |
+| `request`       | `{ url, options }`                 | Отправлен http запрос         |
+| `response`      | `{ url, options, response }`       | Получен ответ на запрос       |
+| `response:body` | `{ url, options, response, body }` | Загружено тело ответа         |
+| `error`         | `Error`                            | Ошибка при выполнении запроса |
 
 Пример использования:
 
@@ -652,11 +737,11 @@ ms.GET('entity/customerorder', { limit: 1 }).then(res => {
   const order = await request2.data()
   ```
 
-- Часть функционала библиотеки будет выненеса в отдельные модули-плагины и дальнейшее добавление новых фич будет происходить преимущественно путем написания соответствующих плагинов.
+- Часть функций библиотеки будет выненеса в отдельные модули-плагины и дальнейшее добавление новых фич будет происходить преимущественно путем написания соответствующих плагинов.
 
 ## TODO
 
-Фичи, которые могут быть включены в следующие версии, описаны в [TODO.md](https://github.com/wmakeev/moysklad/blob/master/TODO.md)
+Мысли по различным дополнительным возможностям, которые могут быть включены в следующие версии, описаны в [TODO.md](https://github.com/wmakeev/moysklad/blob/master/TODO.md)
 
 ## История изменений
 

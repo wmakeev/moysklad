@@ -86,13 +86,14 @@ module.exports = async function fetchUrl (url, options = {}) {
       resBodyJson = await response.json()
     } catch (e) {}
 
-    if (emit)
+    if (emit) {
       emit('response:body', {
         url,
         options: fetchOptions,
         response,
         body: resBodyJson
       })
+    }
     error = getResponseError(resBodyJson) || error
   }
 

@@ -448,13 +448,11 @@ declare namespace Moysklad {
       | undefined
   }
 
-  export type QueryFilter =
-    | {
-        [key: string]: QueryValue | QueryValue[] | QueryObject
-      }
-    | string
+  export type QueryFilter = {
+    [key: string]: QueryValue | QueryValue[] | QueryObject
+  }
 
-  export type QueryOrder = string | Array<string | [string] | [string, string]>
+  export type QueryOrder = Array<string | [string] | [string, string]>
 
   /**
    * Параметры запроса
@@ -474,7 +472,7 @@ declare namespace Moysklad {
      * }
      * ```
      */
-    filter?: QueryFilter
+    filter?: QueryFilter | string
 
     /** TODO */
     search?: string
@@ -507,7 +505,7 @@ declare namespace Moysklad {
      * - `name;code,desc` или `['name', ['code','desc']]`
      * - `name,desc;code,asc` или `['name,desc', ['code','asc']]`
      */
-    order?: QueryOrder
+    order?: QueryOrder | string
 
     [key: string]: any
   }

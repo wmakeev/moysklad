@@ -39,4 +39,9 @@ const filter: Moysklad.QueryFilter = {
   }
 }
 
-ms.POST('foo/bar', 'any', { filter })
+ms.POST('foo/bar', 'any', {
+  filter: {
+    ...filter,
+    foo: 'bar'
+  }
+})

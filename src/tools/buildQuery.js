@@ -34,6 +34,18 @@ module.exports = function buildQuery (query) {
           else throw new TypeError('query.filter must to be string or object')
           break
 
+        case key === 'order' && query.order instanceof Array:
+          addPart(
+            query.order
+              .map(o =>
+                o instanceof Array
+                  ? `${o[0]}${o[1] != null ? ',' + o[1] : ''}`
+                  : o
+              )
+              .join(';')
+          )
+          break
+
         case query[key] instanceof Array:
           query[key].forEach(addPart)
           break

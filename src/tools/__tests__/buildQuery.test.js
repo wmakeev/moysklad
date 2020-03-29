@@ -50,6 +50,25 @@ test('buildQuery', t => {
     'should transform query.filter object to string'
   )
 
+  // Преобразует поле order (если представлено ввиде массива)
+  query = {
+    order: 'foo;bar,asc'
+  }
+  t.equals(
+    buildQuery(query),
+    'order=foo%3Bbar%2Casc',
+    'should not transform query.order string'
+  )
+
+  query = {
+    order: ['foo', ['bar', 'asc'], 'baz,desc', ['qux']]
+  }
+  t.equals(
+    buildQuery(query),
+    'order=foo%3Bbar%2Casc%3Bbaz%2Cdesc%3Bqux',
+    'should transform query.order array notation to string'
+  )
+
   // Не преобразует поле фильтр, если указана строка
   query = {
     filter: 'foo=bar baz'

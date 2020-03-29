@@ -52,7 +52,7 @@ test('Create Moysklad instance with options', t => {
 })
 
 test.only('Create Moysklad instance with default api versions', t => {
-  let ms = Moysklad({
+  const ms = Moysklad({
     fetch,
     token: 'token',
     api: 'phone'

@@ -2349,29 +2349,106 @@ module.exports = defaultsDeep;
 },{}],5:[function(require,module,exports){
 'use strict'
 
-function createError (responseError, errors) {
-  const error = new Error(responseError.error)
-  if (responseError.code) { error.code = responseError.code }
-  if (responseError.moreInfo) { error.moreInfo = responseError.moreInfo }
-  if (errors && errors.length > 1) { error.errors = errors }
-  return error
+class MoyskladError extends Error {
+  constructor (message) {
+    super(message)
+    this.name = this.constructor.name
+    /* istanbul ignore else  */
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, this.constructor)
+    }
+  }
 }
 
-module.exports = function getResponseError (resp) {
-  if (!resp) {
-    return null
-  } else if (resp.errors) {
-    return createError(resp.errors[0], resp.errors)
-  } else if (resp instanceof Array) {
-    // Учитывается только первая ошибка
-    const errorItem = resp.find(item => item.errors)
-    return errorItem ? createError(errorItem.errors[0], errorItem.errors) : null
+class MoyskladApiError extends MoyskladError {
+  constructor (errors) {
+    const error = errors[0]
+    const message = error.error
+    super(message)
+    this.code = error.code
+    this.moreInfo = error.moreInfo
+    if (error.line != null) this.line = error.line
+    if (error.column != null) this.column = error.column
+    this.errors = errors
+  }
+}
+
+module.exports = {
+  MoyskladError,
+  MoyskladApiError
+}
+
+},{}],6:[function(require,module,exports){
+'use strict'
+
+const getEnvVar = require('./getEnvVar')
+
+const DEFAULT_VERSIONS = {
+  remap: '1.1',
+  phone: '1.0',
+  posap: '1.0',
+  'moysklad/loyalty': '1.0'
+}
+
+const ENV_KEY = {
+  remap: 'REMAP',
+  phone: 'PHONE',
+  posap: 'POSAP',
+  'moysklad/loyalty': 'LOYALTY'
+}
+
+function getApiDefaultVersion (api) {
+  if (!api) return null
+
+  const apiVersion = DEFAULT_VERSIONS[api]
+  const envKey = ENV_KEY[api] || api.replace(/\W/g, '_').toUpperCase()
+  const envName = `MOYSKLAD_${envKey}_API_VERSION`
+
+  return getEnvVar(envName) || apiVersion
+}
+
+module.exports = getApiDefaultVersion
+
+},{"./getEnvVar":7}],7:[function(require,module,exports){
+'use strict'
+
+function getEnvVar (key) {
+  if (typeof process !== 'undefined' && process.env && process.env[key]) {
+    return process.env[key]
+  } else if (typeof window !== 'undefined' && window[key] != null) {
+    return window[key]
+  } else if (typeof global !== 'undefined' && global[key] != null) {
+    return global[key]
   } else {
     return null
   }
 }
 
-},{}],6:[function(require,module,exports){
+module.exports = getEnvVar
+
+},{}],8:[function(require,module,exports){
+'use strict'
+
+const { MoyskladApiError } = require('./errors')
+
+module.exports = function getResponseError (resp) {
+  let errors
+
+  if (!resp) return null
+
+  if (resp instanceof Array) {
+    errors = resp
+      .filter(item => item.errors)
+      .map(errItem => errItem.errors)
+      .reduce((res, errors) => res.concat(errors), [])
+  } else if (resp.errors) {
+    errors = resp.errors
+  }
+
+  return errors && errors.length ? new MoyskladApiError(errors) : null
+}
+
+},{"./errors":5}],9:[function(require,module,exports){
 'use strict'
 
 const have = require('have2')
@@ -2379,7 +2456,7 @@ const matchers = require('./matchers')
 
 module.exports = have.with(matchers)
 
-},{"./matchers":8,"have2":2}],7:[function(require,module,exports){
+},{"./matchers":11,"have2":2}],10:[function(require,module,exports){
 /*
  * moysklad
  * Клиент для JSON API МойСклад
@@ -2391,7 +2468,10 @@ module.exports = have.with(matchers)
 'use strict'
 
 const stampit = require('stampit')
+
 const have = require('./have')
+const { MoyskladError } = require('./errors')
+const getApiDefaultVersion = require('./getApiDefaultVersion')
 
 // methods
 const getTimeString = require('./tools/getTimeString')
@@ -2410,18 +2490,21 @@ module.exports = stampit({
   methods: {
     getAuthHeader,
     buildUrl,
+    /* istanbul ignore next */
     buildUri (...args) {
-      console.log('Warning: метод buildUri переименован в buildUrl.')
+      console.log('Warning: метод buildUri переименован в buildUrl')
       return this.buildUrl(...args)
     },
     parseUrl,
+    /* istanbul ignore next */
     parseUri (...args) {
-      console.log('Warning: метод parseUri переименован в parseUrl.')
+      console.log('Warning: метод parseUri переименован в parseUrl')
       return this.parseUrl(...args)
     },
     fetchUrl,
+    /* istanbul ignore next */
     fetchUri (...args) {
-      console.log('Warning: метод fetchUri переименован в fetchUrl.')
+      console.log('Warning: метод fetchUri переименован в fetchUrl')
       return this.fetchUrl(...args)
     },
     GET,
@@ -2433,53 +2516,64 @@ module.exports = stampit({
     getTimeString,
     parseTimeString
   }
-})
-  .init(function (options) {
-    have(options, {
-      endpoint: 'opt str',
-      api: 'opt str',
-      apiVersion: 'opt str'
+}).init(function (options) {
+  have(options, {
+    endpoint: 'opt str',
+    api: 'opt str',
+    apiVersion: 'opt str'
 
-      // TODO fix have object arguments parsing
-      // login: 'opt str',
-      // password: 'opt str',
-      // fetch: 'opt function'
-      // queue: 'opt bool',
-      // emitter: 'opt obj'
-    })
-
-    if (options.fetch) {
-      this.fetch = options.fetch
-    } else if (typeof window !== 'undefined' && window.fetch) {
-      this.fetch = window.fetch.bind(window)
-    } else if (typeof fetch !== 'undefined') {
-      /* eslint no-undef:0 */
-      this.fetch = fetch
-    } else {
-      this.fetch = function () {
-        throw new Error(
-          'Нельзя выполнить http запрос, т.к. при инициализации' +
-          ' экземпляра библиотеки не указан Fetch API модуль' +
-          ' (cм. подробнее https://github.com/wmakeev/moysklad#Установка).')
-      }
-    }
-
-    if (options.emitter) {
-      this.emitter = options.emitter
-    }
-
-    const _options = Object.assign({
-      endpoint: 'https://online.moysklad.ru/api',
-      api: 'remap',
-      apiVersion: '1.1'
-    }, options)
-
-    this.getOptions = function () {
-      return _options
-    }
+    // TODO fix have object arguments parsing
+    // login: 'opt str',
+    // password: 'opt str',
+    // fetch: 'opt function'
+    // queue: 'opt bool',
+    // emitter: 'opt obj'
   })
 
-},{"./have":6,"./methods/DELETE":9,"./methods/GET":10,"./methods/POST":11,"./methods/PUT":12,"./methods/buildUrl":13,"./methods/fetchUrl":14,"./methods/getAuthHeader":15,"./methods/parseUrl":16,"./tools/getTimeString":19,"./tools/parseTimeString":24,"stampit":4}],8:[function(require,module,exports){
+  if (options.fetch) {
+    this.fetch = options.fetch
+  } else if (typeof window !== 'undefined' && window.fetch) {
+    this.fetch = window.fetch.bind(window)
+  } else if (typeof fetch !== 'undefined') {
+    /* eslint no-undef:0 */
+    this.fetch = fetch
+  } else {
+    this.fetch = function () {
+      throw new Error(
+        'Нельзя выполнить http запрос, т.к. при инициализации' +
+          ' экземпляра библиотеки не указан Fetch API модуль' +
+          ' (cм. подробнее https://github.com/wmakeev/moysklad#Установка).'
+      )
+    }
+  }
+
+  if (options.emitter) {
+    this.emitter = options.emitter
+  }
+
+  const _options = Object.assign(
+    {
+      endpoint: 'https://online.moysklad.ru/api',
+      api: 'remap'
+    },
+    options
+  )
+
+  if (!_options.apiVersion) {
+    const apiVersion = getApiDefaultVersion(_options.api)
+    if (apiVersion) {
+      _options.apiVersion = apiVersion
+    } else {
+      throw new MoyskladError(`Не указана версия ${_options.api} API`)
+    }
+  }
+
+  this.getOptions = function () {
+    return _options
+  }
+})
+
+},{"./errors":5,"./getApiDefaultVersion":6,"./have":9,"./methods/DELETE":12,"./methods/GET":13,"./methods/POST":14,"./methods/PUT":15,"./methods/buildUrl":16,"./methods/fetchUrl":17,"./methods/getAuthHeader":18,"./methods/parseUrl":19,"./tools/getTimeString":22,"./tools/parseTimeString":27,"stampit":4}],11:[function(require,module,exports){
 'use strict'
 
 const UUID_REGEX = /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/
@@ -2503,7 +2597,7 @@ module.exports = {
 
 // TODO Проверка типов "Moysklad." на основании модели
 
-},{}],9:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 'use strict'
 
 const have = require('../have')
@@ -2519,7 +2613,7 @@ module.exports = function DELETE (...args) {
   return this.fetchUrl(url, { ...options, method: 'DELETE' })
 }
 
-},{"../have":6}],10:[function(require,module,exports){
+},{"../have":9}],13:[function(require,module,exports){
 'use strict'
 
 const have = require('../have')
@@ -2535,7 +2629,7 @@ module.exports = function GET (...args) {
   return this.fetchUrl(url, { ...options, method: 'GET' })
 }
 
-},{"../have":6}],11:[function(require,module,exports){
+},{"../have":9}],14:[function(require,module,exports){
 'use strict'
 
 const have = require('../have')
@@ -2559,7 +2653,7 @@ module.exports = function POST (...args) {
   return this.fetchUrl(url, { ...options, ...fetchOptions })
 }
 
-},{"../have":6}],12:[function(require,module,exports){
+},{"../have":9}],15:[function(require,module,exports){
 'use strict'
 
 const have = require('../have')
@@ -2582,7 +2676,7 @@ module.exports = function PUT (...args) {
   return this.fetchUrl(url, { ...options, ...fetchOptions })
 }
 
-},{"../have":6}],13:[function(require,module,exports){
+},{"../have":9}],16:[function(require,module,exports){
 'use strict'
 
 const have = require('../have')
@@ -2617,13 +2711,14 @@ module.exports = function buildUrl (...args) {
   return resultUrl
 }
 
-},{"../have":6,"../tools/buildQuery":18,"../tools/normalizeUrl":22}],14:[function(require,module,exports){
+},{"../have":9,"../tools/buildQuery":21,"../tools/normalizeUrl":25}],17:[function(require,module,exports){
 'use strict'
 
 const defaultsDeep = require('lodash.defaultsdeep')
 
 const have = require('../have')
 const getResponseError = require('../getResponseError')
+const { MoyskladError } = require('../errors')
 
 module.exports = async function fetchUrl (url, options = {}) {
   have.strict(arguments, { url: 'url', options: 'opt Object' })
@@ -2636,12 +2731,15 @@ module.exports = async function fetchUrl (url, options = {}) {
 
   const emit = this.emitter ? this.emitter.emit.bind(this.emitter) : null
 
-  const fetchOptions = defaultsDeep({ ...options }, {
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    redirect: 'manual'
-  })
+  const fetchOptions = defaultsDeep(
+    { ...options },
+    {
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      redirect: 'manual'
+    }
+  )
 
   if (!fetchOptions.headers.Authorization) {
     fetchOptions.credentials = 'include'
@@ -2685,8 +2783,9 @@ module.exports = async function fetchUrl (url, options = {}) {
 
   if (rawResponse && muteErrors) return response
 
+  // response.ok → res.status >= 200 && res.status < 300
   if (!response.ok) {
-    error = new Error(`${response.status} ${response.statusText}`)
+    error = new MoyskladError(`${response.status} ${response.statusText}`)
   } else if (rawResponse) {
     return response
   }
@@ -2701,7 +2800,14 @@ module.exports = async function fetchUrl (url, options = {}) {
       resBodyJson = await response.json()
     } catch (e) {}
 
-    if (emit) emit('response:body', { url, options: fetchOptions, response, body: resBodyJson })
+    if (emit) {
+      emit('response:body', {
+        url,
+        options: fetchOptions,
+        response,
+        body: resBodyJson
+      })
+    }
     error = getResponseError(resBodyJson) || error
   }
 
@@ -2713,27 +2819,19 @@ module.exports = async function fetchUrl (url, options = {}) {
   return rawResponse ? response : resBodyJson
 }
 
-},{"../getResponseError":5,"../have":6,"lodash.defaultsdeep":3}],15:[function(require,module,exports){
+},{"../errors":5,"../getResponseError":8,"../have":9,"lodash.defaultsdeep":3}],18:[function(require,module,exports){
 'use strict'
 
 /* global MOYSKLAD_LOGIN, MOYSKLAD_PASSWORD */
-/* eslint no-undef:0 */
+/* eslint no-undef:0 no-unused-vars:0 */
 
 const base64encode = require('@wmakeev/base64encode')
 
-const bearerAuth = token => `Bearer ${token}`
-const basicAuth = (login, password) => 'Basic ' + base64encode(`${login}:${password}`)
+const getEnvVar = require('../getEnvVar')
 
-const getEnvKey = (() => {
-  if (
-    typeof process !== 'undefined' &&
-    process.env
-  ) {
-    return key => process.env[key]
-  } else {
-    return () => null
-  }
-})()
+const bearerAuth = token => `Bearer ${token}`
+const basicAuth = (login, password) =>
+  'Basic ' + base64encode(`${login}:${password}`)
 
 module.exports = function getAuthHeader () {
   let token
@@ -2752,24 +2850,13 @@ module.exports = function getAuthHeader () {
       password = options.password
       break
 
-    case getEnvKey('MOYSKLAD_TOKEN') != null:
-      token = getEnvKey('MOYSKLAD_TOKEN')
+    case getEnvVar('MOYSKLAD_TOKEN') != null:
+      token = getEnvVar('MOYSKLAD_TOKEN')
       break
 
-    case getEnvKey('MOYSKLAD_LOGIN') != null:
-      login = getEnvKey('MOYSKLAD_LOGIN')
-      password = getEnvKey('MOYSKLAD_PASSWORD')
-      break
-
-    case typeof MOYSKLAD_TOKEN !== 'undefined':
-      token = MOYSKLAD_TOKEN
-      break
-
-    case typeof MOYSKLAD_LOGIN !== 'undefined':
-      login = MOYSKLAD_LOGIN
-      if (typeof MOYSKLAD_PASSWORD !== 'undefined') {
-        password = MOYSKLAD_PASSWORD
-      }
+    case getEnvVar('MOYSKLAD_LOGIN') != null:
+      login = getEnvVar('MOYSKLAD_LOGIN')
+      password = getEnvVar('MOYSKLAD_PASSWORD')
       break
 
     default:
@@ -2785,50 +2872,46 @@ module.exports = function getAuthHeader () {
   }
 }
 
-},{"@wmakeev/base64encode":1}],16:[function(require,module,exports){
+},{"../getEnvVar":7,"@wmakeev/base64encode":1}],19:[function(require,module,exports){
 'use srict'
 
 const have = require('../have')
 const normalizeUrl = require('../tools/normalizeUrl')
 const parseQueryString = require('../tools/parseQueryString')
 
-const PATH_QUERY_REGEX = /([^?]+)(?:\?(.+))?$/
+// https://regex101.com/r/yQgvn4/4
+const URL_REGEX = /^(https:\/\/.+\/api)\/(.+)\/(\d+\.\d+)\/([^?]+)(?:\?(.+))?$/
 
 module.exports = function parseUrl (...args) {
-  const { url, path } = have.strict(arguments, [
+  const { url, path } = have.strict(args, [
     { url: 'url' },
     { path: 'str or str arr' }
   ])
 
-  const { endpoint, api, apiVersion } = this.getOptions()
+  let { endpoint, api, apiVersion } = this.getOptions()
+
+  let pathStr = ''
+  let queryStr = ''
 
   if (path instanceof Array) {
-    return {
-      endpoint,
-      api,
-      apiVersion,
-      path: normalizeUrl(path.join('/')).split(/\//g),
-      query: {}
-    }
+    pathStr = path.join('/')
+  } else if (typeof path === 'string') {
+    pathStr = path
+  } else if (url) {
+    const [, endpoint_, api_, version_, path_, query_] =
+      URL_REGEX.exec(url) || []
+    endpoint = endpoint_
+    api = api_
+    pathStr = path_
+    apiVersion = version_
+    queryStr = query_
   }
 
-  let pathAndQuery
-
-  if (url) {
-    const baseUrl = normalizeUrl([endpoint, api, apiVersion].join('/'))
-    if (url.indexOf(baseUrl) !== 0) {
-      throw new Error('Url не соответствует указанной в настройках точке доступа ' + baseUrl)
-    }
-    pathAndQuery = url.substring(baseUrl.length + 1)
-  } else {
-    pathAndQuery = path
+  if (!endpoint || !api || !apiVersion || !pathStr) {
+    throw new Error(
+      `parseUrl: Url не соответсвует API МойСклад - ${url || path}`
+    )
   }
-
-  const [, pathStr, queryStr] = PATH_QUERY_REGEX.exec(pathAndQuery)
-
-  if (!pathStr) throw new Error('Не указан путь запроса')
-
-  // TODO Parse query.filter
 
   return {
     endpoint,
@@ -2839,7 +2922,7 @@ module.exports = function parseUrl (...args) {
   }
 }
 
-},{"../have":6,"../tools/normalizeUrl":22,"../tools/parseQueryString":23}],17:[function(require,module,exports){
+},{"../have":9,"../tools/normalizeUrl":25,"../tools/parseQueryString":26}],20:[function(require,module,exports){
 'use strict'
 
 const getTimeString = require('./getTimeString')
@@ -2996,10 +3079,10 @@ module.exports = function buildFilter (filter) {
             return [key, operator, value]
 
           default:
-            throw new TypeError(`filter "${key}" key value is incorrect`)
+            throw new TypeError(`filter field "${key}" value is incorrect`)
         }
       })
-      .filter(it => it)
+      .filter(it => it != null)
       .map(part => `${part[0]}${part[1]}${part[2]}`)
       .sort((p1, p2) => {
         if (p1 > p2) {
@@ -3014,7 +3097,7 @@ module.exports = function buildFilter (filter) {
   )
 }
 
-},{"./getTimeString":19,"./isPlainObject":20,"./isSimpleValue":21}],18:[function(require,module,exports){
+},{"./getTimeString":22,"./isPlainObject":23,"./isSimpleValue":24}],21:[function(require,module,exports){
 'use strict'
 
 const buildFilter = require('./buildFilter')
@@ -3027,13 +3110,19 @@ const addQueryPart = (res, key) => val => {
     return undefined
   } else if (['string', 'number', 'boolean'].indexOf(typeof val) === -1) {
     throw new TypeError(
-      'url query key value must to be string, number, boolean, null or undefined')
+      'url query key value must to be string, number, boolean, null or undefined'
+    )
   } else {
     res.push([key, encodeURIComponent(val)])
   }
 }
 
 module.exports = function buildQuery (query) {
+  // совместимость с remap 1.2
+  if (query.expand && query.limit == null) {
+    query.limit = 100
+  }
+
   return Object.keys(query)
     .reduce((res, key) => {
       const addPart = addQueryPart(res, key)
@@ -3043,6 +3132,18 @@ module.exports = function buildQuery (query) {
           if (isPlainObject(query.filter)) addPart(buildFilter(query.filter))
           else if (typeof query.filter === 'string') addPart(query.filter)
           else throw new TypeError('query.filter must to be string or object')
+          break
+
+        case key === 'order' && query.order instanceof Array:
+          addPart(
+            query.order
+              .map(o =>
+                o instanceof Array
+                  ? `${o[0]}${o[1] != null ? ',' + o[1] : ''}`
+                  : o
+              )
+              .join(';')
+          )
           break
 
         case query[key] instanceof Array:
@@ -3059,7 +3160,7 @@ module.exports = function buildQuery (query) {
     .join('&')
 }
 
-},{"./buildFilter":17,"./isPlainObject":20}],19:[function(require,module,exports){
+},{"./buildFilter":20,"./isPlainObject":23}],22:[function(require,module,exports){
 'use strict'
 
 const MSK_TIMEZONE_OFFSET = 180 * 60 * 1000
@@ -3078,21 +3179,21 @@ module.exports = function getTimeString (date, includeMs) {
     .replace(includeMs ? /Z$/ : /(\.\d{3})?Z$/, '')
 }
 
-},{}],20:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 'use strict'
 
 module.exports = function isPlainObject (value) {
   return Object.prototype.toString.call(value) === '[object Object]'
 }
 
-},{}],21:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 'use strict'
 
 module.exports = function isSimpleValue (value) {
   return typeof value !== 'object' || value instanceof Date || value === null
 }
 
-},{}],22:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 'use strict'
 
 const URI_EXTRA_SLASH_REGEX = /([^:]\/)\/+/g
@@ -3102,7 +3203,7 @@ module.exports = function normalizeUrl (url) {
   return url.replace(TRIM_SLASH, '').replace(URI_EXTRA_SLASH_REGEX, '$1')
 }
 
-},{}],23:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 'use strict'
 
 function extractQueryValue (str) {
@@ -3154,7 +3255,7 @@ module.exports = function parseQueryString (queryString) {
   return result
 }
 
-},{}],24:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 'use strict'
 
 // https://regex101.com/r/Bxq7dZ/2
@@ -3175,5 +3276,5 @@ module.exports = function parseTimeString (timeString) {
   return new Date(`${m[1]}-${m[2]}-${m[3]}T${m[4]}:${m[5]}:${m[6]}${m[7] ? '.' + m[7] : ''}+03:00`)
 }
 
-},{}]},{},[7])(7)
+},{}]},{},[10])(10)
 });

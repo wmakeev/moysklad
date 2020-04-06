@@ -1,6 +1,6 @@
 ![moysklad](https://wmakeev-public-files.s3-eu-west-1.amazonaws.com/images/logos/logoMS500x350.png)
 
-# Библиотека для работы с API сервиса МойСклад
+# moysklad
 
 [![npm](https://img.shields.io/npm/v/moysklad.svg?cacheSeconds=1800&style=flat-square)](https://www.npmjs.com/package/moysklad)
 [![Travis](https://img.shields.io/travis/wmakeev/moysklad.svg?cacheSeconds=1800&style=flat-square)](https://travis-ci.org/wmakeev/moysklad)
@@ -9,7 +9,7 @@
 [![Code Climate](https://img.shields.io/codeclimate/tech-debt/wmakeev/moysklad.svg?cacheSeconds=1800&style=flat-square)](https://codeclimate.com/github/wmakeev/moysklad)
 [![JavaScript Style Guide](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?cacheSeconds=1800&style=flat-square)](http://standardjs.com/)
 
-> Библиотека для взаимодействия с JSON API сервиса МойСклад для node.js и браузера.
+> Библиотека для взаимодействия с [JSON API сервиса МойСклад](https://dev.moysklad.ru/) для node.js и браузера.
 
 > **ВНИМАНИЕ!** Библиотека находится в стадии разработки и становления. API к релизной версии может быть изменен. Перед обновлением версии смотрите [историю изменений](https://github.com/wmakeev/moysklad/blob/master/CHANGELOG.md).
 
@@ -17,14 +17,13 @@
 
 <!-- TOC -->
 
-- [Библиотека для работы с API сервиса МойСклад](#библиотека-для-работы-с-api-сервиса-мойсклад)
+- [moysklad](#moysklad)
   - [Содержание](#содержание)
   - [Особенности](#особенности)
   - [Установка](#установка)
   - [Использование](#использование)
   - [Параметры инициализации](#параметры-инициализации)
   - [Аутентификация](#аутентификация)
-  - [Фильтрация](#фильтрация)
   - [Расширения](#расширения)
   - [API](#api)
     - [Статические методы](#статические-методы)
@@ -112,6 +111,9 @@ const ms = Moysklad({ login, password })
 ms.GET('entity/customerorder', {
   filter: {
     applicable: true,
+    state: {
+      name: 'Отгружен'
+    },
     sum: { $gt: 1000000, $lt: 2000000 }
   },
   limit: 10,
@@ -120,8 +122,10 @@ ms.GET('entity/customerorder', {
 }).then(({ meta, rows }) => {
   console.log(
     `Последние ${meta.limit} из ${meta.size} проведенных заказов ` +
-      `на сумму от 10000 до 20000 руб`
+      `в статусе "Отгружен" на сумму от 10000 до 20000 руб`
   )
+
+  // Выводим имя заказа, имя контрагента и сумму заказа для всех позиций
   rows.forEach(row => {
     console.log(`${row.name} ${row.agent.name} ${row.sum / 100}`)
   })
@@ -186,39 +190,6 @@ const moysklad = Moysklad({ apiVersion: '1.2' })
    2. Переменные окружения `process.env.MOYSKLAD_LOGIN` и `process.env.MOYSKLAD_PASSWORD`
    3. Глобальная переменная `global.MOYSKLAD_TOKEN`
    4. Глобальные переменные `global.MOYSKLAD_LOGIN` и `global.MOYSKLAD_PASSWORD`
-
-## Фильтрация
-
-Для построения фильтра можно использовать селекторы в стиле Mongo
-
-| Селектор                             | Фильтр МойСклад               | Описание                   |
-| ------------------------------------ | ----------------------------- | -------------------------- |
-| `key: { $eq: value }`                | `key=value`                   | равно                      |
-| `key: { $ne: value }`                | `key!=value`                  | не равно                   |
-| `key: { $gt: value }`                | `key>value`                   | больше                     |
-| `key: { $gte: value }`               | `key>=value`                  | больше или равно           |
-| `key: { $lt: value }`                | `key<value`                   | меньше                     |
-| `key: { $lte: value }`               | `key<=value`                  | меньше или равно           |
-| `key: { $st: value }`                | `key~=value`                  | начинается со строки       |
-| `key: { $et: value }`                | `key=~value`                  | заканчивается строкой      |
-| `key: { $contains: value }`          | `key~value`                   | содержит строку            |
-| `key: { $in: [..] }` или `key: [..]` | `key=value1;key=value2;...`   | входит в                   |
-| `key: { $nin: [..] }`                | `key!=value1;key!=value2;...` | не входит в                |
-| `key: { $exists: true }`             | `key!=`                       | наличие значения (не null) |
-| `key: { $exists: false }`            | `key=`                        | пустое значение (null)     |
-| `key: { $and: [{..}, ..] }`          |                               | объединение условий        |
-| `key: { $not: {..} }`                |                               | отрицание условия          |
-
-На один ключ можно использовать несколько селекторов
-
-```js
-const filter = {
-  key: {
-    $eq: 'value',
-    $exists: true
-  }
-}
-```
 
 ## Расширения
 
@@ -528,7 +499,7 @@ ms.GET(['entity/customerorder', ORDER_ID, 'positions', POSITION_ID], {
 
 ###### querystring
 
-Все поля объекта запроса преобразуются в соответствующую строку запроса url. Некоторые поля (поле `filter`) подвергаются преобразованию.
+Все поля объекта запроса преобразуются в соответствующую строку запроса url. Некоторые поля могут подвергаться преобразованию (напр. поля [`filter`](#filter) и [`order`](#order)).
 
 Поле объекта запроса должно иметь тип: `string`, `number`, `boolean`, `null` или `undefined`, любое другое значение вызовет ошибку.
 
@@ -553,21 +524,60 @@ ms.GET('entity/demand', query)
 - `string`, `number`, `boolean` не проходят дополнительных преобразований (`key=value`)
 - `null` преобразуется в пустую строку (`key=`)
 - `Date` преобразуется в строку методом [`getTimeString`](#gettimestring) (`key=YYYY-MM-DD HH:mm:ss`)
-- `object` интерпретируется как набор селекторов (см. в разделе [Фильтрация](#фильтрация)) и как набор вложенных полей (см. пример ниже)
+- `object` интерпретируется как набор селекторов или вложенных полей (см. пример ниже)
+
+Пример фильтра:
 
 ```js
-// Соответствует следующему значению фильтра: id=5;name.sub=bar;name=foo;name>15
 const query = {
   filter: {
-    id: 5,
-    name: {
-      $gt: 15,
-      $eq: 'foo',
-      sub: 'bar'
+    name: '00001',
+    code: [1, 2, '03'],
+    foo: new Date(2000, 0, 1),
+    state: {
+      name: 'Оформлен'
+    },
+    moment: {
+      $gt: new Date(2000, 0, 1),
+      $lte: new Date(2001, 0, 1)
+    },
+    bar: {
+      baz: 1,
+      $exists: true
     }
   }
 }
 ```
+
+соответствует следующему значению поля `filter` в запросе (даты переданы в часовом поясе +5):
+
+```
+bar!=;bar.baz=1;code=03;code=1;code=2;foo=1999-12-31 22:00:00;moment<=2000-12-31 22:00:00;moment>1999-12-31 22:00:00;name=00001;state.name=Оформлен
+```
+
+Для построения фильтра можно использовать селекторы в стиле Mongo (как в примере выше).
+
+Подробное описание всех возможных селекторов:
+
+| Селектор                             | Фильтр МойСклад               | Описание                   |
+| ------------------------------------ | ----------------------------- | -------------------------- |
+| `key: { $eq: value }`                | `key=value`                   | равно                      |
+| `key: { $ne: value }`                | `key!=value`                  | не равно                   |
+| `key: { $gt: value }`                | `key>value`                   | больше                     |
+| `key: { $gte: value }`               | `key>=value`                  | больше или равно           |
+| `key: { $lt: value }`                | `key<value`                   | меньше                     |
+| `key: { $lte: value }`               | `key<=value`                  | меньше или равно           |
+| `key: { $st: value }`                | `key~=value`                  | начинается со строки       |
+| `key: { $et: value }`                | `key=~value`                  | заканчивается строкой      |
+| `key: { $contains: value }`          | `key~value`                   | содержит строку            |
+| `key: { $in: [..] }` или `key: [..]` | `key=value1;key=value2;...`   | входит в                   |
+| `key: { $nin: [..] }`                | `key!=value1;key!=value2;...` | не входит в                |
+| `key: { $exists: true }`             | `key!=`                       | наличие значения (не null) |
+| `key: { $exists: false }`            | `key=`                        | пустое значение (null)     |
+| `key: { $and: [{..}, ..] }`          |                               | объединение условий        |
+| `key: { $not: {..} }`                |                               | отрицание условия          |
+
+На один ключ можно использовать несколько селекторов
 
 ###### order
 

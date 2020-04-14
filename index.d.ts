@@ -16,14 +16,14 @@ declare namespace Moysklad {
      */
     GET(
       path: string | string[],
-      query?: Query,
+      query?: Query | null,
       options?: RequestOptions
     ): Promise<any>
     GET(params: {
       /** Путь к ресурсу */
       path: string | string[]
       /** Строка запроса */
-      query?: Query
+      query?: Query | null
       /** Опции запроса */
       options?: RequestOptions
     }): Promise<any>
@@ -38,7 +38,7 @@ declare namespace Moysklad {
     POST(
       path: string | string[],
       payload: any,
-      query?: Query,
+      query?: Query | null,
       options?: RequestOptions
     ): Promise<any>
     POST(params: {
@@ -47,7 +47,7 @@ declare namespace Moysklad {
       /** Тело запроса */
       payload: any
       /** Строка запроса */
-      query?: Query
+      query?: Query | null
       /** Опции запроса */
       options?: RequestOptions
     }): Promise<any>
@@ -62,7 +62,7 @@ declare namespace Moysklad {
     PUT(
       path: string | string[],
       payload: any,
-      query?: Query,
+      query?: Query | null,
       options?: RequestOptions
     ): Promise<any>
     PUT(params: {
@@ -71,7 +71,7 @@ declare namespace Moysklad {
       /** Тело запроса */
       payload: any
       /** Строка запроса */
-      query?: Query
+      query?: Query | null
       /** Опции запроса */
       options?: RequestOptions
     }): Promise<any>

@@ -256,6 +256,11 @@ test('Moysklad#POST/PUT/DELETE', async t => {
         value: {
           name: 'Товары в обороте'
         }
+      },
+      {
+        id: '4700f6bd-fa82-4a91-9e8c-822616e71b0a',
+        name: 'Создано',
+        value: Moysklad.getTimeString(new Date())
       }
     ]
   }

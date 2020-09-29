@@ -2360,11 +2360,25 @@ class MoyskladError extends Error {
   }
 }
 
-class MoyskladApiError extends MoyskladError {
-  constructor (errors) {
+class MoyskladRequestError extends MoyskladError {
+  constructor (message, response) {
+    super(message)
+
+    if (response) {
+      this.url = response.url
+      this.status = response.status
+      this.statusText = response.statusText
+    }
+  }
+}
+
+class MoyskladApiError extends MoyskladRequestError {
+  constructor (errors, response) {
     const error = errors[0]
     const message = error.error
-    super(message)
+
+    super(message, response)
+
     this.code = error.code
     this.moreInfo = error.moreInfo
     if (error.line != null) this.line = error.line
@@ -2375,6 +2389,7 @@ class MoyskladApiError extends MoyskladError {
 
 module.exports = {
   MoyskladError,
+  MoyskladRequestError,
   MoyskladApiError
 }
 
@@ -2412,7 +2427,13 @@ module.exports = getApiDefaultVersion
 },{"./getEnvVar":7}],7:[function(require,module,exports){
 'use strict'
 
-function getEnvVar (key) {
+/**
+ * Получить значение переменной окружения
+ * @param {string} key Наименоване переменной окружения
+ * @param {string} defaultValue Наименоване переменной окружения
+ * @returns {string | null} Значение переменной окружения
+ */
+function getEnvVar (key, defaultValue) {
   if (typeof process !== 'undefined' && process.env && process.env[key]) {
     return process.env[key]
   } else if (typeof window !== 'undefined' && window[key] != null) {
@@ -2420,7 +2441,7 @@ function getEnvVar (key) {
   } else if (typeof global !== 'undefined' && global[key] != null) {
     return global[key]
   } else {
-    return null
+    return defaultValue !== undefined ? defaultValue : null
   }
 }
 
@@ -2431,21 +2452,21 @@ module.exports = getEnvVar
 
 const { MoyskladApiError } = require('./errors')
 
-module.exports = function getResponseError (resp) {
+module.exports = function getResponseError (responseBody, response) {
   let errors
 
-  if (!resp) return null
+  if (!responseBody) return null
 
-  if (resp instanceof Array) {
-    errors = resp
+  if (responseBody instanceof Array) {
+    errors = responseBody
       .filter(item => item.errors)
       .map(errItem => errItem.errors)
       .reduce((res, errors) => res.concat(errors), [])
-  } else if (resp.errors) {
-    errors = resp.errors
+  } else if (responseBody.errors) {
+    errors = responseBody.errors
   }
 
-  return errors && errors.length ? new MoyskladApiError(errors) : null
+  return errors && errors.length ? new MoyskladApiError(errors, response) : null
 }
 
 },{"./errors":5}],9:[function(require,module,exports){
@@ -2573,7 +2594,7 @@ module.exports = stampit({
   }
 })
 
-},{"./errors":5,"./getApiDefaultVersion":6,"./have":9,"./methods/DELETE":12,"./methods/GET":13,"./methods/POST":14,"./methods/PUT":15,"./methods/buildUrl":16,"./methods/fetchUrl":17,"./methods/getAuthHeader":18,"./methods/parseUrl":19,"./tools/getTimeString":22,"./tools/parseTimeString":27,"stampit":4}],11:[function(require,module,exports){
+},{"./errors":5,"./getApiDefaultVersion":6,"./have":9,"./methods/DELETE":12,"./methods/GET":13,"./methods/POST":14,"./methods/PUT":15,"./methods/buildUrl":16,"./methods/fetchUrl":17,"./methods/getAuthHeader":18,"./methods/parseUrl":19,"./tools/getTimeString":22,"./tools/parseTimeString":28,"stampit":4}],11:[function(require,module,exports){
 'use strict'
 
 const UUID_REGEX = /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/
@@ -2711,14 +2732,14 @@ module.exports = function buildUrl (...args) {
   return resultUrl
 }
 
-},{"../have":9,"../tools/buildQuery":21,"../tools/normalizeUrl":25}],17:[function(require,module,exports){
+},{"../have":9,"../tools/buildQuery":21,"../tools/normalizeUrl":26}],17:[function(require,module,exports){
 'use strict'
 
 const defaultsDeep = require('lodash.defaultsdeep')
 
 const have = require('../have')
 const getResponseError = require('../getResponseError')
-const { MoyskladError } = require('../errors')
+const { MoyskladRequestError } = require('../errors')
 
 module.exports = async function fetchUrl (url, options = {}) {
   have.strict(arguments, { url: 'url', options: 'opt Object' })
@@ -2785,7 +2806,10 @@ module.exports = async function fetchUrl (url, options = {}) {
 
   // response.ok → res.status >= 200 && res.status < 300
   if (!response.ok) {
-    error = new MoyskladError(`${response.status} ${response.statusText}`)
+    error = new MoyskladRequestError(
+      `${response.status} ${response.statusText}`,
+      response
+    )
   } else if (rawResponse) {
     return response
   }
@@ -2808,7 +2832,7 @@ module.exports = async function fetchUrl (url, options = {}) {
         body: resBodyJson
       })
     }
-    error = getResponseError(resBodyJson) || error
+    error = getResponseError(resBodyJson, response) || error
   }
 
   if (error && !muteErrors) {
@@ -2821,6 +2845,8 @@ module.exports = async function fetchUrl (url, options = {}) {
 
 },{"../errors":5,"../getResponseError":8,"../have":9,"lodash.defaultsdeep":3}],18:[function(require,module,exports){
 'use strict'
+
+const { MoyskladError } = require('../errors')
 
 /* global MOYSKLAD_LOGIN, MOYSKLAD_PASSWORD */
 /* eslint no-undef:0 no-unused-vars:0 */
@@ -2868,11 +2894,11 @@ module.exports = function getAuthHeader () {
   } else if (password) {
     return basicAuth(login, password)
   } else {
-    throw new Error('Не указан пароль для доступа к API')
+    throw new MoyskladError('Не указан пароль для доступа к API')
   }
 }
 
-},{"../getEnvVar":7,"@wmakeev/base64encode":1}],19:[function(require,module,exports){
+},{"../errors":5,"../getEnvVar":7,"@wmakeev/base64encode":1}],19:[function(require,module,exports){
 'use srict'
 
 const have = require('../have')
@@ -2922,7 +2948,7 @@ module.exports = function parseUrl (...args) {
   }
 }
 
-},{"../have":9,"../tools/normalizeUrl":25,"../tools/parseQueryString":26}],20:[function(require,module,exports){
+},{"../have":9,"../tools/normalizeUrl":26,"../tools/parseQueryString":27}],20:[function(require,module,exports){
 'use strict'
 
 const getTimeString = require('./getTimeString')
@@ -3071,7 +3097,7 @@ module.exports = function buildFilter (filter) {
             return [key, operator, '']
 
           case value instanceof Date:
-            return [key, operator, getTimeString(value)]
+            return [key, operator, getTimeString(value, true)]
 
           case typeof value === 'string':
           case typeof value === 'number':
@@ -3097,7 +3123,7 @@ module.exports = function buildFilter (filter) {
   )
 }
 
-},{"./getTimeString":22,"./isPlainObject":23,"./isSimpleValue":24}],21:[function(require,module,exports){
+},{"./getTimeString":22,"./isPlainObject":24,"./isSimpleValue":25}],21:[function(require,module,exports){
 'use strict'
 
 const buildFilter = require('./buildFilter')
@@ -3160,40 +3186,92 @@ module.exports = function buildQuery (query) {
     .join('&')
 }
 
-},{"./buildFilter":20,"./isPlainObject":23}],22:[function(require,module,exports){
+},{"./buildFilter":20,"./isPlainObject":24}],22:[function(require,module,exports){
 'use strict'
 
-const MSK_TIMEZONE_OFFSET = 180 * 60 * 1000
+const getTimezoneFix = require('./getTimezoneFix')
+
+const timezoneFix = getTimezoneFix()
+
+/** Временная зона API МойСклад (часовой пояс в мс) */
+const mskTimezone = +3 * 60 * 60 * 1000 // ms
+
+function pad2 (num) {
+  return `0${num}`.slice(-2)
+}
 
 /**
  * Возвращает дату для фильтра в часовом поясе Москвы
  * @param {Date} date Конвертируемая дата
- * @param {boolean} includeMs Отображать миллисекунды
+ * @param {Boolean} includeMs Необходимо ли включить миллисекунды в дату
  * @returns {string} Дата ввиде строки
  */
 module.exports = function getTimeString (date, includeMs) {
-  const mskTime = new Date(+date + MSK_TIMEZONE_OFFSET)
+  const mskTime = new Date(+date + mskTimezone + timezoneFix)
 
-  return mskTime.toJSON()
-    .replace('T', ' ')
-    .replace(includeMs ? /Z$/ : /(\.\d{3})?Z$/, '')
+  const milliseconds = mskTime.getUTCMilliseconds()
+
+  // 2000-01-01 01:00:00.123
+  return [
+    mskTime.getUTCFullYear(),
+    '-',
+    pad2(mskTime.getUTCMonth() + 1),
+    '-',
+    pad2(mskTime.getUTCDate()),
+    ' ',
+    pad2(mskTime.getUTCHours()),
+    ':',
+    pad2(mskTime.getUTCMinutes()),
+    ':',
+    pad2(mskTime.getUTCSeconds()),
+    milliseconds !== 0 && includeMs ? `.${milliseconds}` : ''
+  ].join('')
 }
 
-},{}],23:[function(require,module,exports){
+},{"./getTimezoneFix":23}],23:[function(require,module,exports){
+const { MoyskladError } = require('../errors')
+const getEnvVar = require('../getEnvVar')
+
+module.exports = function getTimezoneFix () {
+  const localTimeZoneOffset = -(new Date().getTimezoneOffset() * 60 * 1000)
+
+  /** Локальная временная зона в мс */
+  let timeZoneMs = localTimeZoneOffset
+
+  /** Временная зона приложения (часовой пояс в минутах) */
+  const MOYSKLAD_TIMEZONE = getEnvVar('MOYSKLAD_TIMEZONE')
+
+  if (MOYSKLAD_TIMEZONE) {
+    const tz = Number.parseInt(MOYSKLAD_TIMEZONE) * 60 * 1000
+
+    if (Number.isNaN(tz)) {
+      throw new MoyskladError(
+        'Некорректно указана переменная окружения MOYSKLAD_TIMEZONE' +
+          ` - ${MOYSKLAD_TIMEZONE}` // TODO Ссылка на документацию
+      )
+    }
+
+    timeZoneMs = tz
+  }
+
+  return localTimeZoneOffset - timeZoneMs
+}
+
+},{"../errors":5,"../getEnvVar":7}],24:[function(require,module,exports){
 'use strict'
 
 module.exports = function isPlainObject (value) {
   return Object.prototype.toString.call(value) === '[object Object]'
 }
 
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 'use strict'
 
 module.exports = function isSimpleValue (value) {
   return typeof value !== 'object' || value instanceof Date || value === null
 }
 
-},{}],25:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 'use strict'
 
 const URI_EXTRA_SLASH_REGEX = /([^:]\/)\/+/g
@@ -3203,7 +3281,7 @@ module.exports = function normalizeUrl (url) {
   return url.replace(TRIM_SLASH, '').replace(URI_EXTRA_SLASH_REGEX, '$1')
 }
 
-},{}],26:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 'use strict'
 
 function extractQueryValue (str) {
@@ -3255,12 +3333,17 @@ module.exports = function parseQueryString (queryString) {
   return result
 }
 
-},{}],27:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 'use strict'
 
+const getTimezoneFix = require('./getTimezoneFix')
+
+const timezoneFix = getTimezoneFix()
+
 // https://regex101.com/r/Bxq7dZ/2
-const MS_TIME_REGEX =
-  new RegExp(/^(\d{4})-(\d{2})-(\d{2})\s(\d{2}):(\d{2}):(\d{2})(?:\.(\d{3}))?$/)
+const MS_TIME_REGEX = new RegExp(
+  /^(\d{4})-(\d{2})-(\d{2})\s(\d{2}):(\d{2}):(\d{2})(?:\.(\d{3}))?$/
+)
 
 /**
  * Преобразует строку времени МойСклад в объект даты (с учетом временной зоны)
@@ -3273,8 +3356,15 @@ module.exports = function parseTimeString (timeString) {
   if (!m || m.length < 7 || m.length > 8) {
     throw new Error(`Некорректный формат даты "${timeString}"`)
   }
-  return new Date(`${m[1]}-${m[2]}-${m[3]}T${m[4]}:${m[5]}:${m[6]}${m[7] ? '.' + m[7] : ''}+03:00`)
+
+  const date = new Date(
+    `${m[1]}-${m[2]}-${m[3]}T${m[4]}:${m[5]}:${m[6]}${
+      m[7] ? '.' + m[7] : ''
+    }+03:00`
+  )
+
+  return timezoneFix ? new Date(+date - timezoneFix) : date
 }
 
-},{}]},{},[10])(10)
+},{"./getTimezoneFix":23}]},{},[10])(10)
 });

@@ -15,9 +15,11 @@ class MoyskladRequestError extends MoyskladError {
   constructor (message, response) {
     super(message)
 
-    this.url = response.url
-    this.status = response.status
-    this.statusText = response.statusText
+    if (response) {
+      this.url = response.url
+      this.status = response.status
+      this.statusText = response.statusText
+    }
   }
 }
 

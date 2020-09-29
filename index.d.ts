@@ -542,13 +542,13 @@ declare namespace Moysklad {
 
   export interface MoyskladRequestError extends MoyskladError {
     /** url http запроса */
-    url: string
+    url?: string
 
     /** Код статуса http запроса */
-    status: number
+    status?: number
 
     /** Текст статуса http запроса */
-    statusText: string
+    statusText?: string
   }
 
   export interface MoyskladApiError extends MoyskladRequestError {

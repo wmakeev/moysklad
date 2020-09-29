@@ -2,18 +2,18 @@
 
 const { MoyskladApiError } = require('./errors')
 
-module.exports = function getResponseError (resp, response) {
+module.exports = function getResponseError (responseBody, response) {
   let errors
 
-  if (!resp) return null
+  if (!responseBody) return null
 
-  if (resp instanceof Array) {
-    errors = resp
+  if (responseBody instanceof Array) {
+    errors = responseBody
       .filter(item => item.errors)
       .map(errItem => errItem.errors)
       .reduce((res, errors) => res.concat(errors), [])
-  } else if (resp.errors) {
-    errors = resp.errors
+  } else if (responseBody.errors) {
+    errors = responseBody.errors
   }
 
   return errors && errors.length ? new MoyskladApiError(errors, response) : null

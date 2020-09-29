@@ -24,11 +24,11 @@ test('getResponseError (empty response)', async t => {
 })
 
 test('getResponseError (multi error response)', async t => {
-  const resp = {
+  const responseBody = {
     errors: [createFooError('Ошибка 1', 1000), createFooError('Ошибка 2', 2000)]
   }
 
-  const error = getResponseError(resp)
+  const error = getResponseError(responseBody)
 
   t.ok(error instanceof MoyskladError, 'should be instance of MoyskladError')
   t.ok(
@@ -41,7 +41,7 @@ test('getResponseError (multi error response)', async t => {
   t.equal(error.moreInfo, 'https://path/to/info', 'should set error moreInfo')
   t.equal(error.line, 1, 'should set error line')
   t.equal(error.column, 10, 'should set error column')
-  t.deepEqual(error.errors, resp.errors, 'should set errors array')
+  t.deepEqual(error.errors, responseBody.errors, 'should set errors array')
 })
 
 test('getResponseError (single error response)', async t => {

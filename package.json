@@ -1,6 +1,6 @@
 {
   "name": "moysklad",
-  "version": "0.7.2",
+  "version": "0.8.0",
   "description": "Библиотека для работы с API сервиса МойСклад",
   "main": "index.js",
   "types": "index.d.ts",
@@ -51,18 +51,18 @@
   },
   "devDependencies": {
     "blue-tape": "^1.0.0",
-    "browserify": "^16.5.0",
-    "coveralls": "^3.0.9",
-    "debug": "^4.1.1",
+    "browserify": "^16.5.2",
+    "coveralls": "^3.1.0",
+    "debug": "^4.2.1",
     "dotenv": "^8.2.0",
-    "node-fetch": "^2.6.0",
-    "nyc": "^15.0.0",
-    "standard": "^14.3.1",
+    "node-fetch": "^2.6.1",
+    "nyc": "^15.1.0",
+    "standard": "^14.3.4",
     "tap-spec": "^5.0.0",
-    "typescript": "^3.8.3",
+    "typescript": "^4.0.3",
     "walkdir": "0.4.1"
   },
   "engines": {
-    "node": ">=8.10"
+    "node": ">=12"
   }
 }

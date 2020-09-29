@@ -4,7 +4,7 @@ const defaultsDeep = require('lodash.defaultsdeep')
 
 const have = require('../have')
 const getResponseError = require('../getResponseError')
-const { MoyskladError } = require('../errors')
+const { MoyskladRequestError } = require('../errors')
 
 module.exports = async function fetchUrl (url, options = {}) {
   have.strict(arguments, { url: 'url', options: 'opt Object' })
@@ -71,7 +71,10 @@ module.exports = async function fetchUrl (url, options = {}) {
 
   // response.ok → res.status >= 200 && res.status < 300
   if (!response.ok) {
-    error = new MoyskladError(`${response.status} ${response.statusText}`)
+    error = new MoyskladRequestError(
+      `${response.status} ${response.statusText}`,
+      response
+    )
   } else if (rawResponse) {
     return response
   }
@@ -94,7 +97,7 @@ module.exports = async function fetchUrl (url, options = {}) {
         body: resBodyJson
       })
     }
-    error = getResponseError(resBodyJson) || error
+    error = getResponseError(resBodyJson, response) || error
   }
 
   if (error && !muteErrors) {

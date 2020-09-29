@@ -11,11 +11,23 @@ class MoyskladError extends Error {
   }
 }
 
-class MoyskladApiError extends MoyskladError {
-  constructor (errors) {
+class MoyskladRequestError extends MoyskladError {
+  constructor (message, response) {
+    super(message)
+
+    this.url = response.url
+    this.status = response.status
+    this.statusText = response.statusText
+  }
+}
+
+class MoyskladApiError extends MoyskladRequestError {
+  constructor (errors, response) {
     const error = errors[0]
     const message = error.error
-    super(message)
+
+    super(message, response)
+
     this.code = error.code
     this.moreInfo = error.moreInfo
     if (error.line != null) this.line = error.line
@@ -26,5 +38,6 @@ class MoyskladApiError extends MoyskladError {
 
 module.exports = {
   MoyskladError,
+  MoyskladRequestError,
   MoyskladApiError
 }

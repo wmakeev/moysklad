@@ -2,7 +2,7 @@
 
 const { MoyskladApiError } = require('./errors')
 
-module.exports = function getResponseError (resp) {
+module.exports = function getResponseError (resp, response) {
   let errors
 
   if (!resp) return null
@@ -16,5 +16,5 @@ module.exports = function getResponseError (resp) {
     errors = resp.errors
   }
 
-  return errors && errors.length ? new MoyskladApiError(errors) : null
+  return errors && errors.length ? new MoyskladApiError(errors, response) : null
 }

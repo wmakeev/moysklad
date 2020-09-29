@@ -1,5 +1,7 @@
 'use strict'
 
+const { MoyskladError } = require('../errors')
+
 /* global MOYSKLAD_LOGIN, MOYSKLAD_PASSWORD */
 /* eslint no-undef:0 no-unused-vars:0 */
 
@@ -46,6 +48,6 @@ module.exports = function getAuthHeader () {
   } else if (password) {
     return basicAuth(login, password)
   } else {
-    throw new Error('Не указан пароль для доступа к API')
+    throw new MoyskladError('Не указан пароль для доступа к API')
   }
 }

@@ -540,9 +540,25 @@ declare namespace Moysklad {
 
   export interface MoyskladError extends Error {}
 
-  export interface MoyskladApiError extends MoyskladError {
+  export interface MoyskladRequestError extends MoyskladError {
+    /** url http запроса */
+    url: string
+
+    /** Код статуса http запроса */
+    status: number
+
+    /** Текст статуса http запроса */
+    statusText: string
+  }
+
+  export interface MoyskladApiError extends MoyskladRequestError {
+    /** Код первой ошибки */
     code: number
+
+    /** Подробное описание из первой ошибки */
     moreInfo: string
+
+    /** Список ошибок запроса */
     errors: ApiErrorInfo[]
   }
 }

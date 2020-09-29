@@ -21,7 +21,7 @@ test('buildFilter with simple filter', t => {
   t.deepEqual(
     buildFilter(filter),
     [
-      'moment=2017-01-09 22:15:06',
+      'moment=2017-01-09 22:15:06.556',
       'name=foo',
       'other=true',
       'some=',
@@ -51,7 +51,7 @@ test('buildFilter with simple deep and many condition filter', t => {
       'deep.tow=false',
       'many=1',
       'many=baz',
-      'moment=2017-01-09 22:15:06',
+      'moment=2017-01-09 22:15:06.556',
       'name=foo',
       'value=0'
     ].join(';')
@@ -112,7 +112,7 @@ test('buildFilter with mogo query comparison selectors', t => {
       'many!=',
       'many=1',
       'many=baz',
-      'moment<=2017-01-09 22:15:06',
+      'moment<=2017-01-09 22:15:06.556',
       'name=foo',
       'notMany!=3',
       'notMany!=6',

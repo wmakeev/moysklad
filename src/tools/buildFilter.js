@@ -146,7 +146,7 @@ module.exports = function buildFilter (filter) {
             return [key, operator, '']
 
           case value instanceof Date:
-            return [key, operator, getTimeString(value)]
+            return [key, operator, getTimeString(value, true)]
 
           case typeof value === 'string':
           case typeof value === 'number':

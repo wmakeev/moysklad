@@ -9,6 +9,11 @@ test('Moysklad#buildUrl method', t => {
   const ms = Moysklad({ fetch })
 
   t.equals(
+    ms.buildUrl('/path/To//My/Res/'),
+    'https://online.moysklad.ru/api/remap/1.1/path/To/My/Res'
+  )
+
+  t.equals(
     ms.buildUrl(['/path/', 'To//My', 'Res/']),
     'https://online.moysklad.ru/api/remap/1.1/path/To/My/Res'
   )

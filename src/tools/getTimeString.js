@@ -14,9 +14,10 @@ function pad2 (num) {
 /**
  * Возвращает дату для фильтра в часовом поясе Москвы
  * @param {Date} date Конвертируемая дата
+ * @param {Boolean} includeMs Необходимо ли включить миллисекунды в дату
  * @returns {string} Дата ввиде строки
  */
-module.exports = function getTimeString (date) {
+module.exports = function getTimeString (date, includeMs) {
   const mskTime = new Date(+date + mskTimezone + timezoneFix)
 
   const milliseconds = mskTime.getUTCMilliseconds()
@@ -34,6 +35,6 @@ module.exports = function getTimeString (date) {
     pad2(mskTime.getUTCMinutes()),
     ':',
     pad2(mskTime.getUTCSeconds()),
-    milliseconds !== 0 ? `.${milliseconds}` : ''
+    milliseconds !== 0 && includeMs ? `.${milliseconds}` : ''
   ].join('')
 }

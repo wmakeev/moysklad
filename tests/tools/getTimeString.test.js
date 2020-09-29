@@ -24,6 +24,12 @@ test('getTimeString', t => {
 
   t.equals(
     getTimeString(date2),
+    '2017-02-01 10:10:11',
+    'should return time string with ms'
+  )
+
+  t.equals(
+    getTimeString(date2, true),
     '2017-02-01 10:10:11.123',
     'should return time string with ms'
   )
@@ -52,6 +58,12 @@ test('getTimeString (other timezone)', t => {
 
   t.equals(
     getTimeString(date2),
+    '2017-02-01 07:10:11',
+    'should return time string without ms'
+  )
+
+  t.equals(
+    getTimeString(date2, true),
     '2017-02-01 07:10:11.123',
     'should return time string with ms'
   )

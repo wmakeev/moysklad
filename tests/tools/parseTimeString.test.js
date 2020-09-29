@@ -65,6 +65,10 @@ test('getTimeString (other timezone)', t => {
   t.equals(date.getMinutes(), 33, 'should parse minutes')
   t.equals(date.getMilliseconds(), 123, 'should parse ms')
 
+  // Строка
+  date = parseTimeString('2017-04-08 10:33:00')
+  t.equals(date.toTimeString().substr(0, 8), '13:33:00')
+
   // Восстановление прежнего состояния
   delete process.env.MOYSKLAD_TIMEZONE
   delete require.cache[require.resolve('../../src/tools/parseTimeString')]

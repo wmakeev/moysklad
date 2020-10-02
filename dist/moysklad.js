@@ -3196,8 +3196,12 @@ const timezoneFix = getTimezoneFix()
 /** Временная зона API МойСклад (часовой пояс в мс) */
 const mskTimezone = +3 * 60 * 60 * 1000 // ms
 
-function pad2 (num) {
+function leftPad1 (num) {
   return `0${num}`.slice(-2)
+}
+
+function leftPad2 (num) {
+  return `00${num}`.slice(-3)
 }
 
 /**
@@ -3215,16 +3219,16 @@ module.exports = function getTimeString (date, includeMs) {
   return [
     mskTime.getUTCFullYear(),
     '-',
-    pad2(mskTime.getUTCMonth() + 1),
+    leftPad1(mskTime.getUTCMonth() + 1),
     '-',
-    pad2(mskTime.getUTCDate()),
+    leftPad1(mskTime.getUTCDate()),
     ' ',
-    pad2(mskTime.getUTCHours()),
+    leftPad1(mskTime.getUTCHours()),
     ':',
-    pad2(mskTime.getUTCMinutes()),
+    leftPad1(mskTime.getUTCMinutes()),
     ':',
-    pad2(mskTime.getUTCSeconds()),
-    milliseconds !== 0 && includeMs ? `.${milliseconds}` : ''
+    leftPad1(mskTime.getUTCSeconds()),
+    milliseconds !== 0 && includeMs ? `.${leftPad2(milliseconds)}` : ''
   ].join('')
 }
 
@@ -3342,8 +3346,12 @@ const timezoneFix = getTimezoneFix()
 
 // https://regex101.com/r/Bxq7dZ/2
 const MS_TIME_REGEX = new RegExp(
-  /^(\d{4})-(\d{2})-(\d{2})\s(\d{2}):(\d{2}):(\d{2})(?:\.(\d{3}))?$/
+  /^(\d{4})-(\d{2})-(\d{2})\s(\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,3}))?$/
 )
+
+function rightPad2 (num) {
+  return `${num}00`.slice(0, 3)
+}
 
 /**
  * Преобразует строку времени МойСклад в объект даты (с учетом временной зоны)
@@ -3357,11 +3365,11 @@ module.exports = function parseTimeString (timeString) {
     throw new Error(`Некорректный формат даты "${timeString}"`)
   }
 
-  const date = new Date(
-    `${m[1]}-${m[2]}-${m[3]}T${m[4]}:${m[5]}:${m[6]}${
-      m[7] ? '.' + m[7] : ''
-    }+03:00`
-  )
+  const dateExp = `${m[1]}-${m[2]}-${m[3]}T${m[4]}:${m[5]}:${m[6]}${
+    m[7] && Number.parseInt(m[7]) !== 0 ? '.' + rightPad2(m[7]) : ''
+  }+03:00`
+
+  const date = new Date(dateExp)
 
   return timezoneFix ? new Date(+date - timezoneFix) : date
 }

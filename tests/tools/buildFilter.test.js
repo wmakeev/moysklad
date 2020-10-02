@@ -170,6 +170,9 @@ test('buildFilter with query selectors combined with sub fields', t => {
       sub: 'bar',
       empty: undefined
     },
+    updated: {
+      $gte: undefined
+    },
     empty: undefined
   }
 

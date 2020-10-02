@@ -14,13 +14,14 @@ test('getTimeString', t => {
   const getTimeString = require('../../src/tools/getTimeString')
 
   const date1 = new Date('2017-02-01T07:10:11Z')
-  const date2 = new Date('2017-02-01T07:10:11.123Z')
 
   t.equals(
     getTimeString(date1),
     '2017-02-01 10:10:11',
     'should return time string'
   )
+
+  const date2 = new Date('2017-02-01T07:10:11.123Z')
 
   t.equals(
     getTimeString(date2),
@@ -32,6 +33,30 @@ test('getTimeString', t => {
     getTimeString(date2, true),
     '2017-02-01 10:10:11.123',
     'should return time string with ms'
+  )
+
+  const date3 = new Date('2017-02-01T10:10:11.03Z')
+
+  t.equals(
+    getTimeString(date3, true),
+    '2017-02-01 13:10:11.030',
+    'should return time string with 30 ms'
+  )
+
+  const date4 = new Date('2017-02-01T10:10:11.003Z')
+
+  t.equals(
+    getTimeString(date4, true),
+    '2017-02-01 13:10:11.003',
+    'should return time string with 3 ms'
+  )
+
+  const date5 = new Date('2017-02-01T10:10:11.0Z')
+
+  t.equals(
+    getTimeString(date5, true),
+    '2017-02-01 13:10:11',
+    'should return time string with 0 ms'
   )
 
   t.end()
@@ -48,13 +73,14 @@ test('getTimeString (other timezone)', t => {
   // Часовой пояс может отличатся от указанного в MOYSKLAD_TIMEZONE.
   // Считается, что локальное время соов. времени в часовом поясе MOYSKLAD_TIMEZONE.
   const date1 = new Date('2017-02-01T10:10:11')
-  const date2 = new Date('2017-02-01T10:10:11.123')
 
   t.equals(
     getTimeString(date1),
     '2017-02-01 07:10:11', // Время для Омска
     'should return time string'
   )
+
+  const date2 = new Date('2017-02-01T10:10:11.123')
 
   t.equals(
     getTimeString(date2),
@@ -65,7 +91,7 @@ test('getTimeString (other timezone)', t => {
   t.equals(
     getTimeString(date2, true),
     '2017-02-01 07:10:11.123',
-    'should return time string with ms'
+    'should return time string with 123 ms'
   )
 
   // Восстановление прежнего состояния

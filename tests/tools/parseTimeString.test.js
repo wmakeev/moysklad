@@ -28,7 +28,7 @@ test('parseTimeString', t => {
   t.throws(() => parseTimeString('2017-04-08 3:33:00'), /Некорректный формат/)
 
   t.throws(
-    () => parseTimeString('2017-04-08 03:33:00.12'),
+    () => parseTimeString('2017-04-08 03:33:00.0012'),
     /Некорректный формат/
   )
 
@@ -64,6 +64,21 @@ test('getTimeString (other timezone)', t => {
   t.equals(date.getHours(), 16, 'should parse hours')
   t.equals(date.getMinutes(), 33, 'should parse minutes')
   t.equals(date.getMilliseconds(), 123, 'should parse ms')
+
+  date = parseTimeString('2017-04-08 13:33:00.23')
+  t.equals(date.getMilliseconds(), 230, 'should parse ".23" ms')
+
+  date = parseTimeString('2017-04-08 13:33:00.2')
+  t.equals(date.getMilliseconds(), 200, 'should parse ".2" ms')
+
+  date = parseTimeString('2017-04-08 13:33:00.02')
+  t.equals(date.getMilliseconds(), 20, 'should parse ".02" ms')
+
+  date = parseTimeString('2017-04-08 13:33:00.002')
+  t.equals(date.getMilliseconds(), 2, 'should parse ".002" ms')
+
+  date = parseTimeString('2017-04-08 13:33:00.0')
+  t.equals(date.getMilliseconds(), 0, 'should parse ".0" ms')
 
   // Строка
   date = parseTimeString('2017-04-08 10:33:00')

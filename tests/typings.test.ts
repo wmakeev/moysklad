@@ -45,3 +45,13 @@ ms.POST('foo/bar', 'any', {
     foo: 'bar'
   }
 })
+
+ms.GET('foo/bar', {
+  filter: {
+    foo: 'bar',
+    baz: undefined, // Можно указывать undefined (парамерт будет опущен)
+    some: {
+      empty: undefined
+    }
+  }
+})

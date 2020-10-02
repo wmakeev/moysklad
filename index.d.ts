@@ -449,7 +449,7 @@ declare namespace Moysklad {
   }
 
   export type QueryFilter = {
-    [key: string]: QueryValue | QueryValue[] | QueryObject
+    [key: string]: QueryValue | QueryValue[] | QueryObject | undefined
   }
 
   export type QueryOrder = Array<string | [string] | [string, string]>

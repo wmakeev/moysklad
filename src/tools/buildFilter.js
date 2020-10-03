@@ -1,5 +1,6 @@
 'use strict'
 
+const { MoyskladError } = require('../errors')
 const getTimeString = require('./getTimeString')
 const isPlainObject = require('./isPlainObject')
 const isSimpleValue = require('./isSimpleValue')
@@ -100,6 +101,10 @@ function getFilterParts (path, value) {
       } catch (error) {
         throw new Error(`${curKey}: ${error.message}`)
       }
+
+    // Unknown mongo selector
+    case curKey && curKey.substr(0, 1) === '$' && path.length > 1:
+      throw new MoyskladError(`Неизвестный селектор "${curKey}"`)
 
     // Array
     case value instanceof Array:

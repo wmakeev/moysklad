@@ -222,7 +222,13 @@ test('buildFilter errors', t => {
     buildFilter({ foo: { $exists: 'boo' } })
   }, /\$exists: selector value must to be boolean/)
 
+  t.throws(() => {
+    buildFilter({ foo: { $foo: 'boo' } })
+  }, /Неизвестный селектор "\$foo"/)
+
+  t.doesNotThrow(() => {
+    buildFilter({ $foo: 'boo' })
+  }, 'should not test correct selectors for first level fields')
+
   t.end()
 })
-
-// debugger

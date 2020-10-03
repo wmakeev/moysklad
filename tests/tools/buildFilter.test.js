@@ -184,43 +184,43 @@ test('buildFilter with query selectors combined with sub fields', t => {
 test('buildFilter errors', t => {
   t.throws(() => {
     buildFilter()
-  }, /filter must to be an object/)
+  }, /Поле filter должно быть объектом/)
 
   t.throws(() => {
     buildFilter({ foo: Symbol('foo') })
-  }, /filter field "foo" value is incorrect/)
+  }, /Некорректное значение поля "foo" в фильтре/)
 
   t.throws(() => {
     buildFilter({ foo: { $eq: { a: 1 } } })
-  }, /\$eq: value must to be string, number, date or null/)
+  }, /\$eq: значение должно быть строкой, числом, датой или null/)
 
   t.throws(() => {
     buildFilter({ foo: { $in: { a: 1 } } })
-  }, /\$in: selector value must to be an array/)
+  }, /\$in: значение селектора foo должно быть массивом/)
 
   t.throws(() => {
     buildFilter({ foo: { $and: { a: 1 } } })
-  }, /\$and: selector value must to be an array/)
+  }, /\$and: значение селектора должно быть массивом/)
 
   t.throws(() => {
     buildFilter({ foo: { $not: 3 } })
-  }, /\$not: selector value must to be an object/)
+  }, /\$not: значение селектора должно быть объектом/)
 
   t.throws(() => {
     buildFilter({ foo: { $not: { $st: 'start' } } })
-  }, /\$st not support negation/)
+  }, /\$st не поддерживает селектор отрицания \$not/)
 
   t.throws(() => {
     buildFilter({ foo: { $not: { $et: 'start' } } })
-  }, /\$et not support negation/)
+  }, /\$et не поддерживает селектор отрицания \$not/)
 
   t.throws(() => {
     buildFilter({ foo: { $not: { $contains: 'start' } } })
-  }, /\$contains not support negation/)
+  }, /\$contains не поддерживает селектор отрицания \$not/)
 
   t.throws(() => {
     buildFilter({ foo: { $exists: 'boo' } })
-  }, /\$exists: selector value must to be boolean/)
+  }, /\$exists: значение селектора должно быть логическим/)
 
   t.throws(() => {
     buildFilter({ foo: { $foo: 'boo' } })

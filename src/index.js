@@ -80,7 +80,7 @@ module.exports = stampit({
     this.fetch = fetch
   } else {
     this.fetch = function () {
-      throw new Error(
+      throw new MoyskladError(
         'Нельзя выполнить http запрос, т.к. при инициализации' +
           ' экземпляра библиотеки не указан Fetch API модуль' +
           ' (cм. подробнее https://github.com/wmakeev/moysklad#Установка).'

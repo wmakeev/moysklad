@@ -1,5 +1,6 @@
 'use srict'
 
+const { MoyskladError } = require('../errors')
 const have = require('../have')
 const normalizeUrl = require('../tools/normalizeUrl')
 const parseQueryString = require('../tools/parseQueryString')
@@ -33,7 +34,7 @@ module.exports = function parseUrl (...args) {
   }
 
   if (!endpoint || !api || !apiVersion || !pathStr) {
-    throw new Error(
+    throw new MoyskladError(
       `parseUrl: Url не соответсвует API МойСклад - ${url || path}`
     )
   }

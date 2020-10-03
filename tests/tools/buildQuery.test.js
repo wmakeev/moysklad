@@ -27,13 +27,13 @@ test('buildQuery', t => {
 
   t.throws(
     () => buildQuery({ foo: {} }),
-    /url query key value must to be string, number, boolean, null or undefined/,
+    /начение поля строки запроса должно быть строкой, числом, логическим значением, null или undefined/,
     'should throw if query key value not string, number, boolean, null or undefined'
   )
 
   t.throws(
     () => buildQuery({ arr: [1, 'str', Function] }),
-    /url query key value must to be string, number, boolean, null or undefined/,
+    /Значение поля строки запроса должно быть строкой, числом, логическим значением, null или undefined/,
     'should throw if query key value not string, number, boolean, null or undefined'
   )
 
@@ -108,7 +108,7 @@ test('buildQuery', t => {
 
   t.throws(
     () => buildQuery({ filter: ['foo', 'bar'] }),
-    /filter must to be string or object/,
+    /Поле filter запроса должно быть строкой или объектом/,
     'should throw if query.filter is not string or object'
   )
 

@@ -7,17 +7,23 @@ const isSimpleValue = require('./isSimpleValue')
 
 const createValueSelector = selector => (path, value) => {
   if (!isSimpleValue(value)) {
-    throw new TypeError('value must to be string, number, date or null')
+    throw new MoyskladError(
+      'значение должно быть строкой, числом, датой или null'
+    )
   }
   return [[path, selector, value]]
 }
 
 const createCollectionSelector = selector => {
   const sel = createValueSelector(selector)
+
   return (path, value) => {
     if (!(value instanceof Array)) {
-      throw new TypeError('selector value must to be an array')
+      throw new MoyskladError(
+        `значение селектора ${path.join('.')} должно быть массивом`
+      )
     }
+
     return value.reduce((res, v) => res.concat(sel(path, v)), [])
   }
 }
@@ -61,7 +67,9 @@ const comparisonSelectors = Object.keys(selectors).reduce((res, key) => {
 // Logical selectors
 const invertFilterPart = fp => {
   if (!fp[1].not) {
-    throw new Error(`${fp[1].name} not support negation like $not`)
+    throw new MoyskladError(
+      `${fp[1].name} не поддерживает селектор отрицания $not`
+    )
   }
   return [fp[0], fp[1].not, fp[2]]
 }
@@ -74,7 +82,7 @@ function getFilterParts (path, value) {
     // Mongo logical selectors
     case curKey === '$and':
       if (!(value instanceof Array)) {
-        throw new TypeError('$and: selector value must to be an array')
+        throw new MoyskladError('$and: значение селектора должно быть массивом')
       }
       return value.reduce(
         (res, val) => res.concat(getFilterParts(path.slice(0, -1), val)),
@@ -83,14 +91,16 @@ function getFilterParts (path, value) {
 
     case curKey === '$not':
       if (!isPlainObject(value)) {
-        throw new TypeError('$not: selector value must to be an object')
+        throw new MoyskladError('$not: значение селектора должно быть объектом')
       }
       // .concat([[headPath, selectors.eq, null]])
       return getFilterParts(path.slice(0, -1), value).map(invertFilterPart)
 
     case curKey === '$exists':
       if (typeof value !== 'boolean') {
-        throw new TypeError('$exists: selector value must to be boolean')
+        throw new MoyskladError(
+          '$exists: значение селектора должно быть логическим значением'
+        )
       }
       return [[path.slice(0, -1), value ? selectors.ne : selectors.eq, null]]
 
@@ -99,7 +109,7 @@ function getFilterParts (path, value) {
       try {
         return comparisonSelectors[curKey](path.slice(0, -1), value)
       } catch (error) {
-        throw new Error(`${curKey}: ${error.message}`)
+        throw new MoyskladError(`${curKey}: ${error.message}`)
       }
 
     // Unknown mongo selector
@@ -128,7 +138,7 @@ function getFilterParts (path, value) {
 
 module.exports = function buildFilter (filter) {
   if (!isPlainObject(filter)) {
-    throw new TypeError('filter must to be an object')
+    throw new MoyskladError('Поле filter должно быть объектом')
   }
 
   let filterParts = getFilterParts([], filter)
@@ -159,7 +169,9 @@ module.exports = function buildFilter (filter) {
             return [key, operator, value]
 
           default:
-            throw new TypeError(`filter field "${key}" value is incorrect`)
+            throw new MoyskladError(
+              `Некорректное значение поля "${key}" в фильтре`
+            )
         }
       })
       .filter(it => it != null)

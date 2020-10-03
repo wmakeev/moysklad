@@ -1,5 +1,6 @@
 'use strict'
 
+const { MoyskladError } = require('../errors')
 const getTimezoneFix = require('./getTimezoneFix')
 
 const timezoneFix = getTimezoneFix()
@@ -22,7 +23,7 @@ module.exports = function parseTimeString (timeString) {
   // 2017-04-08 13:33:00.123
   const m = MS_TIME_REGEX.exec(timeString)
   if (!m || m.length < 7 || m.length > 8) {
-    throw new Error(`Некорректный формат даты "${timeString}"`)
+    throw new MoyskladError(`Некорректный формат даты "${timeString}"`)
   }
 
   const dateExp = `${m[1]}-${m[2]}-${m[3]}T${m[4]}:${m[5]}:${m[6]}${

@@ -2560,7 +2560,7 @@ module.exports = stampit({
     this.fetch = fetch
   } else {
     this.fetch = function () {
-      throw new Error(
+      throw new MoyskladError(
         'Нельзя выполнить http запрос, т.к. при инициализации' +
           ' экземпляра библиотеки не указан Fetch API модуль' +
           ' (cм. подробнее https://github.com/wmakeev/moysklad#Установка).'
@@ -2901,6 +2901,7 @@ module.exports = function getAuthHeader () {
 },{"../errors":5,"../getEnvVar":7,"@wmakeev/base64encode":1}],19:[function(require,module,exports){
 'use srict'
 
+const { MoyskladError } = require('../errors')
 const have = require('../have')
 const normalizeUrl = require('../tools/normalizeUrl')
 const parseQueryString = require('../tools/parseQueryString')
@@ -2934,7 +2935,7 @@ module.exports = function parseUrl (...args) {
   }
 
   if (!endpoint || !api || !apiVersion || !pathStr) {
-    throw new Error(
+    throw new MoyskladError(
       `parseUrl: Url не соответсвует API МойСклад - ${url || path}`
     )
   }
@@ -2948,26 +2949,33 @@ module.exports = function parseUrl (...args) {
   }
 }
 
-},{"../have":9,"../tools/normalizeUrl":26,"../tools/parseQueryString":27}],20:[function(require,module,exports){
+},{"../errors":5,"../have":9,"../tools/normalizeUrl":26,"../tools/parseQueryString":27}],20:[function(require,module,exports){
 'use strict'
 
+const { MoyskladError } = require('../errors')
 const getTimeString = require('./getTimeString')
 const isPlainObject = require('./isPlainObject')
 const isSimpleValue = require('./isSimpleValue')
 
 const createValueSelector = selector => (path, value) => {
   if (!isSimpleValue(value)) {
-    throw new TypeError('value must to be string, number, date or null')
+    throw new MoyskladError(
+      'значение должно быть строкой, числом, датой или null'
+    )
   }
   return [[path, selector, value]]
 }
 
 const createCollectionSelector = selector => {
   const sel = createValueSelector(selector)
+
   return (path, value) => {
     if (!(value instanceof Array)) {
-      throw new TypeError('selector value must to be an array')
+      throw new MoyskladError(
+        `значение селектора ${path.join('.')} должно быть массивом`
+      )
     }
+
     return value.reduce((res, v) => res.concat(sel(path, v)), [])
   }
 }
@@ -3011,7 +3019,9 @@ const comparisonSelectors = Object.keys(selectors).reduce((res, key) => {
 // Logical selectors
 const invertFilterPart = fp => {
   if (!fp[1].not) {
-    throw new Error(`${fp[1].name} not support negation like $not`)
+    throw new MoyskladError(
+      `${fp[1].name} не поддерживает селектор отрицания $not`
+    )
   }
   return [fp[0], fp[1].not, fp[2]]
 }
@@ -3024,7 +3034,7 @@ function getFilterParts (path, value) {
     // Mongo logical selectors
     case curKey === '$and':
       if (!(value instanceof Array)) {
-        throw new TypeError('$and: selector value must to be an array')
+        throw new MoyskladError('$and: значение селектора должно быть массивом')
       }
       return value.reduce(
         (res, val) => res.concat(getFilterParts(path.slice(0, -1), val)),
@@ -3033,14 +3043,16 @@ function getFilterParts (path, value) {
 
     case curKey === '$not':
       if (!isPlainObject(value)) {
-        throw new TypeError('$not: selector value must to be an object')
+        throw new MoyskladError('$not: значение селектора должно быть объектом')
       }
       // .concat([[headPath, selectors.eq, null]])
       return getFilterParts(path.slice(0, -1), value).map(invertFilterPart)
 
     case curKey === '$exists':
       if (typeof value !== 'boolean') {
-        throw new TypeError('$exists: selector value must to be boolean')
+        throw new MoyskladError(
+          '$exists: значение селектора должно быть логическим значением'
+        )
       }
       return [[path.slice(0, -1), value ? selectors.ne : selectors.eq, null]]
 
@@ -3049,8 +3061,12 @@ function getFilterParts (path, value) {
       try {
         return comparisonSelectors[curKey](path.slice(0, -1), value)
       } catch (error) {
-        throw new Error(`${curKey}: ${error.message}`)
+        throw new MoyskladError(`${curKey}: ${error.message}`)
       }
+
+    // Unknown mongo selector
+    case curKey && curKey.substr(0, 1) === '$' && path.length > 1:
+      throw new MoyskladError(`Неизвестный селектор "${curKey}"`)
 
     // Array
     case value instanceof Array:
@@ -3074,7 +3090,7 @@ function getFilterParts (path, value) {
 
 module.exports = function buildFilter (filter) {
   if (!isPlainObject(filter)) {
-    throw new TypeError('filter must to be an object')
+    throw new MoyskladError('Поле filter должно быть объектом')
   }
 
   let filterParts = getFilterParts([], filter)
@@ -3105,7 +3121,9 @@ module.exports = function buildFilter (filter) {
             return [key, operator, value]
 
           default:
-            throw new TypeError(`filter field "${key}" value is incorrect`)
+            throw new MoyskladError(
+              `Некорректное значение поля "${key}" в фильтре`
+            )
         }
       })
       .filter(it => it != null)
@@ -3123,9 +3141,10 @@ module.exports = function buildFilter (filter) {
   )
 }
 
-},{"./getTimeString":22,"./isPlainObject":24,"./isSimpleValue":25}],21:[function(require,module,exports){
+},{"../errors":5,"./getTimeString":22,"./isPlainObject":24,"./isSimpleValue":25}],21:[function(require,module,exports){
 'use strict'
 
+const { MoyskladError } = require('../errors')
 const buildFilter = require('./buildFilter')
 const isPlainObject = require('./isPlainObject')
 
@@ -3135,8 +3154,8 @@ const addQueryPart = (res, key) => val => {
   } else if (val === undefined) {
     return undefined
   } else if (['string', 'number', 'boolean'].indexOf(typeof val) === -1) {
-    throw new TypeError(
-      'url query key value must to be string, number, boolean, null or undefined'
+    throw new MoyskladError(
+      'Значение поля строки запроса должно быть строкой, числом, логическим значением, null или undefined'
     )
   } else {
     res.push([key, encodeURIComponent(val)])
@@ -3157,7 +3176,11 @@ module.exports = function buildQuery (query) {
         case key === 'filter':
           if (isPlainObject(query.filter)) addPart(buildFilter(query.filter))
           else if (typeof query.filter === 'string') addPart(query.filter)
-          else throw new TypeError('query.filter must to be string or object')
+          else {
+            throw new MoyskladError(
+              'Поле filter запроса должно быть строкой или объектом'
+            )
+          }
           break
 
         case key === 'order' && query.order instanceof Array:
@@ -3186,7 +3209,7 @@ module.exports = function buildQuery (query) {
     .join('&')
 }
 
-},{"./buildFilter":20,"./isPlainObject":24}],22:[function(require,module,exports){
+},{"../errors":5,"./buildFilter":20,"./isPlainObject":24}],22:[function(require,module,exports){
 'use strict'
 
 const getTimezoneFix = require('./getTimezoneFix')
@@ -3340,6 +3363,7 @@ module.exports = function parseQueryString (queryString) {
 },{}],28:[function(require,module,exports){
 'use strict'
 
+const { MoyskladError } = require('../errors')
 const getTimezoneFix = require('./getTimezoneFix')
 
 const timezoneFix = getTimezoneFix()
@@ -3362,7 +3386,7 @@ module.exports = function parseTimeString (timeString) {
   // 2017-04-08 13:33:00.123
   const m = MS_TIME_REGEX.exec(timeString)
   if (!m || m.length < 7 || m.length > 8) {
-    throw new Error(`Некорректный формат даты "${timeString}"`)
+    throw new MoyskladError(`Некорректный формат даты "${timeString}"`)
   }
 
   const dateExp = `${m[1]}-${m[2]}-${m[3]}T${m[4]}:${m[5]}:${m[6]}${
@@ -3374,5 +3398,5 @@ module.exports = function parseTimeString (timeString) {
   return timezoneFix ? new Date(+date - timezoneFix) : date
 }
 
-},{"./getTimezoneFix":23}]},{},[10])(10)
+},{"../errors":5,"./getTimezoneFix":23}]},{},[10])(10)
 });

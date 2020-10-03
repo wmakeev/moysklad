@@ -1,5 +1,6 @@
 'use strict'
 
+const { MoyskladError } = require('../errors')
 const buildFilter = require('./buildFilter')
 const isPlainObject = require('./isPlainObject')
 
@@ -9,8 +10,8 @@ const addQueryPart = (res, key) => val => {
   } else if (val === undefined) {
     return undefined
   } else if (['string', 'number', 'boolean'].indexOf(typeof val) === -1) {
-    throw new TypeError(
-      'url query key value must to be string, number, boolean, null or undefined'
+    throw new MoyskladError(
+      'Значение поля строки запроса должно быть строкой, числом, логическим значением, null или undefined'
     )
   } else {
     res.push([key, encodeURIComponent(val)])
@@ -31,7 +32,11 @@ module.exports = function buildQuery (query) {
         case key === 'filter':
           if (isPlainObject(query.filter)) addPart(buildFilter(query.filter))
           else if (typeof query.filter === 'string') addPart(query.filter)
-          else throw new TypeError('query.filter must to be string or object')
+          else {
+            throw new MoyskladError(
+              'Поле filter запроса должно быть строкой или объектом'
+            )
+          }
           break
 
         case key === 'order' && query.order instanceof Array:

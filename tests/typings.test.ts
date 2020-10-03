@@ -1,8 +1,16 @@
+// Тесты для index.d.ts
+
 import Moysklad from '..'
 
+//#region Работа с датами
 const msDate: string = Moysklad.getTimeString(new Date())
-const msParsedDate: Date = Moysklad.parseTimeString(msDate)
 
+Moysklad.getTimeString(new Date(), true)
+
+const msParsedDate: Date = Moysklad.parseTimeString(msDate)
+//#endregion
+
+//#region Инициализация библиотеки
 const ms = Moysklad({
   endpoint: 'https://online.moysklad.ru/api',
   api: 'remap',
@@ -12,6 +20,10 @@ const ms = Moysklad({
   password: 'password'
 })
 
+Moysklad({ foo: 'bar' })
+//#endregion
+
+//#region Формирование запроса
 ms.GET('path/to/doc', {
   filter: {
     foo: 'bar',
@@ -31,6 +43,8 @@ ms.GET(
     millisecond: true
   }
 )
+
+ms.GET('foo/bar', null, { muteErrors: true })
 
 const filter: Moysklad.QueryFilter = {
   foo: 'bar',
@@ -55,3 +69,6 @@ ms.GET('foo/bar', {
     }
   }
 })
+
+ms.GET('foo/bar', { filter: 'some filter' })
+//#endregion

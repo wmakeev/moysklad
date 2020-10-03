@@ -113,10 +113,10 @@ declare namespace Moysklad {
      * Пример:
      * ```js
      * ms.buildUrl('entity/customerorder', { expand: 'agent' })
-     * // https://online.moysklad.ru/api/remap/1.1/entity/customerorder?expand=agent
+     * // https://online.moysklad.ru/api/remap/1.2/entity/customerorder?expand=agent
      *
      * ms.buildUrl(['entity/customerorder', 'foo-id'])
-     * // https://online.moysklad.ru/api/remap/1.1/entity/customerorder/foo-id
+     * // https://online.moysklad.ru/api/remap/1.2/entity/customerorder/foo-id
      * ```
      */
     buildUrl(path: string | string[], query?: Query): string
@@ -175,7 +175,7 @@ declare namespace Moysklad {
      *
      * Пример:
      * ```js
-     * const url = `https://online.moysklad.ru/api/remap/1.1/entity/customerorder/eb7bc422-ae8d-11e3-9e32-002590a28eca`
+     * const url = `https://online.moysklad.ru/api/remap/1.2/entity/customerorder/eb7bc422-ae8d-11e3-9e32-002590a28eca`
      *
      * const patch = { applicable: false }
      *
@@ -223,7 +223,7 @@ declare namespace Moysklad {
     /**
      * Версия API
      *
-     * по умолчанию `1.1`
+     * по умолчанию `1.2`
      */
     apiVersion?: string
 
@@ -290,9 +290,9 @@ declare namespace Moysklad {
      * Вывод в консоли:
      *
      * ```text
-     * GET https://online.moysklad.ru/api/remap/1.1/entity/customerorder?limit=1 (+4ms)
-     * GET OK 200 https://online.moysklad.ru/api/remap/1.1/entity/customerorder?limit=1 (+575ms)
-     * GET BODY https://online.moysklad.ru/api/remap/1.1/entity/customerorder?limit=1 (+580ms)
+     * GET https://online.moysklad.ru/api/remap/1.2/entity/customerorder?limit=1 (+4ms)
+     * GET OK 200 https://online.moysklad.ru/api/remap/1.2/entity/customerorder?limit=1 (+575ms)
+     * GET BODY https://online.moysklad.ru/api/remap/1.2/entity/customerorder?limit=1 (+580ms)
      * Order name: 00600
      * ```
      *
@@ -328,6 +328,7 @@ declare namespace Moysklad {
 
     /**
      * Если `true`, то в запрос будет включен заголовок `X-Lognex-Format-Millisecond` со значением `true` (все даты объекта будут возвращены с учетом миллисекунд).
+     * @deprecated начиная с версии Remap API 1.2
      */
     millisecond?: boolean
 

@@ -16,7 +16,7 @@ test('Moysklad events (request)', t => {
     .on('request', ({ url, options }) => {
       t.equal(
         url,
-        'https://online.moysklad.ru/api/remap/1.1/entity/customerorder?limit=1',
+        'https://online.moysklad.ru/api/remap/1.2/entity/customerorder?limit=1',
         'should emit request url'
       )
       t.equal(options.method, 'GET', 'should emit request options')
@@ -24,7 +24,7 @@ test('Moysklad events (request)', t => {
     .on('response', ({ url, options, response }) => {
       t.equal(
         url,
-        'https://online.moysklad.ru/api/remap/1.1/entity/customerorder?limit=1',
+        'https://online.moysklad.ru/api/remap/1.2/entity/customerorder?limit=1',
         'should emit response url'
       )
       t.equal(options.method, 'GET', 'should emit response options')
@@ -33,7 +33,7 @@ test('Moysklad events (request)', t => {
     .on('response:body', ({ url, options, response, body }) => {
       t.equal(
         url,
-        'https://online.moysklad.ru/api/remap/1.1/entity/customerorder?limit=1',
+        'https://online.moysklad.ru/api/remap/1.2/entity/customerorder?limit=1',
         'should emit response:body url'
       )
       t.equal(options.method, 'GET', 'should emit response:body options')
@@ -59,7 +59,7 @@ test('Moysklad events (request error)', t => {
     .on('request', ({ url, options }) => {
       t.equal(
         url,
-        'https://online.moysklad.ru/api/remap/1.1/entity/customerorder2?limit=1',
+        'https://online.moysklad.ru/api/remap/1.2/entity/customerorder2?limit=1',
         'should emit request url'
       )
       t.equal(options.method, 'GET', 'should emit request options')
@@ -67,7 +67,7 @@ test('Moysklad events (request error)', t => {
     .on('response', ({ url, options, response }) => {
       t.equal(
         url,
-        'https://online.moysklad.ru/api/remap/1.1/entity/customerorder2?limit=1',
+        'https://online.moysklad.ru/api/remap/1.2/entity/customerorder2?limit=1',
         'should emit response url'
       )
       t.equal(options.method, 'GET', 'should emit response options')
@@ -76,7 +76,7 @@ test('Moysklad events (request error)', t => {
     .on('response:body', ({ url, options, response, body }) => {
       t.equal(
         url,
-        'https://online.moysklad.ru/api/remap/1.1/entity/customerorder2?limit=1',
+        'https://online.moysklad.ru/api/remap/1.2/entity/customerorder2?limit=1',
         'should emit response:body url'
       )
       t.equal(options.method, 'GET', 'should emit response:body options')

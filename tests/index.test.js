@@ -46,7 +46,7 @@ test('Create Moysklad instance with options', t => {
   t.equals(msOptions.login, 'login')
   t.equals(msOptions.password, 'password')
   t.equals(msOptions.api, 'remap')
-  t.equals(msOptions.apiVersion, '1.1')
+  t.equals(msOptions.apiVersion, '1.2')
 
   t.end()
 })
@@ -216,50 +216,85 @@ test('Moysklad#POST/PUT/DELETE', async t => {
     code,
     attributes: [
       {
-        id: '0008b3f4-1897-11e3-d76c-7054d21a8d1e',
-        name: 'Вид товара',
+        meta: {
+          type: 'attributemetadata',
+          href: ms.buildUrl([
+            'entity/product/metadata/attributes',
+            '0008b3f4-1897-11e3-d76c-7054d21a8d1e' // Вид товара
+          ])
+        },
         value: {
           name: 'Рюкзак'
         }
       },
       {
-        id: '14538d43-ea5b-11e9-0a80-0505000d881a',
-        name: 'Пол',
+        meta: {
+          type: 'attributemetadata',
+          href: ms.buildUrl([
+            'entity/product/metadata/attributes',
+            '14538d43-ea5b-11e9-0a80-0505000d881a' // Пол
+          ])
+        },
         value: {
           name: 'Женский'
         }
       },
       {
-        id: 'c18ca61c-eac1-11e9-0a80-042800177f42',
-        name: 'Возраст',
+        meta: {
+          type: 'attributemetadata',
+          href: ms.buildUrl([
+            'entity/product/metadata/attributes',
+            'c18ca61c-eac1-11e9-0a80-042800177f42' // Возраст
+          ])
+        },
         value: {
           name: 'Взрослый'
         }
       },
       {
-        id: 'f4c073c5-1bcc-4d91-8b41-ed825495b677',
-        name: 'Бренд',
+        meta: {
+          type: 'attributemetadata',
+          href: ms.buildUrl([
+            'entity/product/metadata/attributes',
+            'f4c073c5-1bcc-4d91-8b41-ed825495b677' // Бренд
+          ])
+        },
         value: {
           name: 'No Brand'
         }
       },
       {
-        id: '71f17086-1a7f-47f1-b447-59b71351bfad',
-        name: 'Сезон',
+        meta: {
+          type: 'attributemetadata',
+          href: ms.buildUrl([
+            'entity/product/metadata/attributes',
+            '71f17086-1a7f-47f1-b447-59b71351bfad' // Сезон
+          ])
+        },
         value: {
           name: '02 Осень/Зима'
         }
       },
       {
-        id: 'b4bee095-4278-4147-95e0-0328c9207be0',
-        name: 'Вид номенклатуры',
+        meta: {
+          type: 'attributemetadata',
+          href: ms.buildUrl([
+            'entity/product/metadata/attributes',
+            'b4bee095-4278-4147-95e0-0328c9207be0' // Вид номенклатуры
+          ])
+        },
         value: {
           name: 'Товары в обороте'
         }
       },
       {
-        id: '4700f6bd-fa82-4a91-9e8c-822616e71b0a',
-        name: 'Создано',
+        meta: {
+          type: 'attributemetadata',
+          href: ms.buildUrl([
+            'entity/product/metadata/attributes',
+            '4700f6bd-fa82-4a91-9e8c-822616e71b0a' // Создано
+          ])
+        },
         value: Moysklad.getTimeString(new Date())
       }
     ]

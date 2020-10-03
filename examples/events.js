@@ -12,9 +12,12 @@ emitter
   .on('request', ({ url, options }) => {
     console.log(`${options.method} ${url}`)
   })
-  .on('response', ({ url, options: { method }, response: { statusText, status } }) => {
-    console.log(`${method} ${statusText} ${status} ${url} (+${elapsed()}ms)`)
-  })
+  .on(
+    'response',
+    ({ url, options: { method }, response: { statusText, status } }) => {
+      console.log(`${method} ${statusText} ${status} ${url} (+${elapsed()}ms)`)
+    }
+  )
   .on('response:body', ({ url, options: { method }, response, body }) => {
     console.log(`${method} BODY ${url} (+${elapsed()}ms)`)
   })
@@ -27,8 +30,8 @@ ms.GET('entity/customerorder', { limit: 1 }).then(res => {
 })
 
 /*
-GET https://online.moysklad.ru/api/remap/1.1/entity/customerorder?limit=1
-GET OK 200 https://online.moysklad.ru/api/remap/1.1/entity/customerorder?limit=1 (+575ms)
-GET BODY https://online.moysklad.ru/api/remap/1.1/entity/customerorder?limit=1 (+580ms)
+GET https://online.moysklad.ru/api/remap/1.2/entity/customerorder?limit=1
+GET OK 200 https://online.moysklad.ru/api/remap/1.2/entity/customerorder?limit=1 (+575ms)
+GET BODY https://online.moysklad.ru/api/remap/1.2/entity/customerorder?limit=1 (+580ms)
 Order name: 00600
 */

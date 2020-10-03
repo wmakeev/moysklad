@@ -45,7 +45,7 @@ test('Response with rawResponse option (with error)', t => {
     t.equal(err.code, 1005, 'should parse error code')
     t.equal(
       err.moreInfo,
-      'https://online.moysklad.ru/api/remap/1.1/doc#обработка-ошибок-1005',
+      'https://online.moysklad.ru/api/remap/1.2/doc#обработка-ошибок-1005',
       'should parse error moreInfo'
     )
   })
@@ -58,7 +58,7 @@ test('Response with rawResponse and muteErrors options', async t => {
     template: {
       meta: {
         href:
-          'https://online.moysklad.ru/api/remap/1.1/entity/demand/metadata/customtemplate/' +
+          'https://online.moysklad.ru/api/remap/1.2/entity/demand/metadata/customtemplate/' +
           '8a686b8a-9e4a-11e5-7a69-97110004af3e',
         type: 'customtemplate',
         mediaType: 'application/json'
@@ -86,10 +86,10 @@ test('Response with rawResponse and muteErrors options', async t => {
   )
 })
 
-test('Response with millisecond option', t => {
+test('Response with millisecond option (remap 1.1)', t => {
   t.plan(2)
 
-  const ms = Moysklad({ fetch })
+  const ms = Moysklad({ apiVersion: '1.1', fetch })
 
   const { parseTimeString } = Moysklad
 

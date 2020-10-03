@@ -59,7 +59,7 @@
 
 ## Особенности
 
-Библиотека представляет максимально простой и прозрачный интерфейс к существующим методам [API МойСклад](https://online.moysklad.ru/api/remap/1.1/doc) и не выполняет никаких внутренних преобразований отправляемых и получаемых данных.
+Библиотека представляет максимально простой и прозрачный интерфейс к существующим методам [API МойСклад](https://online.moysklad.ru/api/remap/1.2/doc) и не выполняет никаких внутренних преобразований отправляемых и получаемых данных.
 
 При необходимости, можно расширить возможности библиотеки [внешними модулями](#расширения).
 
@@ -147,7 +147,7 @@ ms.GET('entity/customerorder', {
 | `fetch`      | глобальный fetch                   | Функция с интерфейсом [Fetch API](https://developer.mozilla.org/ru/docs/Web/API/Fetch_API). Если глобальный fetch не найден, то будет выброшена ошибка при попытке осуществить http запрос. |
 | `endpoint`   | `"https://online.moysklad.ru/api"` | Точка досупа к API                                                                                                                                                                          |
 | `api`        | `"remap"`                          | Раздел API                                                                                                                                                                                  |
-| `apiVersion` | `"1.1"`                            | Версия API                                                                                                                                                                                  |
+| `apiVersion` | `"1.2"`                            | Версия API                                                                                                                                                                                  |
 | `token`      | `undefined`                        | Токен доступа к API (см. [Аутентификация](#аутентификация))                                                                                                                                 |
 | `login`      | `undefined`                        | Логин для доступа к API (см. [Аутентификация](#аутентификация))                                                                                                                             |
 | `password`   | `undefined`                        | Пароль для доступа к API (см. [Аутентификация](#аутентификация))                                                                                                                            |
@@ -431,13 +431,13 @@ assert.equal(msOptions.password, 'password')
 
 ```js
 const url = ms.buildUrl(
-  'https://online.moysklad.ru/api/remap/1.1/entity/customerorder?expand=positions',
+  'https://online.moysklad.ru/api/remap/1.2/entity/customerorder?expand=positions',
   { limit: 100 }
 )
 
 assert.equal(
   url,
-  'https://online.moysklad.ru/api/remap/1.1/entity/customerorder?expand=positions&limit=100'
+  'https://online.moysklad.ru/api/remap/1.2/entity/customerorder?expand=positions&limit=100'
 )
 ```
 
@@ -446,7 +446,7 @@ const url = ms.buildUrl('entity/customerorder', { expand: 'positions' })
 
 assert.equal(
   url,
-  'https://online.moysklad.ru/api/remap/1.1/entity/customerorder?expand=positions'
+  'https://online.moysklad.ru/api/remap/1.2/entity/customerorder?expand=positions'
 )
 ```
 
@@ -455,7 +455,7 @@ const url = ms.buildUrl(['entity', 'customerorder'], { expand: 'positions' })
 
 assert.equal(
   url,
-  'https://online.moysklad.ru/api/remap/1.1/entity/customerorder?expand=positions'
+  'https://online.moysklad.ru/api/remap/1.2/entity/customerorder?expand=positions'
 )
 ```
 
@@ -472,12 +472,12 @@ assert.equal(
 **Пример использования:**
 
 ```js
-const parsedUri = ms.parseUrl('https://online.moysklad.ru/api/remap/1.1/entity/customerorder?expand=positions')
+const parsedUri = ms.parseUrl('https://online.moysklad.ru/api/remap/1.2/entity/customerorder?expand=positions')
 
 assert.deepEqual(parsedUri, {
   endpoint: 'https://online.moysklad.ru/api',
   api: 'remap'
-  apiVersion: '1.1',
+  apiVersion: '1.2',
   path: ['entity', 'customerorder'],
   query: {
     expand: 'positions'
@@ -500,7 +500,7 @@ assert.deepEqual(parsedUri, {
 **Пример использования:**
 
 ```js
-const url = `https://online.moysklad.ru/api/remap/1.1/entity/customerorder/eb7bcc22-ae8d-11e3-9e32-002590a28eca`
+const url = `https://online.moysklad.ru/api/remap/1.2/entity/customerorder/eb7bcc22-ae8d-11e3-9e32-002590a28eca`
 
 const patch = { applicable: false }
 
@@ -522,7 +522,7 @@ const updatedOrder = await ms.fetchUrl(url, {
 // Три запроса ниже аналогичны
 
 ms.GET(
-  `https://online.moysklad.ru/api/remap/1.1/entity/customerorder/${ORDER_ID}/positions/${POSITION_ID}?expand=assortment`
+  `https://online.moysklad.ru/api/remap/1.2/entity/customerorder/${ORDER_ID}/positions/${POSITION_ID}?expand=assortment`
 )
 
 ms.GET(`entity/customerorder/${ORDER_ID}/positions/${POSITION_ID}`, {
@@ -552,7 +552,7 @@ const query = {
   arr: ['str', 1, true, null, undefined]
 }
 
-// https://online.moysklad.ru/api/remap/1.1/entity/demand?str=some%20string&num=1&bool=true&nil=&arr=str&arr=1&arr=true&arr=
+// https://online.moysklad.ru/api/remap/1.2/entity/demand?str=some%20string&num=1&bool=true&nil=&arr=str&arr=1&arr=true&arr=
 ms.GET('entity/demand', query)
 ```
 
@@ -643,13 +643,13 @@ bar!=;bar.baz=1;code=03;code=1;code=2;foo=1999-12-31 22:00:00;moment<=2001-01-02
 
 Опции специфичные для библиотеки moysklad (не передаются в `fetch`):
 
-| Поле             | Тип       | Описание                                                                                                                                                                                  |
-| ---------------- | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `rawResponse`    | `boolean` | Если `true`, то метод вернет результат в виде объекта [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response)                                                               |
-| `muteErrors`     | `boolean` | Если `true`, то все ошибки будут проигнорированы (метод не будет генерировать ошибку если код ответа сервера не в диапазоне 200-299 и/или тело ответа содержит описание ошибки МойСклад). |
-| `millisecond`    | `boolean` | Если `true`, то в запрос будет включен заголовок `X-Lognex-Format-Millisecond` со значением `true` (все даты объекта будут возвращены с учетом миллисекунд).                              |
-| `precision`      | `boolean` | Если `true`, то в запрос будет включен заголовок `X-Lognex-Precision` со значением `true` (отключение округления цен и себестоимости до копеек).                                          |
-| `webHookDisable` | `boolean` | Если `true`, то в запрос будет включен заголовок `X-Lognex-WebHook-Disable` со значением `true` (отключить уведомления вебхуков в контексте данного запроса).                             |
+| Поле             | Тип       | Описание                                                                                                                                                                                               |
+| ---------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `rawResponse`    | `boolean` | Если `true`, то метод вернет результат в виде объекта [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response)                                                                            |
+| `muteErrors`     | `boolean` | Если `true`, то все ошибки будут проигнорированы (метод не будет генерировать ошибку если код ответа сервера не в диапазоне 200-299 и/или тело ответа содержит описание ошибки МойСклад).              |
+| `millisecond`    | `boolean` | (не используется начиная с Remap API 1.2) Если `true`, то в запрос будет включен заголовок `X-Lognex-Format-Millisecond` со значением `true` (все даты объекта будут возвращены с учетом миллисекунд). |
+| `precision`      | `boolean` | Если `true`, то в запрос будет включен заголовок `X-Lognex-Precision` со значением `true` (отключение округления цен и себестоимости до копеек).                                                       |
+| `webHookDisable` | `boolean` | Если `true`, то в запрос будет включен заголовок `X-Lognex-WebHook-Disable` со значением `true` (отключить уведомления вебхуков в контексте данного запроса).                                          |
 
 **Примеры:**
 

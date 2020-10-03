@@ -12,7 +12,7 @@ test('Moysklad#parseUrl method', t => {
   const common = { endpoint, api, apiVersion }
 
   t.deepEqual(
-    ms.parseUrl('https://online.moysklad.ru/api/remap/1.1/path/to/my/res'),
+    ms.parseUrl('https://online.moysklad.ru/api/remap/1.2/path/to/my/res'),
     {
       ...common,
       path: ['path', 'to', 'my', 'res'],
@@ -33,7 +33,7 @@ test('Moysklad#parseUrl method', t => {
 
   t.deepEqual(
     ms.parseUrl(
-      'https://online.moysklad.ru/api/remap/1.1/path/to/my/res?a=1&b=2&' +
+      'https://online.moysklad.ru/api/remap/1.2/path/to/my/res?a=1&b=2&' +
         'a=one&c=&foo.bar=baz&filter=name%3Dfoo%3Bvalue%3Dbar&order=foo%2Casc'
     ),
     {
@@ -72,11 +72,11 @@ test('Moysklad#parseUrl method', t => {
   }, /Url не соответсвует/)
 
   t.throws(() => {
-    ms.parseUrl('https://online.moysklad.ru/api/remap/1.1')
+    ms.parseUrl('https://online.moysklad.ru/api/remap/1.2')
   }, /Url не соответсвует/)
 
   t.throws(() => {
-    ms.parseUrl('https://online.moysklad.ru/remap/1.1/path')
+    ms.parseUrl('https://online.moysklad.ru/remap/1.2/path')
   }, /Url не соответсвует/)
 
   t.end()

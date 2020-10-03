@@ -2399,7 +2399,7 @@ module.exports = {
 const getEnvVar = require('./getEnvVar')
 
 const DEFAULT_VERSIONS = {
-  remap: '1.1',
+  remap: '1.2',
   phone: '1.0',
   posap: '1.0',
   'moysklad/loyalty': '1.0'

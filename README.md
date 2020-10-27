@@ -64,7 +64,7 @@
 
 ## Установка
 
-> Поддерживаются версии node.js >=8.10
+> Поддерживаются версии node.js >=12
 
 ```
 $ npm install moysklad
@@ -81,6 +81,7 @@ $ npm install isomorphic-fetch
 
 ```js
 require('isomorphic-fetch') // polyfill
+
 const Moysklad = require('moysklad')
 
 const moysklad = Moysklad()
@@ -93,10 +94,11 @@ $ npm install node-fetch
 ```
 
 ```js
-const nodeFetch = require('node-fetch')
+const fetch = require('node-fetch')
+
 const Moysklad = require('moysklad')
 
-const moysklad = Moysklad({ fetch: nodeFetch })
+const moysklad = Moysklad({ fetch })
 ```
 
 В примерах выше приведены две наиболее популярные библиотеки реализующие Fetch API в node.js
@@ -782,9 +784,13 @@ ms.GET('entity/customerorder', { limit: 1 }).then(res => {
 
 > Ошибка при выполнении запроса
 
+extends MoyskladError
+
 #### MoyskladApiError
 
 > Ошибка API МойСклад
+
+extends MoyskladRequestError
 
 ## TODO
 

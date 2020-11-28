@@ -6,9 +6,7 @@ const getTimezoneFix = require('./getTimezoneFix')
 const timezoneFix = getTimezoneFix()
 
 // https://regex101.com/r/Bxq7dZ/2
-const MS_TIME_REGEX = new RegExp(
-  /^(\d{4})-(\d{2})-(\d{2})\s(\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,3}))?$/
-)
+const MS_TIME_REGEX = /^(\d{4})-(\d{2})-(\d{2})\s(\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,3}))?$/
 
 function rightPad2 (num) {
   return `${num}00`.slice(0, 3)

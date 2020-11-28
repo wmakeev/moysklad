@@ -45,7 +45,7 @@ test('Response with rawResponse option (with error)', t => {
     t.equal(err.code, 1005, 'should parse error code')
     t.equal(
       err.moreInfo,
-      'https://online.moysklad.ru/api/remap/1.2/doc#обработка-ошибок-1005',
+      'https://dev.moysklad.ru/doc/api/remap/1.2/#mojsklad-json-api-oshibki',
       'should parse error moreInfo'
     )
   })

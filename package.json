@@ -1,6 +1,6 @@
 {
   "name": "moysklad",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "description": "Библиотека для работы с API сервиса МойСклад",
   "main": "index.js",
   "types": "index.d.ts",
@@ -18,7 +18,6 @@
     "test-src": "node -r dotenv/config tests | tap-spec",
     "test-typings": "tsc --build tests/tsconfig.json",
     "test": "npm run lint && npm run test-typings && npm run build-dist && npm run test-src",
-    "prepublish": "npm run test",
     "coverage": "nyc --silent node -r dotenv/config ./tests --src src | tap-spec && nyc report --reporter=text --reporter=lcov",
     "coverage-report": "nyc report --reporter=text-lcov | coveralls"
   },
@@ -44,22 +43,22 @@
   },
   "homepage": "https://github.com/wmakeev/moysklad#readme",
   "dependencies": {
-    "@wmakeev/base64encode": "^1.0.0",
+    "@wmakeev/base64encode": "^1.1.0",
     "have2": "1.0.0-beta.1",
     "lodash.defaultsdeep": "^4.6.1",
     "stampit": "^4.3.1"
   },
   "devDependencies": {
     "blue-tape": "^1.0.0",
-    "browserify": "^16.5.2",
+    "browserify": "^17.0.0",
     "coveralls": "^3.1.0",
-    "debug": "^4.2.1",
+    "debug": "^4.3.1",
     "dotenv": "^8.2.0",
     "node-fetch": "^2.6.1",
     "nyc": "^15.1.0",
-    "standard": "^14.3.4",
+    "standard": "^16.0.3",
     "tap-spec": "^5.0.0",
-    "typescript": "^4.0.3",
+    "typescript": "^4.1.2",
     "walkdir": "0.4.1"
   },
   "engines": {

@@ -72,7 +72,9 @@ module.exports = async function fetchUrl (url, options = {}) {
   // response.ok → res.status >= 200 && res.status < 300
   if (!response.ok) {
     error = new MoyskladRequestError(
-      `${response.status} ${response.statusText}`,
+      `${response.status}${
+        response.statusText ? ` ${response.statusText}` : ''
+      }`,
       response
     )
   } else if (rawResponse) {

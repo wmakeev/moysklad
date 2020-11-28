@@ -1,21 +1,31 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.MoyskladCore = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 'use strict'
 
-/* eslint node/no-deprecated-api:0 */
+/* eslint node/no-deprecated-api:0, brace-style:0 */
+/* global Utilities */
 
 var encode
 
+// browser
 if (typeof btoa !== 'undefined') {
-  // browser
   encode = function (value) { return btoa(value) }
-} else if (typeof process !== 'undefined' && process.version) {
-  // node
+}
+
+// node
+else if (typeof process !== 'undefined' && process.version) {
   let nodeVersion = Number(process.version.match(/^v(\d+\.\d+)/)[1])
   encode = nodeVersion < 4.5
     ? function (value) { return new Buffer(value).toString('base64') }
     : function (value) { return Buffer.from(value).toString('base64') }
-} else {
-  // unknown context
+}
+
+// GAS
+else if (typeof Utilities !== 'undefined' && Utilities.base64Encode) {
+  encode = function (value) { return Utilities.base64Encode(value) }
+}
+
+// unknown context
+else {
   throw new Error('base64encode: Can\'t determine environment')
 }
 
@@ -2807,7 +2817,9 @@ module.exports = async function fetchUrl (url, options = {}) {
   // response.ok → res.status >= 200 && res.status < 300
   if (!response.ok) {
     error = new MoyskladRequestError(
-      `${response.status} ${response.statusText}`,
+      `${response.status}${
+        response.statusText ? ` ${response.statusText}` : ''
+      }`,
       response
     )
   } else if (rawResponse) {
@@ -3369,9 +3381,7 @@ const getTimezoneFix = require('./getTimezoneFix')
 const timezoneFix = getTimezoneFix()
 
 // https://regex101.com/r/Bxq7dZ/2
-const MS_TIME_REGEX = new RegExp(
-  /^(\d{4})-(\d{2})-(\d{2})\s(\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,3}))?$/
-)
+const MS_TIME_REGEX = /^(\d{4})-(\d{2})-(\d{2})\s(\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,3}))?$/
 
 function rightPad2 (num) {
   return `${num}00`.slice(0, 3)

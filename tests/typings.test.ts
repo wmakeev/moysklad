@@ -5,7 +5,9 @@ import Moysklad from '..'
 //#region Работа с датами
 const msDate: string = Moysklad.getTimeString(new Date())
 
+// getTimeString
 Moysklad.getTimeString(new Date(), true)
+Moysklad.getTimeString(123, true)
 
 const msParsedDate: Date = Moysklad.parseTimeString(msDate)
 //#endregion
@@ -71,4 +73,38 @@ ms.GET('foo/bar', {
 })
 
 ms.GET('foo/bar', { filter: 'some filter' })
+//#endregion
+
+//#region Ошибки
+const error = new Moysklad.MoyskladError('foo')
+
+const requestError = new Moysklad.MoyskladRequestError('foo')
+requestError.status
+requestError.statusText
+requestError.url
+
+const cond1: Moysklad.MoyskladRequestError extends Moysklad.MoyskladError
+  ? true
+  : never = true
+
+const apiError = new Moysklad.MoyskladApiError('foo')
+apiError.code
+apiError.errors
+apiError.message
+apiError.moreInfo
+apiError.name
+apiError.status
+apiError.statusText
+apiError.url
+
+const cond2: Moysklad.MoyskladApiError extends Moysklad.MoyskladRequestError
+  ? true
+  : never = true
+
+// @ts-expect-error
+const cond3: Moysklad.MoyskladRequestError extends Moysklad.MoyskladApiError
+  ? true
+  : never = true
+
+if (apiError instanceof Moysklad.MoyskladError) true
 //#endregion

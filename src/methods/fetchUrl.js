@@ -18,6 +18,11 @@ module.exports = async function fetchUrl (url, options = {}) {
   const emit = this.emitter ? this.emitter.emit.bind(this.emitter) : null
 
   const fetchOptions = defaultsDeep(
+    {
+      headers: {
+        'User-Agent': this.getOptions().userAgent
+      }
+    },
     { ...options },
     {
       headers: {

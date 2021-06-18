@@ -106,6 +106,13 @@ declare namespace Moysklad {
     getOptions(): Options
 
     /**
+     * Возвращает текущую версию библиотеки.
+     *
+     * Версия из package.json (поле `version`)
+     */
+    getVersion(): string
+
+    /**
      * Возвращает полный url для указанных параметров
      * @param path Путь к ресурсу или href
      * @param query Параметры строки запроса
@@ -298,6 +305,15 @@ declare namespace Moysklad {
      *
      */
     emitter?: any
+
+    /**
+     * Содержимое заголовка "User-Agent" при выполнении запроса.
+     *
+     * Удобно использовать для контроля изменений через API на вкладке "Аудит".
+     *
+     * По умолчанию: `moysklad/{version} (+https://github.com/wmakeev/moysklad)`
+     */
+    userAgent?: string
 
     [option: string]: any
   }
@@ -516,7 +532,7 @@ declare namespace Moysklad {
    * @param date дата
    * @param includeMs если `true`, то в результирующую дату будут включены миллисекунды
    */
-  export function getTimeString (date: Date, includeMs?: boolean): string
+  export function getTimeString (date: Date | number, includeMs?: boolean): string
 
   /**
    * Преобразует строку с датой в формате API МойСклад в объект даты (с учетом часового пояса исходной даты)
@@ -539,9 +555,9 @@ declare namespace Moysklad {
     error_message?: string
   }
 
-  export interface MoyskladError extends Error {}
+  export class MoyskladError extends Error {}
 
-  export interface MoyskladRequestError extends MoyskladError {
+  export class MoyskladRequestError extends MoyskladError {
     /** url http запроса */
     url?: string
 
@@ -552,7 +568,7 @@ declare namespace Moysklad {
     statusText?: string
   }
 
-  export interface MoyskladApiError extends MoyskladRequestError {
+  export class MoyskladApiError extends MoyskladRequestError {
     /** Код первой ошибки */
     code: number
 

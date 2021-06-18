@@ -26,7 +26,7 @@ class MoyskladRequestError extends MoyskladError {
 class MoyskladApiError extends MoyskladRequestError {
   constructor (errors, response) {
     const error = errors[0]
-    const message = error.error
+    const message = error.error + (error.moreInfo ? ` (${error.moreInfo})` : '')
 
     super(message, response)
 

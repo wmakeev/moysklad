@@ -2385,7 +2385,7 @@ class MoyskladRequestError extends MoyskladError {
 class MoyskladApiError extends MoyskladRequestError {
   constructor (errors, response) {
     const error = errors[0]
-    const message = error.error
+    const message = error.error + (error.moreInfo ? ` (${error.moreInfo})` : '')
 
     super(message, response)
 
@@ -2501,8 +2501,8 @@ module.exports = have.with(matchers)
 const stampit = require('stampit')
 
 const have = require('./have')
-const { MoyskladError } = require('./errors')
 const getApiDefaultVersion = require('./getApiDefaultVersion')
+const { version } = require('./version')
 
 // methods
 const getTimeString = require('./tools/getTimeString')
@@ -2515,6 +2515,13 @@ const GET = require('./methods/GET')
 const POST = require('./methods/POST')
 const PUT = require('./methods/PUT')
 const DELETE = require('./methods/DELETE')
+
+// errors
+const {
+  MoyskladApiError,
+  MoyskladError,
+  MoyskladRequestError
+} = require('./errors')
 
 // TODO Remove old methods
 module.exports = stampit({
@@ -2545,7 +2552,10 @@ module.exports = stampit({
   },
   statics: {
     getTimeString,
-    parseTimeString
+    parseTimeString,
+    MoyskladApiError,
+    MoyskladError,
+    MoyskladRequestError
   }
 }).init(function (options) {
   have(options, {
@@ -2585,7 +2595,8 @@ module.exports = stampit({
   const _options = Object.assign(
     {
       endpoint: 'https://online.moysklad.ru/api',
-      api: 'remap'
+      api: 'remap',
+      userAgent: `moysklad/${version} (+https://github.com/wmakeev/moysklad)`
     },
     options
   )
@@ -2602,9 +2613,13 @@ module.exports = stampit({
   this.getOptions = function () {
     return _options
   }
+
+  this.getVersion = function () {
+    return version
+  }
 })
 
-},{"./errors":5,"./getApiDefaultVersion":6,"./have":9,"./methods/DELETE":12,"./methods/GET":13,"./methods/POST":14,"./methods/PUT":15,"./methods/buildUrl":16,"./methods/fetchUrl":17,"./methods/getAuthHeader":18,"./methods/parseUrl":19,"./tools/getTimeString":22,"./tools/parseTimeString":28,"stampit":4}],11:[function(require,module,exports){
+},{"./errors":5,"./getApiDefaultVersion":6,"./have":9,"./methods/DELETE":12,"./methods/GET":13,"./methods/POST":14,"./methods/PUT":15,"./methods/buildUrl":16,"./methods/fetchUrl":17,"./methods/getAuthHeader":18,"./methods/parseUrl":19,"./tools/getTimeString":22,"./tools/parseTimeString":28,"./version":29,"stampit":4}],11:[function(require,module,exports){
 'use strict'
 
 const UUID_REGEX = /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/
@@ -2763,6 +2778,11 @@ module.exports = async function fetchUrl (url, options = {}) {
   const emit = this.emitter ? this.emitter.emit.bind(this.emitter) : null
 
   const fetchOptions = defaultsDeep(
+    {
+      headers: {
+        'User-Agent': this.getOptions().userAgent
+      }
+    },
     { ...options },
     {
       headers: {
@@ -3241,7 +3261,7 @@ function leftPad2 (num) {
 
 /**
  * Возвращает дату для фильтра в часовом поясе Москвы
- * @param {Date} date Конвертируемая дата
+ * @param {Date | number} date Конвертируемая дата
  * @param {Boolean} includeMs Необходимо ли включить миллисекунды в дату
  * @returns {string} Дата ввиде строки
  */
@@ -3408,5 +3428,7 @@ module.exports = function parseTimeString (timeString) {
   return timezoneFix ? new Date(+date - timezoneFix) : date
 }
 
-},{"../errors":5,"./getTimezoneFix":23}]},{},[10])(10)
+},{"../errors":5,"./getTimezoneFix":23}],29:[function(require,module,exports){
+module.exports = { version: '0.10.0' }
+},{}]},{},[10])(10)
 });

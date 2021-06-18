@@ -21,12 +21,18 @@ test('getTimeString', t => {
     'should return time string'
   )
 
+  t.equals(
+    getTimeString(+date1),
+    '2017-02-01 10:10:11',
+    'should return time string by date as number'
+  )
+
   const date2 = new Date('2017-02-01T07:10:11.123Z')
 
   t.equals(
     getTimeString(date2),
     '2017-02-01 10:10:11',
-    'should return time string with ms'
+    'should return time string without ms'
   )
 
   t.equals(

@@ -17,7 +17,7 @@ function leftPad2 (num) {
 
 /**
  * Возвращает дату для фильтра в часовом поясе Москвы
- * @param {Date} date Конвертируемая дата
+ * @param {Date | number} date Конвертируемая дата
  * @param {Boolean} includeMs Необходимо ли включить миллисекунды в дату
  * @returns {string} Дата ввиде строки
  */

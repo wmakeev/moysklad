@@ -143,16 +143,17 @@ ms.GET('entity/customerorder', {
 
 Все параметры опциональные (имеют значения по умолчанию)
 
-| Параметр     | Значение по умолчанию              | Описание                                                                                                                                                                                    |
-| ------------ | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `fetch`      | глобальный fetch                   | Функция с интерфейсом [Fetch API](https://developer.mozilla.org/ru/docs/Web/API/Fetch_API). Если глобальный fetch не найден, то будет выброшена ошибка при попытке осуществить http запрос. |
-| `endpoint`   | `"https://online.moysklad.ru/api"` | Точка досупа к API                                                                                                                                                                          |
-| `api`        | `"remap"`                          | Раздел API                                                                                                                                                                                  |
-| `apiVersion` | `"1.2"`                            | Версия API                                                                                                                                                                                  |
-| `token`      | `undefined`                        | Токен доступа к API (см. [Аутентификация](#аутентификация))                                                                                                                                 |
-| `login`      | `undefined`                        | Логин для доступа к API (см. [Аутентификация](#аутентификация))                                                                                                                             |
-| `password`   | `undefined`                        | Пароль для доступа к API (см. [Аутентификация](#аутентификация))                                                                                                                            |
-| `emitter`    | `undefined`                        | экземляр [EventEmitter](https://nodejs.org/api/events.html#events_class_eventemitter) для передачи [событий библиотеки](#события)                                                           |
+| Параметр     | Значение по умолчанию                                       | Описание                                                                                                                                                                                    |
+| ------------ | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `fetch`      | глобальный fetch                                            | Функция с интерфейсом [Fetch API](https://developer.mozilla.org/ru/docs/Web/API/Fetch_API). Если глобальный fetch не найден, то будет выброшена ошибка при попытке осуществить http запрос. |
+| `endpoint`   | `"https://online.moysklad.ru/api"`                          | Точка досупа к API                                                                                                                                                                          |
+| `api`        | `"remap"`                                                   | Раздел API                                                                                                                                                                                  |
+| `apiVersion` | `"1.2"`                                                     | Версия API                                                                                                                                                                                  |
+| `token`      | `undefined`                                                 | Токен доступа к API (см. [Аутентификация](#аутентификация))                                                                                                                                 |
+| `login`      | `undefined`                                                 | Логин для доступа к API (см. [Аутентификация](#аутентификация))                                                                                                                             |
+| `password`   | `undefined`                                                 | Пароль для доступа к API (см. [Аутентификация](#аутентификация))                                                                                                                            |
+| `emitter`    | `undefined`                                                 | экземляр [EventEmitter](https://nodejs.org/api/events.html#events_class_eventemitter) для передачи [событий библиотеки](#события)                                                           |
+| `userAgent`  | `moysklad/{version} (+https://github.com/wmakeev/moysklad)` | Содержимое заголовка "User-Agent" при выполнении запроса. Удобно использовать для контроля изменений через API на вкладке "Аудит".                                                          |
 
 Некоторые [внешние расширения](#расширения) могут добавлять свои дополнительные параметры.
 
@@ -774,23 +775,94 @@ ms.GET('entity/customerorder', { limit: 1 }).then(res => {
 
 ### Работа с ошибками
 
-> TODO Необходимо описать ошибоки и их свойства.
+Библиотека генерирует отдельные классы ошибок
 
 #### MoyskladError
 
-> Внутренняя ошибка библиотеки
+Наследует класс `Error`
+
+> Внутренняя ошибка библиотеки не связанная с выполнением запроса к API
+
+```js
+const Moysklad = require('moysklad')
+
+const ms = Moysklad()
+
+try {
+  await ms.GET('entity/product', {
+    filter: 123
+  })
+} catch (err) {
+  assert.ok(err instanceof Moysklad.MoyskladError)
+  assert.strictEqual(
+    err.message,
+    'Поле filter запроса должно быть строкой или объектом`
+  )
+}
+```
 
 #### MoyskladRequestError
 
 > Ошибка при выполнении запроса
 
-extends MoyskladError
+Наследует класс [MoyskladError](#moyskladerror)
+
+```js
+const Moysklad = require('moysklad')
+
+const ms = Moysklad({ fetch, api: 'foo', apiVersion: '1.0' })
+
+try {
+  await ms.GET('foo/bar')
+} catch (err) {
+  assert.ok(err instanceof Moysklad.MoyskladRequestError)
+  assert.strictEqual(err.name, 'MoyskladRequestError')
+  assert.strictEqual(err.message, '404 Not Found')
+  assert.strictEqual(err.status, 404)
+  assert.strictEqual(err.statusText, 'Not Found')
+  assert.strictEqual(err.url, 'https://online.moysklad.ru/api/foo/0/foo/bar')
+}
+```
 
 #### MoyskladApiError
 
 > Ошибка API МойСклад
 
-extends MoyskladRequestError
+Наследует класс [MoyskladRequestError](#moyskladrequesterror)
+
+```js
+const assert = require('assert')
+const Moysklad = require('moysklad')
+
+const ms = Moysklad({ fetch, api: 'foo', apiVersion: '1.0' })
+
+try {
+  await ms.PUT('entity/product', {
+    foo: 'bar'
+  })
+} catch (err) {
+  assert.ok(err instanceof Moysklad.MoyskladApiError)
+  assert.strictEqual(err.name, 'MoyskladApiError')
+  assert.strictEqual(
+    err.message,
+    'Не указан идентификатор объекта (https://dev.moysklad.ru/doc/api/remap/1.2/#error_1012)'
+  )
+  assert.strictEqual(err.code, 1012)
+  assert.strictEqual(
+    err.moreInfo,
+    'https://dev.moysklad.ru/doc/api/remap/1.2/#error_1012'
+  )
+  assert.strictEqual(err.status, 400)
+  assert.strictEqual(err.statusText, 'Bad Request')
+  assert.strictEqual(
+    err.url,
+    'https://online.moysklad.ru/api/remap/1.2/entity/product'
+  )
+  assert.strictEqual(err.errors[0].code, err.code)
+  assert.strictEqual(err.errors[0].error, 'Не указан идентификатор объекта')
+  assert.strictEqual(err.errors[0].moreInfo, err.moreInfo)
+}
+```
 
 ## TODO
 

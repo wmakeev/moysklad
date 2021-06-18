@@ -36,7 +36,11 @@ test('getResponseError (multi error response)', async t => {
     'should be instance of MoyskladApiError'
   )
 
-  t.equal(error.message, 'Ошибка 1', 'should set error message')
+  t.equal(
+    error.message,
+    'Ошибка 1 (https://path/to/info)',
+    'should set error message'
+  )
   t.equal(error.code, 1000, 'should set error code')
   t.equal(error.moreInfo, 'https://path/to/info', 'should set error moreInfo')
   t.equal(error.line, 1, 'should set error line')
@@ -57,7 +61,11 @@ test('getResponseError (single error response)', async t => {
     'should be instance of MoyskladApiError'
   )
 
-  t.equal(error.message, 'Ошибка 1', 'should set error message')
+  t.equal(
+    error.message,
+    'Ошибка 1 (https://path/to/info)',
+    'should set error message'
+  )
   t.deepEqual(error.errors, resp.errors, 'should set errors array')
 })
 
@@ -84,7 +92,11 @@ test('getResponseError (multi error batch response)', async t => {
     'should be instance of MoyskladApiError'
   )
 
-  t.equal(error.message, 'Ошибка 11', 'should set error message')
+  t.equal(
+    error.message,
+    'Ошибка 11 (https://path/to/info)',
+    'should set error message'
+  )
   t.equal(error.code, 1100, 'should set error code')
   t.equal(error.moreInfo, 'https://path/to/info', 'should set error moreInfo')
   t.equal(error.errors.length, 3, 'should set errors array')

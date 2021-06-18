@@ -86,7 +86,7 @@ test('Moysklad events (request error)', t => {
     .on('error', err => {
       t.equal(
         err.message,
-        "Неизвестный тип: 'customerorder2'",
+        "Неизвестный тип: 'customerorder2' (https://dev.moysklad.ru/doc/api/remap/1.2/#error_1005)",
         'should emit response error'
       )
     })

@@ -11,8 +11,8 @@
 const stampit = require('stampit')
 
 const have = require('./have')
-const { MoyskladError } = require('./errors')
 const getApiDefaultVersion = require('./getApiDefaultVersion')
+const { version } = require('./version')
 
 // methods
 const getTimeString = require('./tools/getTimeString')
@@ -25,6 +25,13 @@ const GET = require('./methods/GET')
 const POST = require('./methods/POST')
 const PUT = require('./methods/PUT')
 const DELETE = require('./methods/DELETE')
+
+// errors
+const {
+  MoyskladApiError,
+  MoyskladError,
+  MoyskladRequestError
+} = require('./errors')
 
 // TODO Remove old methods
 module.exports = stampit({
@@ -55,7 +62,10 @@ module.exports = stampit({
   },
   statics: {
     getTimeString,
-    parseTimeString
+    parseTimeString,
+    MoyskladApiError,
+    MoyskladError,
+    MoyskladRequestError
   }
 }).init(function (options) {
   have(options, {
@@ -95,7 +105,8 @@ module.exports = stampit({
   const _options = Object.assign(
     {
       endpoint: 'https://online.moysklad.ru/api',
-      api: 'remap'
+      api: 'remap',
+      userAgent: `moysklad/${version} (+https://github.com/wmakeev/moysklad)`
     },
     options
   )
@@ -111,5 +122,9 @@ module.exports = stampit({
 
   this.getOptions = function () {
     return _options
+  }
+
+  this.getVersion = function () {
+    return version
   }
 })

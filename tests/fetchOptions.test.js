@@ -39,13 +39,13 @@ test('Response with rawResponse option (with error)', t => {
     t.ok(err instanceof Error, 'should throw error')
     t.equal(
       err.message,
-      "Неизвестный тип: 'demand2'",
+      "Неизвестный тип: 'demand2' (https://dev.moysklad.ru/doc/api/remap/1.2/#error_1005)",
       'should parse error message'
     )
     t.equal(err.code, 1005, 'should parse error code')
     t.equal(
       err.moreInfo,
-      'https://dev.moysklad.ru/doc/api/remap/1.2/#mojsklad-json-api-oshibki',
+      'https://dev.moysklad.ru/doc/api/remap/1.2/#error_1005',
       'should parse error moreInfo'
     )
   })
@@ -68,7 +68,7 @@ test('Response with rawResponse and muteErrors options', async t => {
   }
 
   const { headers, status: code } = await ms.POST(
-    'entity/demand/773e16c5-ef53-11e6-7a69-9711001669c5/export/',
+    'entity/demand/13abf361-e9c6-45ea-a940-df70289a7f95/export/',
     body,
     null,
     {
@@ -81,7 +81,7 @@ test('Response with rawResponse and muteErrors options', async t => {
 
   t.ok(headers.get, 'headers should have get method')
   t.ok(
-    /vensi_tov_check-NA-dmd-09995.pdf/.test(headers.get('location')),
+    /vensi_tov_check-03033.pdf/.test(headers.get('location')),
     'headers Location header should contain url to from'
   )
 })

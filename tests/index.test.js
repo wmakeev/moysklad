@@ -20,6 +20,10 @@ test('Moysklad instance methods', t => {
   const ms = Moysklad({ fetch })
   t.ok(ms)
   t.equals(typeof ms.getOptions, 'function')
+
+  t.equals(typeof ms.getVersion, 'function')
+  t.ok(typeof ms.getVersion() === 'string')
+
   t.equals(typeof ms.getAuthHeader, 'function')
   t.equals(typeof ms.fetchUrl, 'function')
   t.equals(typeof ms.buildUrl, 'function')

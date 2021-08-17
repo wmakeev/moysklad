@@ -298,9 +298,7 @@ assert.equal(
 
 > GET запрос
 
-- `ms.GET(path: string | string[], query?: object, options?: object) : Promise`
-
-- `ms.GET(args: object) : Promise`
+- `ms.GET(path: string, query?: object, options?: object) : Promise`
 
 **Параметры:**
 
@@ -315,7 +313,7 @@ assert.equal(
 ```js
 const productsCollection = await ms.GET('entity/product', { limit: 50 })
 
-const order = await ms.GET(['entity', 'customerorder', orderId], {
+const order = await ms.GET(`entity/customerorder/${orderId}`, {
   expand: 'positions'
 })
 ```
@@ -344,6 +342,29 @@ const order = await ms.GET(['entity', 'customerorder', orderId], {
 const newProduct = await ms.POST('entity/product', { name: 'Новый товар' })
 ```
 
+По умолчанию, при массовом обновлении сущностей, если _хотябы один_ из элементов в ответе содержит ошибку, то метод вызовет ошибку
+[MoyskladApiError](#moyskladapierror) .
+
+Если такое поведение не является предпочтительным, то можно обрабатывать ошибки при массовом обновлении/создании объектов вручную (см. `muteErrors` в [параметрах запроса](#options-параметры-запроса)):
+
+```js
+const updated = await ms.POST('entity/supply', supplyList, null, {
+  muteErrors: true
+})
+
+const errors = updated
+  .filter(item => item.errors)
+  .map(item => item.errors[0].error)
+
+if (errors.length) {
+  console.log('Есть ошибки:', errors.join(', '))
+}
+
+const supplyHrefs = updated
+  .filter(item => !item.errors)
+  .map(item => item.meta.href)
+```
+
 #### PUT
 
 > PUT запрос
@@ -365,16 +386,14 @@ const newProduct = await ms.POST('entity/product', { name: 'Новый това�
 **Пример использования:**
 
 ```js
-const updatedProduct = await ms.PUT(['entity/product', id], product)
+const updatedProduct = await ms.PUT(`entity/product/${id}`, product)
 ```
 
 #### DELETE
 
 > DELETE запрос
 
-- `ms.DELETE(path: string | string[], options?: object) : Promise`
-
-- `ms.DELETE(args: object) : Promise`
+- `ms.DELETE(path: string, options?: object) : Promise`
 
 **Параметры:**
 
@@ -387,7 +406,7 @@ const updatedProduct = await ms.PUT(['entity/product', id], product)
 **Пример использования:**
 
 ```js
-await ms.DELETE(['entity/product', product.id])
+await ms.DELETE(`entity/product/${product.id}`)
 ```
 
 #### getOptions
@@ -416,10 +435,6 @@ assert.equal(msOptions.password, 'password')
 > Формирует url запроса
 
 - `ms.buildUrl(url: string, query?: object) : string`
-
-- `ms.buildUrl(path: string | string[], query?: object) : string`
-
-- `ms.buildUrl(args: object) : string`
 
 **Параметры:**
 
@@ -452,13 +467,15 @@ assert.equal(
 )
 ```
 
-```js
-const url = ms.buildUrl(['entity', 'customerorder'], { expand: 'positions' })
+Можно безопасно дублировать символы `/`, лишние знаки будут сключены из
+результирующего url
 
-assert.equal(
-  url,
-  'https://online.moysklad.ru/api/remap/1.2/entity/customerorder?expand=positions'
-)
+```js
+const positionUrl = `/positions/${posId}/`
+
+const url = ms.buildUrl(`entity/customerorder/` + positionUrl)
+
+assert.equal(url, `entity/customerorder/positions/${posId}`)
 ```
 
 #### parseUrl
@@ -516,24 +533,36 @@ const updatedOrder = await ms.fetchUrl(url, {
 
 ##### `path`
 
-Строка или массив строк.
+Строка.
 
 **Примеры:**
 
-```js
-// Три запроса ниже аналогичны
+Url запроса можно указать полностью
 
+```js
 ms.GET(
   `https://online.moysklad.ru/api/remap/1.2/entity/customerorder/${ORDER_ID}/positions/${POSITION_ID}?expand=assortment`
 )
+```
 
+Но гораздо удобнее указывать путь только после версии API и выносить
+параметры запроса в параметры метода. Полный url будет сгенерирован автоматически, согласно [настройкам экземпляра](#параметры-инициализации).
+
+Ниже пример аналогичного запроса:
+
+```js
 ms.GET(`entity/customerorder/${ORDER_ID}/positions/${POSITION_ID}`, {
   expand: 'assortment'
 })
+```
 
-ms.GET(['entity/customerorder', ORDER_ID, 'positions', POSITION_ID], {
-  expand: 'assortment'
-})
+Можно безопасно дублировать символы `/`, лишние знаки будут сключены из
+результирующего url
+
+```js
+const positionUrl = `/positions/${posId}`
+
+ms.GET(`entity/customerorder/` + positionUrl)
 ```
 
 ##### `query`
@@ -663,10 +692,9 @@ bar!=;bar.baz=1;code=03;code=1;code=2;foo=1999-12-31 22:00:00;moment<=2001-01-02
   const body = {
     template: {
       meta: {
-        href: ms.buildUrl([
-          'entity/demand/metadata/customtemplate',
-          TEMPLATE_ID
-        ]),
+        href: ms.buildUrl(
+          `entity/demand/metadata/customtemplate/${TEMPLATE_ID}`
+        ),
         type: 'customtemplate',
         mediaType: 'application/json'
       }
@@ -675,7 +703,7 @@ bar!=;bar.baz=1;code=03;code=1;code=2;foo=1999-12-31 22:00:00;moment<=2001-01-02
   }
 
   const { headers, status } = await ms.POST(
-    ['entity/demand', DEMAND_ID, 'export'],
+    `entity/demand/${DEMAND_ID}/export`,
     body,
     null,
     {
@@ -698,14 +726,14 @@ bar!=;bar.baz=1;code=03;code=1;code=2;foo=1999-12-31 22:00:00;moment<=2001-01-02
   const folder = {
     meta: {
       type: 'productfolder',
-      href: ms.buildUrl(['entity/productfolder', FOLDER_ID])
+      href: ms.buildUrl(`entity/productfolder/${FOLDER_ID}`)
     },
     description: 'Новое описание группы товаров'
   }
 
   // Указываем кастомный заголовок X-Lognex-WebHook-Disable для PUT запроса
   const updatedFolder = await ms.PUT(
-    ['entity/productfolder', FOLDER_ID],
+    `entity/productfolder/${FOLDER_ID}`,
     folder,
     null,
     {
@@ -730,14 +758,12 @@ bar!=;bar.baz=1;code=03;code=1;code=2;foo=1999-12-31 22:00:00;moment<=2001-01-02
   const PRODUCT_UI_ID = 'cb277549-34f4-4029-b9de-7b37e8e25a54'
 
   // Error: 308 Permanent Redirect
-  await ms.fetchUrl(
-    ms.buildUrl(['entity/product', PRODUCT_UI_ID]
-  )
+  await ms.fetchUrl(ms.buildUrl(`entity/product/${PRODUCT_UI_ID}`))
 
   // Указана опция redirect
   const product = await ms.fetchUrl(
-    ms.buildUrl(['entity/product', PRODUCT_UI_ID]),
-    { redirect: 'follow'}
+    ms.buildUrl(`entity/product/${PRODUCT_UI_ID}`),
+    { redirect: 'follow' }
   )
 
   assert.ok(product) // OK

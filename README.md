@@ -222,7 +222,9 @@ const moysklad = Moysklad({
 
 > Преобразует локальную дату в строку в формате API МойСклад в часовом поясе Москвы
 
-`Moysklad.getTimeString(date: Date, includeMs?: boolean) : string`
+```ts
+Moysklad.getTimeString(date: Date, includeMs?: boolean): string
+```
 
 **Параметры:**
 
@@ -259,7 +261,9 @@ assert.equal(timeString, '2017-02-01 07:10:11')
 
 > Преобразует строку с датой в формате API МойСклад в объект даты (с учетом локального часового пояса и часового пояса API МойСклад)
 
-`Moysklad.parseTimeString(date: string) : Date`
+```ts
+Moysklad.parseTimeString(date: string) : Date
+```
 
 **Параметры:**
 
@@ -298,7 +302,9 @@ assert.equal(
 
 > GET запрос
 
-- `ms.GET(path: string, query?: object, options?: object) : Promise`
+```ts
+ms.GET(path: string, query?: object, options?: object): Promise
+```
 
 **Параметры:**
 
@@ -322,9 +328,14 @@ const order = await ms.GET(`entity/customerorder/${orderId}`, {
 
 > POST запрос
 
-- `ms.POST(path: string | string[], payload?: object|Array<object>, query?: object, options?: object) : Promise`
-
-- `ms.POST(args: object) : Promise`
+```ts
+ms.POST(
+  path: string,
+  payload?: object | Array<object>,
+  query?: object,
+  options?: object
+): Promise
+```
 
 **Параметры:**
 
@@ -365,13 +376,20 @@ const supplyHrefs = updated
   .map(item => item.meta.href)
 ```
 
+> TODO С другой стороны, в примере выше можно получить другой вид ошибки. Например timeout и метод вернет `undefined`. Выходит, нужно конкретизировать тип ошибки в `muteErrors`.
+
 #### PUT
 
 > PUT запрос
 
-- `ms.PUT(path: string | string[], payload?: object, query?: object, options?: object) : Promise`
-
-- `ms.PUT(args: object) : Promise`
+```ts
+ms.PUT(
+  path: string | string[],
+  payload?: object,
+  query?: object,
+  options?: object
+) : Promise
+```
 
 **Параметры:**
 
@@ -393,7 +411,9 @@ const updatedProduct = await ms.PUT(`entity/product/${id}`, product)
 
 > DELETE запрос
 
-- `ms.DELETE(path: string, options?: object) : Promise`
+```ts
+ms.DELETE(path: string, options?: object): Promise
+```
 
 **Параметры:**
 
@@ -434,7 +454,9 @@ assert.equal(msOptions.password, 'password')
 
 > Формирует url запроса
 
-- `ms.buildUrl(url: string, query?: object) : string`
+```ts
+ms.buildUrl(url: string, query?: object): string
+```
 
 **Параметры:**
 
@@ -482,7 +504,15 @@ assert.equal(url, `entity/customerorder/positions/${posId}`)
 
 > Разбор url на составные компоненты
 
-- `ms.parseUrl(url: string) : object`
+```ts
+ms.parseUrl(url: string): {
+  endpoint: string
+  api: string
+  apiVersion: string
+  path: Array<string>
+  query: object
+}
+```
 
 **Параметры:**
 
@@ -508,7 +538,9 @@ assert.deepEqual(parsedUri, {
 
 > Выполнить запрос по указанному url
 
-- `ms.fetchUrl(url: string, options?: object) : Promise`
+```ts
+ms.fetchUrl(url: string, options?: object): Promise
+```
 
 **Параметры:**
 

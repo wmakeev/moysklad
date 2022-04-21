@@ -1,35 +1,35 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.MoyskladCore = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 'use strict'
 
-/* eslint node/no-deprecated-api:0, brace-style:0 */
-/* global Utilities */
-
-var encode
-
-// browser
-if (typeof btoa !== 'undefined') {
-  encode = function (value) { return btoa(value) }
-}
+let encode
 
 // node
-else if (typeof process !== 'undefined' && process.version) {
-  let nodeVersion = Number(process.version.match(/^v(\d+\.\d+)/)[1])
-  encode = nodeVersion < 4.5
-    ? function (value) { return new Buffer(value).toString('base64') }
-    : function (value) { return Buffer.from(value).toString('base64') }
+if (typeof process !== 'undefined' && process.version) {
+  encode = function (value) {
+    return Buffer.from(value).toString('base64')
+  }
+}
+
+// browser
+else if (typeof btoa !== 'undefined') {
+  encode = function (value) {
+    return btoa(value)
+  }
 }
 
 // GAS
 else if (typeof Utilities !== 'undefined' && Utilities.base64Encode) {
-  encode = function (value) { return Utilities.base64Encode(value) }
+  encode = function (value) {
+    return Utilities.base64Encode(value)
+  }
 }
 
 // unknown context
 else {
-  throw new Error('base64encode: Can\'t determine environment')
+  throw new Error("base64encode: Can't determine environment")
 }
 
-module.exports = function base64encode (value) {
+module.exports = function base64encode(value) {
   return encode(String(value))
 }
 
@@ -2354,8 +2354,7 @@ function stubFalse() {
 module.exports = defaultsDeep;
 
 },{}],4:[function(require,module,exports){
-!function(){"use strict";var f,p="roperties",c="ropertyDescriptors",t="static",a="onfiguration",s="p"+p,l="deepP"+p,y="p"+c,d=t+"P"+p,m=t+"DeepP"+p,v=t+"P"+c,h="c"+a,P="deepC"+a,_="deepProps",b="deepStatics",g="deepConf",O="initializers",w="methods",A="composers",D="compose",r="object",S="length",n=Object,j=Array.isArray,x=n.defineProperties,C=n.defineProperty,N=n.getOwnPropertyDescriptor,e=n.getOwnPropertySymbols,z=Array.prototype,o=z.concat,E=z.slice;function I(t){return n.getOwnPropertyNames(t).concat(e?e(t):[])}function i(t,r){return E.call(arguments,2).reduce(t,r)}var R=i.bind(0,function t(r,n){if(n)for(var e,o=I(n),i=0;i<o.length;i+=1)e=N(n,o[i]),C(r,o[i],e);return r});function V(t){return"function"==typeof t}function k(t){return t&&typeof t==r||V(t)}function q(t){return t&&typeof t==r&&t.__proto__==n.prototype}var B=i.bind(0,function t(r,n){if(n===f)return r;if(j(n))return(j(r)?r:[]).concat(n);if(!q(n))return n;for(var e,o,i=I(n),u=0;u<i[S];)e=i[u++],(o=N(n,e)).hasOwnProperty("value")?o.value!==f&&(r[e]=t(q(r[e])||j(n[e])?r[e]:{},n[e])):C(r,e,o);return r});function F(){return(p=o.apply([],arguments).filter(function(t,r,n){return V(t)&&n.indexOf(t)===r}))[S]?p:f}function u(t){return p=function t(){return function t(r){var n,e,o=t[D]||{},i={__proto__:o[w]},u=o[O],p=E.apply(arguments),c=o[l];if(c&&B(i,c),(c=o[s])&&R(i,c),(c=o[y])&&x(i,c),!u||!u[S])return i;for(r===f&&(r={}),o=0;o<u[S];)V(n=u[o++])&&(i=(e=n.call(i,r,{instance:i,stamp:t,args:p}))===f?i:e);return i}}(),(c=t[m])&&B(p,c),(c=t[d])&&R(p,c),(c=t[v])&&x(p,c),c=V(p[D])?p[D]:H,R(p[D]=function(){return c.apply(this,arguments)},t),p}function G(n,e){function t(t,r){k(e[t])&&(k(n[t])||(n[t]={}),(r||R)(n[t],e[t]))}function r(t){(p=F(n[t],e[t]))&&(n[t]=p)}return e&&k(e=e[D]||e)&&(t(w),t(s),t(l,B),t(y),t(d),t(m,B),t(v),t(h),t(P,B),r(O),r(A)),n}function H(){return u(o.apply([this],arguments).reduce(G,{}))}function J(t){return V(t)&&V(t[D])}var K={};function L(t,r){return function(){return(a={})[t]=r.apply(f,o.apply([{}],arguments)),((p=this)&&p[D]||c).call(p,a)}}K[w]=L(w,R),K[s]=K.props=L(s,R),K[O]=K.init=L(O,F),K[A]=L(A,F),K[l]=K[_]=L(l,B),K[d]=K.statics=L(d,R),K[m]=K[b]=L(m,B),K[h]=K.conf=L(h,R),K[P]=K[g]=L(P,B),K[y]=L(y,R),K[v]=L(v,R),c=K[D]=R(function t(){for(var r,n,e=0,o=[],i=arguments,u=this;e<i[S];)k(r=i[e++])&&o.push(J(r)?r:((a={})[w]=(n=r)[w]||f,c=n.props,a[s]=k((p=n[s])||c)?R({},c,p):f,a[O]=F(n.init,n[O]),a[A]=F(n[A]),c=n[_],a[l]=k((p=n[l])||c)?B({},c,p):f,a[y]=n[y],c=n.statics,a[d]=k((p=n[d])||c)?R({},c,p):f,c=n[b],a[m]=k((p=n[m])||c)?B({},c,p):f,p=n[v],a[v]=k((c=n.name&&{name:{value:n.name}})||p)?R({},p,c):f,c=n.conf,a[h]=k((p=n[h])||c)?R({},c,p):f,c=n[g],a[P]=k((p=n[P])||c)?B({},c,p):f,a));if(r=H.apply(u||z,o),u&&o.unshift(u),j(i=r[D][A]))for(e=0;e<i[S];)r=J(u=i[e++]({stamp:r,composables:o}))?u:r;return r},K),K["create"]=function(){return this.apply(f,arguments)},(a={})[d]=K,z=H(a),c[D]=c.bind(),c.version="4.3.1",typeof f!=typeof module?module.exports=c:self.stampit=c}();
-
+!function(){"use strict";var u,c,a,s,f,y="properties",l="deepProperties",b="propertyDescriptors",d="staticProperties",O="staticDeepProperties",h="staticPropertyDescriptors",g="configuration",m="deepConfiguration",P="deepProps",A="deepStatics",j="deepConf",v="initializers",_="methods",w="composers",D="compose";function S(r){return Object.getOwnPropertyNames(r).concat(Object.getOwnPropertySymbols?Object.getOwnPropertySymbols(r):[])}function r(r,t){return Array.prototype.slice.call(arguments,2).reduce(r,t)}var x=r.bind(0,function r(t,e){if(e)for(var n=S(e),o=0;o<n.length;o+=1)Object.defineProperty(t,n[o],Object.getOwnPropertyDescriptor(e,n[o]));return t});function C(r){return"function"==typeof r}function N(r){return r&&"object"==typeof r||C(r)}function z(r){return r&&"object"==typeof r&&r.__proto__==Object.prototype}var E=r.bind(0,function r(t,e){if(e===u)return t;if(Array.isArray(e))return(Array.isArray(t)?t:[]).concat(e);if(!z(e))return e;for(var n,o,i=S(e),p=0;p<i.length;)n=i[p++],(o=Object.getOwnPropertyDescriptor(e,n)).hasOwnProperty("value")?o.value!==u&&(t[n]=r(z(t[n])||Array.isArray(e[n])?t[n]:{},e[n])):Object.defineProperty(t,n,o);return t});function I(){return(c=Array.prototype.concat.apply([],arguments).filter(function(r,t,e){return C(r)&&e.indexOf(r)===t})).length?c:u}function t(r){return c=function r(){return function r(t){var e,n,o=r[D]||{},i={__proto__:o[_]},p=o[v],c=Array.prototype.slice.apply(arguments),a=o[l];if(a&&E(i,a),(a=o[y])&&x(i,a),(a=o[b])&&Object.defineProperties(i,a),!p||!p.length)return i;for(t===u&&(t={}),o=0;o<p.length;)C(e=p[o++])&&(i=(n=e.call(i,t,{instance:i,stamp:r,args:c}))===u?i:n);return i}}(),(a=r[O])&&E(c,a),(a=r[d])&&x(c,a),(a=r[h])&&Object.defineProperties(c,a),a=C(c[D])?c[D]:R,x(c[D]=function(){return a.apply(this,arguments)},r),c}function e(e,n){function r(r,t){N(n[r])&&(N(e[r])||(e[r]={}),(t||x)(e[r],n[r]))}function t(r){(c=I(e[r],n[r]))&&(e[r]=c)}return n&&N(n=n[D]||n)&&(r(_),r(y),r(l,E),r(b),r(d),r(O,E),r(h),r(g),r(m,E),t(v),t(w)),e}function R(){return t(Array.prototype.concat.apply([this],arguments).reduce(e,{}))}function V(r){return C(r)&&C(r[D])}var n={};function o(r,t){return function(){return(s={})[r]=t.apply(u,Array.prototype.concat.apply([{}],arguments)),((c=this)&&c[D]||a).call(c,s)}}n[_]=o(_,x),n[y]=n.props=o(y,x),n[v]=n.init=o(v,I),n[w]=o(w,I),n[l]=n[P]=o(l,E),n[d]=n.statics=o(d,x),n[O]=n[A]=o(O,E),n[g]=n.conf=o(g,x),n[m]=n[j]=o(m,E),n[b]=o(b,x),n[h]=o(h,x),a=n[D]=x(function r(){for(var t,e,n=0,o=[],i=arguments,p=this;n<i.length;)N(t=i[n++])&&o.push(V(t)?t:((s={})[_]=(e=t)[_]||u,a=e.props,s[y]=N((c=e[y])||a)?x({},a,c):u,s[v]=I(e.init,e[v]),s[w]=I(e[w]),a=e[P],s[l]=N((c=e[l])||a)?E({},a,c):u,s[b]=e[b],a=e.statics,s[d]=N((c=e[d])||a)?x({},a,c):u,a=e[A],s[O]=N((c=e[O])||a)?E({},a,c):u,c=e[h],s[h]=N((a=e.name&&{name:{value:e.name}})||c)?x({},c,a):u,a=e.conf,s[g]=N((c=e[g])||a)?x({},a,c):u,a=e[j],s[m]=N((c=e[m])||a)?E({},a,c):u,s));if(t=R.apply(p||f,o),p&&o.unshift(p),Array.isArray(i=t[D][w]))for(n=0;n<i.length;)t=V(p=i[n++]({stamp:t,composables:o}))?p:t;return t},n),n.create=function(){return this.apply(u,arguments)},(s={})[d]=n,f=R(s),a[D]=a.bind(),a.version="4.3.2",typeof u!=typeof module?module.exports=a:self.stampit=a}();
 },{}],5:[function(require,module,exports){
 'use strict'
 
@@ -3429,6 +3428,6 @@ module.exports = function parseTimeString (timeString) {
 }
 
 },{"../errors":5,"./getTimezoneFix":23}],29:[function(require,module,exports){
-module.exports = { version: '0.10.0' }
+module.exports = { version: '0.10.1' }
 },{}]},{},[10])(10)
 });

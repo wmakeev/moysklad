@@ -80,11 +80,31 @@ test('Moysklad#buildUrl method', t => {
   t.equals(
     ms.buildUrl(
       'https://online.moysklad.ru/api/remap/1.2/entity/purchaseorder' +
+        '/191ebffa-45df-11e6-7a69-93a7000513f8/positions?expand=agent&limit=10&offset=100',
+      null
+    ),
+    'https://online.moysklad.ru/api/remap/1.2/entity/purchaseorder' +
+      '/191ebffa-45df-11e6-7a69-93a7000513f8/positions?expand=agent&limit=10&offset=100'
+  )
+
+  t.equals(
+    ms.buildUrl(
+      'https://online.moysklad.ru/api/remap/1.2/entity/purchaseorder' +
         '/191ebffa-45df-11e6-7a69-93a7000513f8/positions',
       {}
     ),
     'https://online.moysklad.ru/api/remap/1.2/entity/purchaseorder' +
       '/191ebffa-45df-11e6-7a69-93a7000513f8/positions'
+  )
+
+  t.equals(
+    ms.buildUrl(
+      'https://online.moysklad.ru/api/remap/1.2/entity/purchaseorder' +
+        '/191ebffa-45df-11e6-7a69-93a7000513f8/positions?expand=agent&limit=10&offset=100',
+      {}
+    ),
+    'https://online.moysklad.ru/api/remap/1.2/entity/purchaseorder' +
+      '/191ebffa-45df-11e6-7a69-93a7000513f8/positions?expand=agent&limit=10&offset=100'
   )
 
   t.end()

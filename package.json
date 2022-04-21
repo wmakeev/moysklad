@@ -1,6 +1,6 @@
 {
   "name": "moysklad",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "description": "Библиотека для работы с API сервиса МойСклад",
   "main": "index.js",
   "types": "index.d.ts",
@@ -43,22 +43,22 @@
   },
   "homepage": "https://github.com/wmakeev/moysklad#readme",
   "dependencies": {
-    "@wmakeev/base64encode": "^1.1.0",
+    "@wmakeev/base64encode": "^2.0.1",
     "have2": "1.0.0-beta.1",
     "lodash.defaultsdeep": "^4.6.1",
-    "stampit": "^4.3.1"
+    "stampit": "^4.3.2"
   },
   "devDependencies": {
     "blue-tape": "^1.0.0",
     "browserify": "^17.0.0",
-    "coveralls": "^3.1.0",
-    "debug": "^4.3.1",
-    "dotenv": "^8.2.0",
+    "coveralls": "^3.1.1",
+    "debug": "^4.3.4",
+    "dotenv": "^16.0.0",
     "node-fetch": "^2.6.1",
     "nyc": "^15.1.0",
-    "standard": "^16.0.3",
+    "standard": "^17.0.0",
     "tap-spec": "^5.0.0",
-    "typescript": "^4.1.2",
+    "typescript": "^4.6.3",
     "walkdir": "0.4.1"
   },
   "engines": {

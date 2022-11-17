@@ -2851,9 +2851,11 @@ module.exports = async function fetchUrl (url, options = {}) {
     response.headers.get('Content-Type').indexOf('application/json') !== -1
   ) {
     // response.json() может вызвать ошибку, если тело ответа пустое
-    try {
-      resBodyJson = await response.json()
-    } catch (e) {}
+    const resBodyText = await response.text()
+
+    if (resBodyText) {
+      resBodyJson = JSON.parse(resBodyText)
+    }
 
     if (emit) {
       emit('response:body', {
@@ -3428,6 +3430,6 @@ module.exports = function parseTimeString (timeString) {
 }
 
 },{"../errors":5,"./getTimezoneFix":23}],29:[function(require,module,exports){
-module.exports = { version: '0.10.1' }
+module.exports = { version: '0.10.2' }
 },{}]},{},[10])(10)
 });

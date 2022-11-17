@@ -92,9 +92,11 @@ module.exports = async function fetchUrl (url, options = {}) {
     response.headers.get('Content-Type').indexOf('application/json') !== -1
   ) {
     // response.json() может вызвать ошибку, если тело ответа пустое
-    try {
-      resBodyJson = await response.json()
-    } catch (e) {}
+    const resBodyText = await response.text()
+
+    if (resBodyText) {
+      resBodyJson = JSON.parse(resBodyText)
+    }
 
     if (emit) {
       emit('response:body', {

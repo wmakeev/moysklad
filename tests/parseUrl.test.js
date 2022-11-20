@@ -1,7 +1,7 @@
 'use strict'
 
-const test = require('blue-tape')
-const fetch = require('node-fetch')
+const test = require('tape')
+const { fetch } = require('undici')
 
 const Moysklad = require('..')
 
@@ -40,17 +40,17 @@ test('Moysklad#parseUrl method', t => {
       ...common,
       path: ['path', 'to', 'my', 'res'],
       query: {
-        a: [1, 'one'],
-        b: 2,
-        c: null,
+        'a': [1, 'one'],
+        'b': 2,
+        'c': null,
         'foo.bar': 'baz',
-        filter: 'name=foo;value=bar',
+        'filter': 'name=foo;value=bar',
         // TODO Filter parsing
         // filter: {
         //   name: 'foo',
         //   value: 'bar'
         // }
-        order: 'foo,asc'
+        'order': 'foo,asc'
       }
     }
   )

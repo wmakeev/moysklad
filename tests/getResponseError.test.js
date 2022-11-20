@@ -1,6 +1,6 @@
 'use strict'
 
-const test = require('blue-tape')
+const test = require('tape')
 const getResponseError = require('../src/getResponseError')
 const { MoyskladError, MoyskladApiError } = require('../src/errors')
 

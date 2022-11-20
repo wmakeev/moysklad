@@ -1,6 +1,6 @@
 'use strict'
 
-const test = require('blue-tape')
+const test = require('tape')
 const buildQuery = require('../../src/tools/buildQuery')
 
 test('buildQuery', t => {

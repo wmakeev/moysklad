@@ -1,4 +1,6 @@
-const fetch = require('node-fetch')
+/* eslint node/no-extraneous-require:0, no-unused-vars:0 */
+
+const { fetch } = require('undici')
 const Moysklad = require('moysklad')
 const { EventEmitter } = require('events')
 

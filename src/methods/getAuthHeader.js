@@ -13,7 +13,7 @@ const bearerAuth = token => `Bearer ${token}`
 const basicAuth = (login, password) =>
   'Basic ' + base64encode(`${login}:${password}`)
 
-module.exports = function getAuthHeader () {
+module.exports = function getAuthHeader() {
   let token
   let login
   let password

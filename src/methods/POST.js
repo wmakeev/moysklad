@@ -2,9 +2,14 @@
 
 const have = require('../have')
 
-module.exports = function POST (...args) {
+module.exports = function POST(...args) {
   // TODO Test payload: 'Object or Object arr'
-  const { path, payload, query, options = {} } = have.strict(args, [
+  const {
+    path,
+    payload,
+    query,
+    options = {}
+  } = have.strict(args, [
     {
       path: 'str or str arr',
       payload: 'opt Object or Object arr',

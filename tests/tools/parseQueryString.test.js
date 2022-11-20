@@ -1,6 +1,6 @@
 'use strict'
 
-const test = require('blue-tape')
+const test = require('tape')
 const parseQueryString = require('../../src/tools/parseQueryString')
 
 test('parseQueryString', t => {
@@ -39,14 +39,14 @@ test('parseQueryString', t => {
         'bool=true&f=&notBool= true'
     ),
     {
-      a: [1, 'tow', null, 4, null, 'five'],
-      b: '3three',
-      c: 'three ',
-      e: 'qwerty 123 ',
+      'a': [1, 'tow', null, 4, null, 'five'],
+      'b': '3three',
+      'c': 'three ',
+      'e': 'qwerty 123 ',
       'foo.bar': ' baz',
-      bool: true,
-      notBool: ' true',
-      f: null
+      'bool': true,
+      'notBool': ' true',
+      'f': null
     },
     'should parse complex query'
   )

@@ -1,3 +1,5 @@
+/* eslint node/no-extraneous-require:0 */
+
 const { URL } = require('url')
 const assert = require('assert')
 const Moysklad = require('moysklad')

@@ -1,6 +1,6 @@
 'use strict'
 
-const test = require('blue-tape')
+const test = require('tape')
 const parseTimeString = require('../../src/tools/parseTimeString')
 
 test('parseTimeString', t => {

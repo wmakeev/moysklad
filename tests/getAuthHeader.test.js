@@ -1,6 +1,6 @@
 'use strict'
 
-const test = require('blue-tape')
+const test = require('tape')
 const base64encode = require('@wmakeev/base64encode')
 
 const Moysklad = require('..')

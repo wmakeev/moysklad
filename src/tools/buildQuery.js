@@ -18,7 +18,7 @@ const addQueryPart = (res, key) => val => {
   }
 }
 
-module.exports = function buildQuery (query) {
+module.exports = function buildQuery(query) {
   // совместимость с remap 1.2
   if (query.expand && query.limit == null) {
     query.limit = 100

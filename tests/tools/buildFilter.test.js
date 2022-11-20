@@ -1,6 +1,6 @@
 'use strict'
 
-const test = require('blue-tape')
+const test = require('tape')
 const buildFilter = require('../../src/tools/buildFilter')
 
 test('buildFilter', t => {
@@ -34,14 +34,14 @@ test('buildFilter with simple filter', t => {
 
 test('buildFilter with simple deep and many condition filter', t => {
   const filter = {
-    name: 'foo',
-    value: 0,
-    moment: new Date('2017-01-09T19:15:06.556Z'),
+    'name': 'foo',
+    'value': 0,
+    'moment': new Date('2017-01-09T19:15:06.556Z'),
     'deep.one': 5,
-    deep: {
+    'deep': {
       tow: false
     },
-    many: [1, 'baz']
+    'many': [1, 'baz']
   }
 
   t.deepEqual(

@@ -1,7 +1,7 @@
 const { MoyskladError } = require('../errors')
 const getEnvVar = require('../getEnvVar')
 
-module.exports = function getTimezoneFix () {
+module.exports = function getTimezoneFix() {
   const localTimeZoneOffset = -(new Date().getTimezoneOffset() * 60 * 1000)
 
   /** Локальная временная зона в мс */

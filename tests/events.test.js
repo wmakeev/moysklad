@@ -1,7 +1,7 @@
 'use strict'
 
-const test = require('blue-tape')
-const fetch = require('node-fetch')
+const test = require('tape')
+const { fetch } = require('undici')
 const { EventEmitter } = require('events')
 
 const Moysklad = require('..')

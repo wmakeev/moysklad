@@ -2,8 +2,12 @@
 
 const have = require('../have')
 
-module.exports = function GET (...args) {
-  const { path, query, options = {} } = have.strict(args, [
+module.exports = function GET(...args) {
+  const {
+    path,
+    query,
+    options = {}
+  } = have.strict(args, [
     { path: 'str or str arr', query: 'opt Object', options: 'opt Object' },
     have.argumentsObject
   ])

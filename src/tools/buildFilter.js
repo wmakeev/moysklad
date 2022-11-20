@@ -58,9 +58,9 @@ selectors.nin.not = selectors.in
 
 const comparisonSelectors = Object.keys(selectors).reduce((res, key) => {
   const op = selectors[key]
-  res['$' + key] = (op.collection
-    ? createCollectionSelector
-    : createValueSelector)(op)
+  res['$' + key] = (
+    op.collection ? createCollectionSelector : createValueSelector
+  )(op)
   return res
 }, {})
 
@@ -74,7 +74,7 @@ const invertFilterPart = fp => {
   return [fp[0], fp[1].not, fp[2]]
 }
 
-function getFilterParts (path, value) {
+function getFilterParts(path, value) {
   const pathLen = path.length
   const curKey = pathLen ? path[pathLen - 1] : null
 
@@ -136,7 +136,7 @@ function getFilterParts (path, value) {
   }
 }
 
-module.exports = function buildFilter (filter) {
+module.exports = function buildFilter(filter) {
   if (!isPlainObject(filter)) {
     throw new MoyskladError('Поле filter должно быть объектом')
   }

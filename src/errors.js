@@ -1,7 +1,7 @@
 'use strict'
 
 class MoyskladError extends Error {
-  constructor (message) {
+  constructor(message) {
     super(message)
     this.name = this.constructor.name
     /* istanbul ignore else  */
@@ -12,7 +12,7 @@ class MoyskladError extends Error {
 }
 
 class MoyskladRequestError extends MoyskladError {
-  constructor (message, response) {
+  constructor(message, response) {
     super(message)
 
     if (response) {
@@ -24,7 +24,7 @@ class MoyskladRequestError extends MoyskladError {
 }
 
 class MoyskladApiError extends MoyskladRequestError {
-  constructor (errors, response) {
+  constructor(errors, response) {
     const error = errors[0]
     const message = error.error + (error.moreInfo ? ` (${error.moreInfo})` : '')
 

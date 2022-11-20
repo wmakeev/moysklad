@@ -7,11 +7,11 @@ const timezoneFix = getTimezoneFix()
 /** Временная зона API МойСклад (часовой пояс в мс) */
 const mskTimezone = +3 * 60 * 60 * 1000 // ms
 
-function leftPad1 (num) {
+function leftPad1(num) {
   return `0${num}`.slice(-2)
 }
 
-function leftPad2 (num) {
+function leftPad2(num) {
   return `00${num}`.slice(-3)
 }
 
@@ -21,7 +21,7 @@ function leftPad2 (num) {
  * @param {Boolean} includeMs Необходимо ли включить миллисекунды в дату
  * @returns {string} Дата ввиде строки
  */
-module.exports = function getTimeString (date, includeMs) {
+module.exports = function getTimeString(date, includeMs) {
   const mskTime = new Date(+date + mskTimezone + timezoneFix)
 
   const milliseconds = mskTime.getUTCMilliseconds()

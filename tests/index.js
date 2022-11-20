@@ -1,11 +1,19 @@
 'use strict'
 
-const walk = require('walkdir')
-
-const TEST_FILES_PATTERN = /.+\.test\.js$/i
-
-walk.sync(__dirname, function (path, stat) {
-  if (TEST_FILES_PATTERN.test(path)) {
-    require(path)
-  }
-})
+require('./tools/buildFilter.test')
+require('./tools/buildQuery.test')
+require('./tools/getTimeString.test')
+require('./tools/normalizeUrl.test')
+require('./tools/parseQueryString.test')
+require('./tools/parseTimeString.test')
+require('./getAuthHeader.test')
+require('./matchers.test')
+require('./parseUrl.test')
+require('./buildUrl.test')
+require('./index.test')
+require('./fetchUrl.test')
+require('./fetchOptions.test')
+require('./DELETE.test')
+require('./errorsHandle.test')
+require('./getResponseError.test')
+require('./events.test')

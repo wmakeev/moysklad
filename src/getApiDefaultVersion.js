@@ -3,20 +3,20 @@
 const getEnvVar = require('./getEnvVar')
 
 const DEFAULT_VERSIONS = {
-  remap: '1.2',
-  phone: '1.0',
-  posap: '1.0',
+  'remap': '1.2',
+  'phone': '1.0',
+  'posap': '1.0',
   'moysklad/loyalty': '1.0'
 }
 
 const ENV_KEY = {
-  remap: 'REMAP',
-  phone: 'PHONE',
-  posap: 'POSAP',
+  'remap': 'REMAP',
+  'phone': 'PHONE',
+  'posap': 'POSAP',
   'moysklad/loyalty': 'LOYALTY'
 }
 
-function getApiDefaultVersion (api) {
+function getApiDefaultVersion(api) {
   if (!api) return null
 
   const apiVersion = DEFAULT_VERSIONS[api]

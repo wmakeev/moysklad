@@ -6,7 +6,7 @@ const have = require('../have')
 const getResponseError = require('../getResponseError')
 const { MoyskladRequestError } = require('../errors')
 
-module.exports = async function fetchUrl (url, options = {}) {
+module.exports = async function fetchUrl(url, options = {}) {
   have.strict(arguments, { url: 'url', options: 'opt Object' })
 
   let resBodyJson, error

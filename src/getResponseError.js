@@ -2,7 +2,7 @@
 
 const { MoyskladApiError } = require('./errors')
 
-module.exports = function getResponseError (responseBody, response) {
+module.exports = function getResponseError(responseBody, response) {
   let errors
 
   if (!responseBody) return null

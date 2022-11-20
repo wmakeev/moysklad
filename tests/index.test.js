@@ -1,7 +1,9 @@
 'use strict'
 
-const test = require('blue-tape')
-const fetch = require('node-fetch')
+/* global window */
+
+const test = require('tape')
+const { fetch } = require('undici')
 
 const Moysklad = require('..')
 

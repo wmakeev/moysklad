@@ -8,7 +8,7 @@ const parseQueryString = require('../tools/parseQueryString')
 // https://regex101.com/r/yQgvn4/4
 const URL_REGEX = /^(https:\/\/.+\/api)\/(.+)\/(\d+\.\d+)\/([^?]+)(?:\?(.+))?$/
 
-module.exports = function parseUrl (...args) {
+module.exports = function parseUrl(...args) {
   const { url, path } = have.strict(args, [
     { url: 'url' },
     { path: 'str or str arr' }

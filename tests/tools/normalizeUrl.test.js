@@ -1,6 +1,6 @@
 'use strict'
 
-const test = require('blue-tape')
+const test = require('tape')
 const normalizeUrl = require('../../src/tools/normalizeUrl')
 
 test('normalizeUrl', t => {

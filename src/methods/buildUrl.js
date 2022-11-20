@@ -4,7 +4,8 @@ const have = require('../have')
 const buildQuery = require('../tools/buildQuery')
 const normalizeUrl = require('../tools/normalizeUrl')
 
-module.exports = function buildUrl (...args) {
+module.exports = function buildUrl(...args) {
+  // eslint-disable-next-line prefer-const
   let { url, path, query } = have.strict(args, [
     { url: 'url', query: 'opt Object' },
     { path: 'str or str arr', query: 'opt Object' },
@@ -22,7 +23,9 @@ module.exports = function buildUrl (...args) {
 
   const { endpoint, api, apiVersion } = this.getOptions()
 
-  let resultUrl = normalizeUrl([endpoint, api, apiVersion].concat(path).join('/'))
+  let resultUrl = normalizeUrl(
+    [endpoint, api, apiVersion].concat(path).join('/')
+  )
 
   if (query) {
     const queryString = buildQuery(query)

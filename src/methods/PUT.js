@@ -2,8 +2,13 @@
 
 const have = require('../have')
 
-module.exports = function PUT (...args) {
-  const { path, payload, query, options = {} } = have.strict(args, [
+module.exports = function PUT(...args) {
+  const {
+    path,
+    payload,
+    query,
+    options = {}
+  } = have.strict(args, [
     {
       path: 'str or str arr',
       payload: 'opt Object',

@@ -1,6 +1,6 @@
 'use strict'
 
-function extractQueryValue (str) {
+function extractQueryValue(str) {
   if (str === '') {
     return null
   }
@@ -17,13 +17,13 @@ function extractQueryValue (str) {
   return decodeURIComponent(str)
 }
 
-function extractQueryValues (str) {
+function extractQueryValues(str) {
   return str.indexOf(',') !== -1
     ? str.split(',').map(v => extractQueryValue(v))
     : [extractQueryValue(str)]
 }
 
-module.exports = function parseQueryString (queryString) {
+module.exports = function parseQueryString(queryString) {
   if (queryString == null || queryString === '') {
     return undefined
   }

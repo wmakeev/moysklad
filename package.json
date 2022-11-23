@@ -14,9 +14,9 @@
   ],
   "scripts": {
     "lint": "eslint . --fix",
-    "clean": "echo 'clean'",
-    "build": "npm run clean && node ./scripts/lib-version.js",
+    "clean": "echo 'no clean'",
     "bundle": "webpack",
+    "build": "npm run clean && node ./scripts/lib-version.js",
     "test-src": "node -r dotenv/config tests",
     "test-typings": "tsc --build tests/tsconfig.json",
     "test": "npm run lint && npm run test-typings && npm run build && npm run bundle && npm run test-src",

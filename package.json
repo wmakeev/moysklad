@@ -17,7 +17,7 @@
     "clean": "echo 'no clean'",
     "pick-version": "node ./scripts/lib-version.js",
     "bundle": "webpack",
-    "build": "npm run clean && npm run pick-version",
+    "build": "npm run clean",
     "test-src": "node -r dotenv/config tests",
     "test-typings": "tsc --build tests/tsconfig.json",
     "test": "npm run lint && npm run test-typings && npm run build && npm run bundle && npm run test-src",

@@ -15,12 +15,14 @@
   "scripts": {
     "lint": "eslint . --fix",
     "clean": "echo 'no clean'",
+    "pick-version": "node ./scripts/lib-version.js",
     "bundle": "webpack",
-    "build": "npm run clean && node ./scripts/lib-version.js",
+    "build": "npm run clean && npm run pick-version",
     "test-src": "node -r dotenv/config tests",
     "test-typings": "tsc --build tests/tsconfig.json",
     "test": "npm run lint && npm run test-typings && npm run build && npm run bundle && npm run test-src",
     "coverage": "c8 node -r dotenv/config ./tests --src src --reporter text --reporter lcov --skip-full",
+    "version": "npm run pick-version && npm run bundle && git add src/version.js bundle/*",
     "release": "np"
   },
   "repository": {
@@ -67,6 +69,7 @@
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^4.2.1",
+    "np": "*",
     "prettier": "^2.7.1",
     "tape": "^5.6.1",
     "typescript": "^4.9.3",

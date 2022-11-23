@@ -7,5 +7,5 @@ const package = JSON.parse(
 
 fs.writeFileSync(
   path.join(process.cwd(), 'src/version.js'),
-  `module.exports = { version: '${package.version}' }`
+  `module.exports = { version: '${package.version}' }\n`
 )

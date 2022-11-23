@@ -574,7 +574,6 @@ const getTimeString = __webpack_require__(9)
 const parseTimeString = __webpack_require__(562)
 const buildFilter = __webpack_require__(656)
 const buildQuery = __webpack_require__(467)
-const getTimezoneShift = __webpack_require__(928)
 const getAuthHeader = __webpack_require__(706)
 const buildUrl = __webpack_require__(831)
 const parseUrl = __webpack_require__(60)
@@ -634,7 +633,6 @@ module.exports = stampit({
   statics: {
     getTimeString,
     parseTimeString,
-    getTimezoneShift,
     buildFilter,
     buildQuery,
     MoyskladError,

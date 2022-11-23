@@ -5,8 +5,8 @@ env:
 language: node_js
 
 node_js:
-  - '12'
   - '16'
+  - '18'
 
 before_script:
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
@@ -18,9 +18,6 @@ script:
 
 after_script:
   - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
-
-after_success:
-  - npm run coverage-report
 
 notifications:
   email: false

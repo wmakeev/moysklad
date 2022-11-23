@@ -17,8 +17,6 @@ const ENV_KEY = {
 }
 
 function getApiDefaultVersion(api) {
-  if (!api) return null
-
   const apiVersion = DEFAULT_VERSIONS[api]
   const envKey = ENV_KEY[api] || api.replace(/\W/g, '_').toUpperCase()
   const envName = `MOYSKLAD_${envKey}_API_VERSION`

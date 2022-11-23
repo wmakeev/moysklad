@@ -35,7 +35,7 @@ module.exports = function parseUrl(...args) {
 
   if (!endpoint || !api || !apiVersion || !pathStr) {
     throw new MoyskladError(
-      `parseUrl: Url не соответсвует API МойСклад - ${url || path}`
+      `parseUrl: Url не соответствует API МойСклад - ${url || path}`
     )
   }
 

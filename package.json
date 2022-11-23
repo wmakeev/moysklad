@@ -5,6 +5,7 @@
   "main": "index.js",
   "types": "index.d.ts",
   "files": [
+    "bundle",
     "src",
     "tools",
     "index.js",
@@ -12,14 +13,15 @@
     "README.md"
   ],
   "scripts": {
-    "lint": "standard src/*/**",
-    "clean-dist": "rm -rf dist || : && mkdir -p dist",
-    "build-dist": "npm run clean-dist && node ./scripts/lib-version.js && browserify --no-builtins --detect-globals false -s MoyskladCore -o dist/moysklad.js src/index.js",
-    "test-src": "node -r dotenv/config tests | tap-spec",
+    "lint": "eslint . --fix",
+    "clean": "echo 'clean'",
+    "build": "npm run clean && node ./scripts/lib-version.js",
+    "bundle": "webpack",
+    "test-src": "node -r dotenv/config tests",
     "test-typings": "tsc --build tests/tsconfig.json",
-    "test": "npm run lint && npm run test-typings && npm run build-dist && npm run test-src",
-    "coverage": "nyc --silent node -r dotenv/config ./tests --src src | tap-spec && nyc report --reporter=text --reporter=lcov",
-    "coverage-report": "nyc report --reporter=text-lcov | coveralls"
+    "test": "npm run lint && npm run test-typings && npm run build && npm run bundle && npm run test-src",
+    "coverage": "c8 node -r dotenv/config ./tests --src src --reporter text --reporter lcov --skip-full",
+    "release": "np"
   },
   "repository": {
     "type": "git",
@@ -42,26 +44,37 @@
     "url": "https://github.com/wmakeev/moysklad/issues"
   },
   "homepage": "https://github.com/wmakeev/moysklad#readme",
+  "prettier": {
+    "semi": false,
+    "singleQuote": true,
+    "quoteProps": "consistent",
+    "trailingComma": "none",
+    "arrowParens": "avoid"
+  },
+  "np": {
+    "yarn": false
+  },
   "dependencies": {
     "@wmakeev/base64encode": "^2.0.1",
     "have2": "1.0.0-beta.1",
-    "lodash.defaultsdeep": "^4.6.1",
     "stampit": "^4.3.2"
   },
   "devDependencies": {
-    "blue-tape": "^1.0.0",
-    "browserify": "^17.0.0",
-    "coveralls": "^3.1.1",
-    "debug": "^4.3.4",
-    "dotenv": "^16.0.0",
-    "node-fetch": "^2.6.1",
-    "nyc": "^15.1.0",
-    "standard": "^17.0.0",
-    "tap-spec": "^5.0.0",
-    "typescript": "^4.6.3",
-    "walkdir": "0.4.1"
+    "@types/node": "^18.11.9",
+    "c8": "^7.12.0",
+    "dotenv": "^16.0.3",
+    "eslint": "^8.28.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "prettier": "^2.7.1",
+    "tape": "^5.6.1",
+    "typescript": "^4.9.3",
+    "undici": "^5.12.0",
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.0"
   },
   "engines": {
-    "node": ">=12"
+    "node": ">=16.8"
   }
 }

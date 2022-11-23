@@ -2,7 +2,11 @@
 
 const test = require('tape')
 const getResponseError = require('../src/getResponseError')
-const { MoyskladError, MoyskladApiError } = require('../src/errors')
+const {
+  MoyskladError,
+  MoyskladApiError,
+  MoyskladCollectionError
+} = require('../src/errors')
 
 const createFooError = (message, code) => ({
   meta: {
@@ -69,7 +73,7 @@ test('getResponseError (single error response)', async t => {
   t.deepEqual(error.errors, resp.errors, 'should set errors array')
 })
 
-test('getResponseError (multi error batch response)', async t => {
+test('getResponseError (multi error batch response) #1', async t => {
   const resp = [
     { foo: 'bar1' },
     {
@@ -100,4 +104,50 @@ test('getResponseError (multi error batch response)', async t => {
   t.equal(error.code, 1100, 'should set error code')
   t.equal(error.moreInfo, 'https://path/to/info', 'should set error moreInfo')
   t.equal(error.errors.length, 3, 'should set errors array')
+})
+
+test('getResponseError (multi error batch response) #2', async t => {
+  const resp = [
+    { foo: 'bar1' },
+    {
+      errors: [
+        createFooError('Ошибка 11', 1100),
+        createFooError('Ошибка 12', 1200)
+      ]
+    },
+    { foo: 'bar2' },
+    {
+      errors: [createFooError('Ошибка 21', 2100)]
+    }
+  ]
+
+  const error = getResponseError(resp)
+
+  t.ok(
+    error instanceof MoyskladCollectionError,
+    'should be instance of MoyskladCollectionError'
+  )
+  t.ok(
+    error instanceof MoyskladApiError,
+    'should be instance of MoyskladApiError'
+  )
+
+  t.equal(
+    error.message,
+    'Ошибка 11 (https://path/to/info)',
+    'should set error message'
+  )
+  t.equal(error.code, 1100, 'should set error code')
+  t.equal(error.moreInfo, 'https://path/to/info', 'should set error moreInfo')
+  t.equal(error.errors.length, 3, 'should set errors array')
+  t.equal(error.errorsIndexes.length, 2, 'should set errorsIndexes array')
+
+  t.equal(error.errorsIndexes[0][0], 1, 'should set errors index array')
+  t.equal(error.errorsIndexes[0][1].length, 2, 'should set errors for index')
+  t.equal(error.errorsIndexes[0][1][0].code, 1100, 'should set error in array')
+  t.equal(error.errorsIndexes[0][1][1].code, 1200, 'should set error in array')
+
+  t.equal(error.errorsIndexes[1][0], 3, 'should set errors index array')
+  t.equal(error.errorsIndexes[1][1].length, 1, 'should set errors for index')
+  t.equal(error.errorsIndexes[1][1][0].code, 2100, 'should set error in array')
 })

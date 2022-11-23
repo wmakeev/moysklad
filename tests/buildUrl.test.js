@@ -13,11 +13,13 @@ test('Moysklad#buildUrl method', t => {
     'https://online.moysklad.ru/api/remap/1.2/path/To/My/Res'
   )
 
+  // TODO deprecated
   t.equals(
     ms.buildUrl(['/path/', 'To//My', 'Res/']),
     'https://online.moysklad.ru/api/remap/1.2/path/To/My/Res'
   )
 
+  // TODO deprecated
   t.equals(
     ms.buildUrl(['path', 'to', 'res'], {
       a: 1,
@@ -28,6 +30,7 @@ test('Moysklad#buildUrl method', t => {
     'https://online.moysklad.ru/api/remap/1.2/path/to/res?a=1&b=tow&c=true&d=0&d=2'
   )
 
+  // TODO deprecated
   t.equals(
     ms.buildUrl(['path', 'to', 'res'], {
       a: 1,

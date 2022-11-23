@@ -3,7 +3,7 @@
 const test = require('tape')
 
 test('getTimeString', t => {
-  const getTimeString = require('../../src/tools/getTimeString')
+  const { getTimeString } = require('../..')
 
   t.ok(getTimeString)
   t.equals(typeof getTimeString, 'function', 'should be function')
@@ -11,7 +11,7 @@ test('getTimeString', t => {
 })
 
 test('getTimeString', t => {
-  const getTimeString = require('../../src/tools/getTimeString')
+  const { getTimeString } = require('../..')
 
   const date1 = new Date('2017-02-01T07:10:11Z')
 

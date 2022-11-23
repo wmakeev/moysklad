@@ -1,7 +1,7 @@
 'use strict'
 
 const test = require('tape')
-const buildFilter = require('../../src/tools/buildFilter')
+const { buildFilter } = require('../..')
 
 test('buildFilter', t => {
   t.ok(buildFilter)
@@ -60,7 +60,7 @@ test('buildFilter with simple deep and many condition filter', t => {
   t.end()
 })
 
-test('buildFilter with mogo query comparison selectors', t => {
+test('buildFilter with Mongo query comparison selectors', t => {
   const filter = {
     name: {
       $eq: 'foo'
@@ -91,7 +91,7 @@ test('buildFilter with mogo query comparison selectors', t => {
     },
     many: {
       $exists: true,
-      $in: [1, 'baz']
+      $in: [1, 1, 'baz']
     },
     notMany: {
       $nin: [3, 6],
@@ -111,6 +111,7 @@ test('buildFilter with mogo query comparison selectors', t => {
       'end=~psfx',
       'many!=',
       'many=1',
+      'many=1',
       'many=baz',
       'moment<=2017-01-09 22:15:06.556',
       'name=foo',
@@ -127,7 +128,7 @@ test('buildFilter with mogo query comparison selectors', t => {
   t.end()
 })
 
-test('buildFilter with mogo query logical selectors', t => {
+test('buildFilter with Mongo query logical selectors', t => {
   const filter = {
     name: {
       $and: [{ $eq: 'foo' }, { $eq: 'bar' }]
@@ -156,6 +157,38 @@ test('buildFilter with mogo query logical selectors', t => {
       'value!=6'
     ].join(';')
   )
+
+  t.end()
+})
+
+test('buildFilter with $and query selectors', t => {
+  const filter1 = {
+    name: {
+      $and: [
+        { $eq: 'foo' },
+        {
+          $not: {
+            $eq: 10,
+            $in: [5, 6]
+          }
+        }
+      ]
+    }
+  }
+  const filter1Str = buildFilter(filter1)
+
+  const filter2 = {
+    name: {
+      $eq: 'foo',
+      $not: {
+        $eq: 10,
+        $in: [5, 6]
+      }
+    }
+  }
+  const filter2Str = buildFilter(filter2)
+
+  t.equal(filter1Str, filter2Str)
 
   t.end()
 })

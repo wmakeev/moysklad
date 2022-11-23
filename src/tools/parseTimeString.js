@@ -1,9 +1,9 @@
 'use strict'
 
 const { MoyskladError } = require('../errors')
-const getTimezoneFix = require('./getTimezoneFix')
+const getTimezoneShift = require('./getTimezoneShift')
 
-const timezoneFix = getTimezoneFix()
+const timezoneFix = getTimezoneShift()
 
 // https://regex101.com/r/Bxq7dZ/2
 const MS_TIME_REGEX =

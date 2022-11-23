@@ -4,6 +4,7 @@ const test = require('tape')
 const { fetch } = require('undici')
 
 const Moysklad = require('..')
+const { MoyskladError } = require('..')
 
 test('Moysklad#parseUrl method', t => {
   const ms = Moysklad({ fetch })
@@ -68,16 +69,21 @@ test('Moysklad#parseUrl method', t => {
   })
 
   t.throws(() => {
-    ms.parseUrl('https://foo.ru/bar/baz')
-  }, /Url не соответсвует/)
+    try {
+      ms.parseUrl('https://foo.ru/bar/baz')
+    } catch (err) {
+      t.ok(err instanceof MoyskladError)
+      throw err
+    }
+  }, /Url не соответствует/)
 
   t.throws(() => {
     ms.parseUrl('https://online.moysklad.ru/api/remap/1.2')
-  }, /Url не соответсвует/)
+  }, /Url не соответствует/)
 
   t.throws(() => {
     ms.parseUrl('https://online.moysklad.ru/remap/1.2/path')
-  }, /Url не соответсвует/)
+  }, /Url не соответствует/)
 
   t.end()
 })

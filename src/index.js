@@ -17,6 +17,8 @@ const { version } = require('./version')
 // methods
 const getTimeString = require('./tools/getTimeString')
 const parseTimeString = require('./tools/parseTimeString')
+const buildFilter = require('./tools/buildFilter')
+const buildQuery = require('./tools/buildQuery')
 const getAuthHeader = require('./methods/getAuthHeader')
 const buildUrl = require('./methods/buildUrl')
 const parseUrl = require('./methods/parseUrl')
@@ -30,42 +32,59 @@ const DELETE = require('./methods/DELETE')
 const {
   MoyskladApiError,
   MoyskladError,
-  MoyskladRequestError
+  MoyskladRequestError,
+  MoyskladCollectionError,
+  MoyskladUnexpectedRedirectError
 } = require('./errors')
 
 // TODO Remove old methods
 module.exports = stampit({
   methods: {
     getAuthHeader,
+
     buildUrl,
-    /* istanbul ignore next */
+
+    /* c8 ignore next 3 */
     buildUri(...args) {
       console.log('Warning: метод buildUri переименован в buildUrl')
       return this.buildUrl(...args)
     },
+
     parseUrl,
-    /* istanbul ignore next */
+
+    /* c8 ignore next 3 */
     parseUri(...args) {
       console.log('Warning: метод parseUri переименован в parseUrl')
       return this.parseUrl(...args)
     },
+
     fetchUrl,
-    /* istanbul ignore next */
+
+    /* c8 ignore next 3 */
     fetchUri(...args) {
       console.log('Warning: метод fetchUri переименован в fetchUrl')
       return this.fetchUrl(...args)
     },
+
     GET,
+
     POST,
+
     PUT,
+
     DELETE
   },
+
   statics: {
     getTimeString,
     parseTimeString,
-    MoyskladApiError,
+    buildFilter,
+    buildQuery,
     MoyskladError,
-    MoyskladRequestError
+    MoyskladRequestError,
+    MoyskladUnexpectedRedirectError,
+    MoyskladApiError,
+    MoyskladCollectionError
   }
 }).init(function (options) {
   have(options, {
@@ -113,6 +132,7 @@ module.exports = stampit({
 
   if (!_options.apiVersion) {
     const apiVersion = getApiDefaultVersion(_options.api)
+
     if (apiVersion) {
       _options.apiVersion = apiVersion
     } else {

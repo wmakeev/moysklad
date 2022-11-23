@@ -1,3 +1,5 @@
+// @ts-check
+
 // Тесты для index.d.ts
 
 import Moysklad from '..'
@@ -46,7 +48,10 @@ ms.GET(
   }
 )
 
-ms.GET('foo/bar', null, { muteErrors: true })
+async function case1() {
+  await ms.GET('foo/bar', null, { rawResponse: true })
+  await ms.GET('foo/bar', null, { muteCollectionErrors: true })
+}
 
 const filter: Moysklad.QueryFilter = {
   foo: 'bar',
@@ -103,6 +108,10 @@ const cond2: Moysklad.MoyskladApiError extends Moysklad.MoyskladRequestError
 
 // @ts-expect-error
 const cond3: Moysklad.MoyskladRequestError extends Moysklad.MoyskladApiError
+  ? true
+  : never = true
+
+const cond4: Moysklad.MoyskladUnexpectedRedirectError extends Moysklad.MoyskladRequestError
   ? true
   : never = true
 

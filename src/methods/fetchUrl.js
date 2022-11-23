@@ -1,36 +1,40 @@
 'use strict'
 
-const defaultsDeep = require('lodash.defaultsdeep')
-
 const have = require('../have')
 const getResponseError = require('../getResponseError')
-const { MoyskladRequestError } = require('../errors')
+const {
+  MoyskladRequestError,
+  MoyskladApiError,
+  MoyskladCollectionError,
+  MoyskladUnexpectedRedirectError
+} = require('../errors')
+
+let globalRequestId = 0
 
 module.exports = async function fetchUrl(url, options = {}) {
+  const requestId = ++globalRequestId
+
   have.strict(arguments, { url: 'url', options: 'opt Object' })
 
-  let resBodyJson, error
+  let result, error
 
   // Специфические параметры (не передаются в опции fetch)
   let rawResponse = false
-  let muteErrors = false
+  let rawRedirect = false
+  let muteApiErrors = false
+  let muteCollectionErrors = false
 
   const emit = this.emitter ? this.emitter.emit.bind(this.emitter) : null
 
-  const fetchOptions = defaultsDeep(
-    {
-      headers: {
-        'User-Agent': this.getOptions().userAgent
-      }
-    },
-    { ...options },
-    {
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      redirect: 'manual'
+  const fetchOptions = {
+    redirect: 'manual',
+    ...options,
+    headers: {
+      'User-Agent': this.getOptions().userAgent,
+      'Content-Type': 'application/json',
+      ...options.headers
     }
-  )
+  }
 
   if (!fetchOptions.headers.Authorization) {
     fetchOptions.credentials = 'include'
@@ -41,9 +45,21 @@ module.exports = async function fetchUrl(url, options = {}) {
     rawResponse = true
     delete fetchOptions.rawResponse
   }
-  if (fetchOptions.muteErrors) {
-    muteErrors = true
+  if (fetchOptions.rawRedirect) {
+    rawRedirect = true
+    delete fetchOptions.rawRedirect
+  }
+  if (/* depricated */ fetchOptions.muteErrors) {
+    muteApiErrors = true
     delete fetchOptions.muteErrors
+  }
+  if (fetchOptions.muteApiErrors) {
+    muteApiErrors = true
+    delete fetchOptions.muteApiErrors
+  }
+  if (fetchOptions.muteCollectionErrors) {
+    muteCollectionErrors = true
+    delete fetchOptions.muteCollectionErrors
   }
 
   // X-Lognex
@@ -65,25 +81,30 @@ module.exports = async function fetchUrl(url, options = {}) {
     fetchOptions.headers.Authorization = this.getAuthHeader()
   }
 
-  if (emit) emit('request', { url, options: fetchOptions })
+  if (emit) emit('request', { requestId, url, options: fetchOptions })
 
   /** @type {Response} */
   const response = await this.fetch(url, fetchOptions)
 
-  if (emit) emit('response', { url, options: fetchOptions, response })
+  if (emit)
+    emit('response', { requestId, url, options: fetchOptions, response })
 
-  if (rawResponse && muteErrors) return response
+  if (rawResponse) return response
 
-  // response.ok → res.status >= 200 && res.status < 300
-  if (!response.ok) {
+  if (response.status >= 300 && response.status < 400) {
+    if (rawRedirect) {
+      return response
+    } else {
+      throw new MoyskladUnexpectedRedirectError(response)
+    }
+  }
+
+  // response.ok → response.status >= 200 && response.status < 300
+  if (response.status < 200 || response.status >= 300) {
     error = new MoyskladRequestError(
-      `${response.status}${
-        response.statusText ? ` ${response.statusText}` : ''
-      }`,
+      [response.status, response.statusText].filter(it => it).join(' '),
       response
     )
-  } else if (rawResponse) {
-    return response
   }
 
   // разбираем тело запроса
@@ -95,24 +116,36 @@ module.exports = async function fetchUrl(url, options = {}) {
     const resBodyText = await response.text()
 
     if (resBodyText) {
-      resBodyJson = JSON.parse(resBodyText)
+      result = JSON.parse(resBodyText)
+    } else {
+      result = undefined
     }
 
-    if (emit) {
-      emit('response:body', {
-        url,
-        options: fetchOptions,
-        response,
-        body: resBodyJson
-      })
-    }
-    error = getResponseError(resBodyJson, response) || error
+    error = getResponseError(result, response) || error
   }
 
-  if (error && !muteErrors) {
-    if (emit) emit('error', error)
+  if (emit) {
+    emit('response:body', {
+      requestId,
+      url,
+      options: fetchOptions,
+      response,
+      body: result
+    })
+  }
+
+  if (error) {
+    if (error instanceof MoyskladApiError && muteApiErrors) {
+      return result
+    }
+
+    if (error instanceof MoyskladCollectionError && muteCollectionErrors) {
+      return result
+    }
+
+    if (emit) emit('error', error, { requestId })
     throw error
   }
 
-  return rawResponse ? response : resBodyJson
+  return result
 }

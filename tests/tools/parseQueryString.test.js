@@ -1,7 +1,7 @@
 'use strict'
 
 const test = require('tape')
-const parseQueryString = require('../../src/tools/parseQueryString')
+const parseQueryString = require('../../tools/parseQueryString')
 
 test('parseQueryString', t => {
   t.ok(parseQueryString)

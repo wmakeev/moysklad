@@ -4,21 +4,31 @@ export = Moysklad
  * Создает экземпляр клиента для рабты с API МойСклад
  * @param options Параметры инициализации экземпляра
  */
-declare function Moysklad (options?: Moysklad.Options): Moysklad.Instance
+declare function Moysklad(options?: Moysklad.Options): Moysklad.Instance
 
 declare namespace Moysklad {
   export interface Instance {
     /**
      * Выполняет GET запрос по указанному ресурсу
+     *
      * @param path Путь к ресурсу
      * @param query Строка запроса
      * @param options Опции запроса
      */
     GET(
-      path: string | string[],
+      path: string,
       query?: Query | null,
       options?: RequestOptions
     ): Promise<any>
+
+    /** @deprecated */
+    GET(
+      path: string[],
+      query?: Query | null,
+      options?: RequestOptions
+    ): Promise<any>
+
+    /** @deprecated */
     GET(params: {
       /** Путь к ресурсу */
       path: string | string[]
@@ -30,17 +40,28 @@ declare namespace Moysklad {
 
     /**
      * Выполняет POST запрос по указанному ресурсу
+     *
      * @param path Путь к ресурсу
      * @param payload Тело запроса
      * @param query Строка запроса
      * @param options Опции запроса
      */
     POST(
-      path: string | string[],
+      path: string,
       payload: any,
       query?: Query | null,
       options?: RequestOptions
     ): Promise<any>
+
+    /** @deprecated */
+    POST(
+      path: string[],
+      payload: any,
+      query?: Query | null,
+      options?: RequestOptions
+    ): Promise<any>
+
+    /** @deprecated */
     POST(params: {
       /** Путь к ресурсу */
       path: string | string[]
@@ -54,17 +75,28 @@ declare namespace Moysklad {
 
     /**
      * Выполняет PUT запрос по указанному ресурсу
+     *
      * @param path Путь к ресурсу
      * @param payload Тело запроса
      * @param query Строка запроса
      * @param options Опции запроса
      */
     PUT(
-      path: string | string[],
+      path: string,
       payload: any,
       query?: Query | null,
       options?: RequestOptions
     ): Promise<any>
+
+    /** @deprecated */
+    PUT(
+      path: string[],
+      payload: any,
+      query?: Query | null,
+      options?: RequestOptions
+    ): Promise<any>
+
+    /** @deprecated */
     PUT(params: {
       /** Путь к ресурсу */
       path: string | string[]
@@ -78,10 +110,16 @@ declare namespace Moysklad {
 
     /**
      * Выполняет DELETE запрос по указанному ресурсу
+     *
      * @param path Путь к ресурсу
      * @param options Опции запроса
      */
-    DELETE(path: string | string[], options?: RequestOptions): Promise<any>
+    DELETE(path: string, options?: RequestOptions): Promise<any>
+
+    /** @deprecated */
+    DELETE(path: string[], options?: RequestOptions): Promise<any>
+
+    /** @deprecated */
     DELETE(params: {
       /** Путь к ресурсу */
       path: string | string[]
@@ -99,7 +137,7 @@ declare namespace Moysklad {
      * const options = ms.getOptions()
      *
      * console.log(options)
-     * // {endpoint: "https://online.moysklad.ru/api", api: "remap", apiVersion: "1.2", fetch: }
+     * // { endpoint: "https://online.moysklad.ru/api", api: "remap", apiVersion: "1.2", fetch }
      *
      * ```
      */
@@ -114,31 +152,34 @@ declare namespace Moysklad {
 
     /**
      * Возвращает полный url для указанных параметров
+     *
      * @param path Путь к ресурсу или href
      * @param query Параметры строки запроса
      *
      * Пример:
+     *
      * ```js
      * ms.buildUrl('entity/customerorder', { expand: 'agent' })
      * // https://online.moysklad.ru/api/remap/1.2/entity/customerorder?expand=agent
-     *
-     * ms.buildUrl(['entity/customerorder', 'foo-id'])
-     * // https://online.moysklad.ru/api/remap/1.2/entity/customerorder/foo-id
      * ```
      */
-    buildUrl(path: string | string[], query?: Query): string
+    buildUrl(path: string, query?: Query): string
+
+    /**
+     * @deprecated Для передачи параметра `path` используйте строку
+     */
+    buildUrl(path: string[], query?: Query): string
 
     /**
      * Разбирает url ресурса API МойСклад на составные части
+     *
      * @param url url, path или ref ресурса API МойСклад
      *
      * - url `https://...`
-     * - path `["path", "to"]`
      * - ref `"path/to"`
+     * - (deprecated) path `["path", "to"]`
      */
-    parseUrl(
-      url: string
-    ): {
+    parseUrl(url: string): {
       /**
        * Точка досупа к API
        *
@@ -177,6 +218,7 @@ declare namespace Moysklad {
 
     /**
      * Выполняет запрос по указанному url и возвращает результат
+     *
      * @param url url ресурса
      * @param options Параметры запроса
      *
@@ -196,8 +238,6 @@ declare namespace Moysklad {
 
     /**
      * Возвращает значение HTTP заголовка Authorization
-     *
-     * Если указан ло
      */
     getAuthHeader(): string
   }
@@ -264,7 +304,7 @@ declare namespace Moysklad {
      * Пример использования:
      *
      * ```js
-     * const fetch = require('node-fetch')
+     * const { fetch } = require('undici')
      * const { EventEmitter } = require('events')
      *
      * const Moysklad = require('..')
@@ -276,17 +316,17 @@ declare namespace Moysklad {
      * const startTime = Date.now()
      *
      * emitter
-     *   .on('request', ({ url, options }) => {
+     *   .on('request', ({ requestId, url, options }) => {
      *     console.log(`${options.method} ${url} (+${Date.now() - startTime}ms)`)
      *   })
-     *   .on('response', ({ url, options: { method }, response: { statusText, status } }) => {
+     *   .on('response', ({ requestId, url, options: { method }, response: { statusText, status } }) => {
      *     console.log(`${method} ${statusText} ${status} ${url} (+${Date.now() - startTime}ms)`)
      *   })
-     *   .on('response:body', ({ url, options: { method }, response, body }) => {
+     *   .on('response:body', ({ requestId, url, options: { method }, response, body }) => {
      *     console.log(`${method} BODY ${url} (+${Date.now() - startTime}ms)`)
      *   })
-     *   .on('error', (...args) => {
-     *     console.log(args)
+     *   .on('error', (error, { requestId }) => {
+     *     console.log(error, requestId)
      *   })
      *
      * ms.GET('entity/customerorder', { limit: 1 }).then(res => {
@@ -319,42 +359,120 @@ declare namespace Moysklad {
   }
 
   /**
-   * Все опции переданные в объекте `options` (за исключением вспомогательных) передаются напрямую в опции метода `fetch` ([Fetch API](http://github.github.io/fetch/)) при осуществлении запроса.
+   * Все опции переданные в объекте `options` (за исключением вспомогательных) передаются напрямую
+   * в опции метода `fetch` ([Fetch API](http://github.github.io/fetch/)) при осуществлении запроса.
    */
   export interface RequestOptions {
     /**
-     * Если `true`, то метод вернет результат в виде объекта [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response)
+     * Если `true`, то метод вернет результат запроса в виде объекта
+     * [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response)
+     *
+     * Если ответ содержит ошибку, то вам её нужно обработать вручную.
+     *
+     * Если `true`, то опции `muteApiErrors` и `muteCollectionErrors` не учитываются.
      */
     rawResponse?: boolean
 
     /**
-     * Если `true`, то все ошибки будут проигнорированы (метод не будет генерировать ошибку если код ответа сервера не в диапазоне 200-299 и/или тело ответа содержит описание ошибки МойСклад).
-     * Ошибка вернется как результат ввиде объекта.
+     * Если `true` и код запроса `3xx` (редирект), то метод вернет
+     * [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response).
      *
-     * Пример:
+     * В обратном случае, будет выброшена ошибка `MoyskladRequestError`.
+     *
+     * Опция нужна для явного указания того, что вы ожидаете получить редирект
+     * при опции запроса `redirect` не равной `follow`.
+     */
+    rawRedirect?: boolean
+
+    /**
+     * Если `true`, то все ошибки API (тип ошибки `MoyskladApiError`) будут проигнорированы.
+     *
+     * Ошибка `MoyskladApiError` генерируется в случаях:
+     * - если код ответа сервера не 2xx и тело ответа содержит поле `errors`
+     * - если ответ коллекция и хотя бы один элемент коллекции содержит поле `errors`
+     *
+     * Результат будет содержать ответ сервера с ошибокой или коллекцию.
+     *
+     * Ошибка сервера или протокола проигнорированы не будут.
+     *
+     * Опция полезна, если вы хотите самостоятельно обрабатывать ошибки API МойСклад.
+     *
+     * Пример (одна ошибка):
+     *
      * ```js
-     * const result = await ms.GET('foo', null, { muteErrors: true })
+     * const result = await ms.GET('foo', null, { muteApiErrors: true })
      *
      * if (result.errors) {
-     *  console.log(result.errors[0].error)
+     *   console.log(result.errors[0].error)
      * }
      * ```
+     *
+     * Пример (ошибка в коллекции):
+     *
+     * ```js
+     * const result = await ms.POST('entity/demand', [demands], {
+     *   muteApiErrors: true
+     * })
+     *
+     * if (Array.isArray(result)) {
+     *   const errors = result.filter(it => it.errors)
+     *
+     *   if (errors.length) {
+     *     throw new Error('В коллекции есть ошибки')
+     *   }
+     * } else if (result.errors) {
+     *   throw new Error(result.errors[0].error)
+     * }
+     * ```
+     *
+     * @see `muteCollectionErrors`
+     */
+    muteApiErrors?: boolean
+
+    /**
+     * @deprecated используйте `muteApiErrors`
      */
     muteErrors?: boolean
 
     /**
-     * Если `true`, то в запрос будет включен заголовок `X-Lognex-Format-Millisecond` со значением `true` (все даты объекта будут возвращены с учетом миллисекунд).
+     * Если `true`, то будут проигнорированны ошибки внутри коллекций.
+     *
+     * Если ответ коллекция и хотя бы один элемент коллекции содержит поле `errors`,
+     * то ошибка `MoyskladApiError` выброшена не будет.
+     *
+     * Пример (ошибка в коллекции):
+     *
+     * ```js
+     * const result = await ms.POST('entity/demand', [demands], {
+     *   muteCollectionErrors: true
+     * })
+     *
+     * const errors = result.filter(it => it.errors)
+     *
+     * if (errors.length) {
+     *   throw new Error('В коллекции есть ошибки')
+     * }
+     * ```
+     */
+    muteCollectionErrors?: boolean
+
+    /**
+     * Если `true`, то в запрос будет включен заголовок `X-Lognex-Format-Millisecond` со значением
+     * `true` (все даты объекта будут возвращены с учетом миллисекунд).
+     *
      * @deprecated начиная с версии Remap API 1.2
      */
     millisecond?: boolean
 
     /**
-     * Если `true`, то в запрос будет включен заголовок `X-Lognex-Precision` со значением `true` (отключение округления цен и себестоимости до копеек).
+     * Если `true`, то в запрос будет включен заголовок `X-Lognex-Precision` со значением `true`
+     * (отключение округления цен и себестоимости до копеек).
      */
     precision?: boolean
 
     /**
-     * Если `true`, то в запрос будет включен заголовок `X-Lognex-WebHook-Disable` со значением `true` (отключить уведомления вебхуков в контексте данного запроса).
+     * Если `true`, то в запрос будет включен заголовок `X-Lognex-WebHook-Disable` со значением
+     * `true` (отключить уведомления вебхуков в контексте данного запроса).
      */
     webHookDisable?: boolean
 
@@ -439,13 +557,41 @@ declare namespace Moysklad {
     /**
      * Наличие значения (не null)
      *
-     * true - `key!=`
-     * false - `key=`
+     * - `true` - `key!=`
+     * - `false` - `key=`
      */
     $exists?: boolean
 
     /**
      * Объединение нескольких условий
+     *
+     * Оба фильтра ниже идентичны:
+     *
+     * ```js
+     * const filter1 = {
+     *   name: {
+     *     $and: [
+     *       { $eq: 'foo' },
+     *       {
+     *         $not: {
+     *           $eq: 10,
+     *           $in: [5, 6]
+     *         }
+     *       }
+     *     ]
+     *   }
+     * }
+     *
+     * const filter2 = {
+     *   name: {
+     *     $eq: 'foo',
+     *     $not: {
+     *       $eq: 10,
+     *       $in: [5, 6]
+     *     }
+     *   }
+     * }
+     * ```
      */
     $and?: QueryObject[]
 
@@ -532,21 +678,52 @@ declare namespace Moysklad {
    * @param date дата
    * @param includeMs если `true`, то в результирующую дату будут включены миллисекунды
    */
-  export function getTimeString (date: Date | number, includeMs?: boolean): string
+  export function getTimeString(
+    date: Date | number,
+    includeMs?: boolean
+  ): string
 
   /**
    * Преобразует строку с датой в формате API МойСклад в объект даты (с учетом часового пояса исходной даты)
    * @param date дата в формате МойСклад (напр. `2017-04-08 13:33:00.123`)
    */
-  export function parseTimeString (date: string): Date
+  export function parseTimeString(date: string): Date
 
+  /**
+   * Формирует не закодированную строку фильтра
+   *
+   * ```js
+   * Moysklad.buildFilter({ name: { $st: 'foo' } })
+   * // 'code=123;name~=foo'
+   * ```
+   *
+   * @param filter Объект фильтра
+   */
+  export function buildFilter(filter: QueryFilter): string
+
+  /**
+   * Формирует строку с параметрами запроса
+   *
+   * ```js
+   * Moysklad.buildQuery({
+   *  filter: { name: 'foo' },
+   *  limit: 100,
+   *  foo: 'bar'
+   * })
+   *
+   * // 'filter=name%3Dfoo&limit=100&foo=bar'
+   * ```
+   *
+   * @param query Параметры запроса
+   */
+  export function buildQuery(query: Query): string
   /**
    * Метод используется для расширения библиотеки внешними модулями
    * @param extension Модуль расширения
    */
-  export function compose (extension: Function): typeof Moysklad
+  export function compose(extension: Function): typeof Moysklad
 
-  interface ApiErrorInfo {
+  export interface ApiErrorInfo {
     error: string
     code: number
     moreInfo: string
@@ -555,8 +732,14 @@ declare namespace Moysklad {
     error_message?: string
   }
 
+  /**
+   * Внутренняя ошибка библиотеки не связанная с выполнением запроса к API
+   */
   export class MoyskladError extends Error {}
 
+  /**
+   * Ошибка при выполнении запроса
+   */
   export class MoyskladRequestError extends MoyskladError {
     /** url http запроса */
     url?: string
@@ -568,6 +751,18 @@ declare namespace Moysklad {
     statusText?: string
   }
 
+  /**
+   * Ошибка если запрос вернул перенапраление (код `3xx`), когда явно не
+   * указана опция запроса `rawRedirect` и опция `redirect` не равна `follow`
+   */
+  export class MoyskladUnexpectedRedirectError extends MoyskladRequestError {
+    /** Location заголовок редиректа */
+    location?: string
+  }
+
+  /**
+   * Ошибка API МойСклад
+   */
   export class MoyskladApiError extends MoyskladRequestError {
     /** Код первой ошибки */
     code: number
@@ -577,5 +772,51 @@ declare namespace Moysklad {
 
     /** Список ошибок запроса */
     errors: ApiErrorInfo[]
+  }
+
+  /**
+   * Ошибка в коллекции при массовом создании/изменении сущностей
+   */
+  export class MoyskladCollectionError extends MoyskladApiError {
+    /**
+     * Ошибки в соответствии с идексами переданных сущностей в исходной коллекции.
+     *
+     * Позволяет точно сопоставить ошибки с конкретной сущностью из коллекции.
+     */
+    errorsIndexes: Array<[number, ApiErrorInfo[]]>
+  }
+
+  /** Событие `request` отправки запроса */
+  export interface RequestEvent {
+    /** Уникальный номер запроса в рамках модуля библиотеки */
+    requestId: number
+
+    /** URL запроса */
+    url: string
+
+    /** Параметры запроса */
+    options: any
+  }
+
+  /** Событие `response` получения ответа на запрос */
+  export interface ResponseEvent extends RequestEvent {
+    /** Ответ на запрос */
+    response: Response
+  }
+
+  /** Событие `response:body` получения ответа на запрос */
+  export interface ResponseBodyEvent extends ResponseEvent {
+    body: any
+  }
+
+  export interface MoyskladEmitter {
+    on(name: 'request', handler: (ev: RequestEvent) => void): this
+    on(name: 'response', handler: (ev: ResponseEvent) => void): this
+    on(name: 'response:body', handler: (ev: ResponseBodyEvent) => void): this
+    on(
+      name: 'error',
+      handler: (error: Error, options: { requestId: number }) => void
+    ): this
+    on(name: string, handler: (...args: any[]) => void): this
   }
 }

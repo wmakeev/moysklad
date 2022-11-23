@@ -1,7 +1,7 @@
-/* eslint node/no-extraneous-require:0 */
-
 const { URL } = require('url')
 const assert = require('assert')
+
+/** @type {import('..')} */
 const Moysklad = require('moysklad')
 
 const ms = Moysklad({ apiVersion: '1.2' })

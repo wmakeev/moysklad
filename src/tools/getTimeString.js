@@ -1,8 +1,8 @@
 'use strict'
 
-const getTimezoneFix = require('./getTimezoneFix')
+const getTimezoneShift = require('./getTimezoneShift')
 
-const timezoneFix = getTimezoneFix()
+const timezoneFix = getTimezoneShift()
 
 /** Временная зона API МойСклад (часовой пояс в мс) */
 const mskTimezone = +3 * 60 * 60 * 1000 // ms
@@ -17,6 +17,7 @@ function leftPad2(num) {
 
 /**
  * Возвращает дату для фильтра в часовом поясе Москвы
+ *
  * @param {Date | number} date Конвертируемая дата
  * @param {Boolean} includeMs Необходимо ли включить миллисекунды в дату
  * @returns {string} Дата ввиде строки

@@ -15,6 +15,13 @@ test('Moysklad constructor', t => {
 test('Moysklad static methods', t => {
   t.equals(typeof Moysklad.getTimeString, 'function')
   t.equals(typeof Moysklad.parseTimeString, 'function')
+  t.equals(typeof Moysklad.buildFilter, 'function')
+  t.equals(typeof Moysklad.buildQuery, 'function')
+  t.equals(typeof Moysklad.MoyskladApiError, 'function')
+  t.equals(typeof Moysklad.MoyskladCollectionError, 'function')
+  t.equals(typeof Moysklad.MoyskladError, 'function')
+  t.equals(typeof Moysklad.MoyskladRequestError, 'function')
+  t.equals(typeof Moysklad.MoyskladUnexpectedRedirectError, 'function')
   t.end()
 })
 
@@ -224,10 +231,10 @@ test('Moysklad#POST/PUT/DELETE', async t => {
       {
         meta: {
           type: 'attributemetadata',
-          href: ms.buildUrl([
-            'entity/product/metadata/attributes',
-            '0008b3f4-1897-11e3-d76c-7054d21a8d1e' // Вид товара
-          ])
+          href: ms.buildUrl(
+            // Вид товара
+            'entity/product/metadata/attributes/0008b3f4-1897-11e3-d76c-7054d21a8d1e'
+          )
         },
         value: {
           name: 'Рюкзак'
@@ -236,10 +243,10 @@ test('Moysklad#POST/PUT/DELETE', async t => {
       {
         meta: {
           type: 'attributemetadata',
-          href: ms.buildUrl([
-            'entity/product/metadata/attributes',
-            '14538d43-ea5b-11e9-0a80-0505000d881a' // Пол
-          ])
+          href: ms.buildUrl(
+            // Пол
+            'entity/product/metadata/attributes/14538d43-ea5b-11e9-0a80-0505000d881a'
+          )
         },
         value: {
           name: 'Женский'
@@ -248,10 +255,10 @@ test('Moysklad#POST/PUT/DELETE', async t => {
       {
         meta: {
           type: 'attributemetadata',
-          href: ms.buildUrl([
-            'entity/product/metadata/attributes',
-            'c18ca61c-eac1-11e9-0a80-042800177f42' // Возраст
-          ])
+          href: ms.buildUrl(
+            // Возраст
+            'entity/product/metadata/attributes/c18ca61c-eac1-11e9-0a80-042800177f42'
+          )
         },
         value: {
           name: 'Взрослый'
@@ -260,10 +267,10 @@ test('Moysklad#POST/PUT/DELETE', async t => {
       {
         meta: {
           type: 'attributemetadata',
-          href: ms.buildUrl([
-            'entity/product/metadata/attributes',
-            'f4c073c5-1bcc-4d91-8b41-ed825495b677' // Бренд
-          ])
+          href: ms.buildUrl(
+            // Бренд
+            'entity/product/metadata/attributes/f4c073c5-1bcc-4d91-8b41-ed825495b677'
+          )
         },
         value: {
           name: 'No Brand'
@@ -272,10 +279,10 @@ test('Moysklad#POST/PUT/DELETE', async t => {
       {
         meta: {
           type: 'attributemetadata',
-          href: ms.buildUrl([
-            'entity/product/metadata/attributes',
-            '71f17086-1a7f-47f1-b447-59b71351bfad' // Сезон
-          ])
+          href: ms.buildUrl(
+            // Сезон
+            'entity/product/metadata/attributes/71f17086-1a7f-47f1-b447-59b71351bfad'
+          )
         },
         value: {
           name: '02 Осень/Зима'
@@ -284,10 +291,10 @@ test('Moysklad#POST/PUT/DELETE', async t => {
       {
         meta: {
           type: 'attributemetadata',
-          href: ms.buildUrl([
-            'entity/product/metadata/attributes',
-            'b4bee095-4278-4147-95e0-0328c9207be0' // Вид номенклатуры
-          ])
+          href: ms.buildUrl(
+            // Вид номенклатуры
+            'entity/product/metadata/attributes/b4bee095-4278-4147-95e0-0328c9207be0'
+          )
         },
         value: {
           name: 'Товары в обороте'
@@ -296,10 +303,10 @@ test('Moysklad#POST/PUT/DELETE', async t => {
       {
         meta: {
           type: 'attributemetadata',
-          href: ms.buildUrl([
-            'entity/product/metadata/attributes',
-            '4700f6bd-fa82-4a91-9e8c-822616e71b0a' // Создано
-          ])
+          href: ms.buildUrl(
+            // Создано
+            'entity/product/metadata/attributes/4700f6bd-fa82-4a91-9e8c-822616e71b0a'
+          )
         },
         value: Moysklad.getTimeString(new Date())
       }
@@ -313,15 +320,17 @@ test('Moysklad#POST/PUT/DELETE', async t => {
   t.equals(newProduct.code, code, 'new entity name should have some property')
 
   code = 'test-' + Date.now()
-  newProduct = await ms.PUT(['entity/product', newProduct.id], { code })
+  newProduct = await ms.PUT(`entity/product/${newProduct.id}`, { code })
 
   t.ok(newProduct, 'PUT should update entity')
   t.equals(newProduct.code, code, 'updated entity field should be equal')
 
   await ms.DELETE(['entity/product', newProduct.id])
 
-  await t.shouldFail(
-    (() => ms.GET(['entity/product', newProduct.id]))(),
-    /не найден/i
-  )
+  try {
+    await ms.GET(`entity/product/${newProduct.id}`)
+    t.fail('ms.GET should fail')
+  } catch (err) {
+    t.ok(err.message.includes('не найден'))
+  }
 })

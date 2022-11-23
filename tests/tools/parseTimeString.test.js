@@ -1,7 +1,7 @@
 'use strict'
 
 const test = require('tape')
-const parseTimeString = require('../../src/tools/parseTimeString')
+const parseTimeString = require('../../tools/parseTimeString')
 
 test('parseTimeString', t => {
   t.equals(typeof parseTimeString, 'function', 'should be function')

@@ -1,7 +1,7 @@
 'use strict'
 
 const test = require('tape')
-const buildQuery = require('../../src/tools/buildQuery')
+const { buildQuery } = require('../..')
 
 test('buildQuery', t => {
   t.ok(buildQuery)

@@ -16,7 +16,8 @@ typings
 package-lock.json
 
 # Local dependency directory
-!examples/node_modules
+!/examples/node_modules
+!/examples
 
 # Optional npm cache directory
 .npm

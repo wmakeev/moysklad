@@ -29,9 +29,9 @@ test('Moysklad#DELETE', async t => {
             assortment: {
               meta: {
                 type: 'product',
-                href: ms.buildUrl([
+                href: ms.buildUrl(
                   'entity/product/d29f9d08-30d1-11e7-7a34-5acf004eda99'
-                ])
+                )
               }
             },
             quantity: 1
@@ -40,9 +40,9 @@ test('Moysklad#DELETE', async t => {
             assortment: {
               meta: {
                 type: 'product',
-                href: ms.buildUrl([
+                href: ms.buildUrl(
                   'entity/product/d29f038e-30d1-11e7-7a34-5acf004eda8c'
-                ])
+                )
               }
             },
             quantity: 1
@@ -55,7 +55,7 @@ test('Moysklad#DELETE', async t => {
     t.equal(internalorder.positions.rows.length, 2)
 
     await ms.POST(
-      ['entity/internalorder', internalorder.id, 'positions/delete'],
+      `entity/internalorder/${internalorder.id}/positions/delete`,
       internalorder.positions.rows.map(pos => ({ meta: pos.meta }))
     )
   } finally {
@@ -72,7 +72,10 @@ test('Moysklad#DELETE', async t => {
         )
       }
 
-      result = await ms.DELETE(internalorder.meta.href, { muteErrors: true })
+      result = await ms.DELETE(internalorder.meta.href, {
+        // deprecated
+        muteErrors: true
+      })
       t.ok(
         result.errors[0].error.includes('не найден'),
         'should return error object on deletion deleted entity'

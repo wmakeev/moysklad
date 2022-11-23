@@ -1,7 +1,11 @@
 const { MoyskladError } = require('../errors')
 const getEnvVar = require('../getEnvVar')
 
-module.exports = function getTimezoneFix() {
+/**
+ * @deprecated Работать с датами нужно в UTC либо преобразовывать
+ * вне библиотеки
+ */
+module.exports = function getTimezoneShift() {
   const localTimeZoneOffset = -(new Date().getTimezoneOffset() * 60 * 1000)
 
   /** Локальная временная зона в мс */

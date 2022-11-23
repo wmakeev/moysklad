@@ -1,7 +1,7 @@
 'use strict'
 
 const test = require('tape')
-const normalizeUrl = require('../../src/tools/normalizeUrl')
+const normalizeUrl = require('../../tools/normalizeUrl')
 
 test('normalizeUrl', t => {
   t.ok(normalizeUrl)

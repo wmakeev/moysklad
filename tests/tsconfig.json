@@ -7,7 +7,8 @@
     "target": "ES2019", // Node 12.x
     "module": "CommonJS",
     "lib": [
-      "ES2019" // Node 12.x
+      "ES2019", // Node 12.x
+      "DOM"
     ],
     "declaration": true,
     "declarationMap": true,

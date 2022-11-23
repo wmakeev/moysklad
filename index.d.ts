@@ -723,6 +723,7 @@ declare namespace Moysklad {
    */
   export function compose(extension: Function): typeof Moysklad
 
+  /** Описание конкретной ошибки в API МойСклад */
   export interface ApiErrorInfo {
     error: string
     code: number
@@ -730,6 +731,15 @@ declare namespace Moysklad {
     column?: number
     line?: number
     error_message?: string
+  }
+
+  /**
+   * Объект с полем `errors` в котором перечислены все ошибки.
+   *
+   * Используется для сообщения об ошибках в API МойСклад.
+   */
+  export interface ApiError {
+    errors: ApiErrorInfo[]
   }
 
   /**

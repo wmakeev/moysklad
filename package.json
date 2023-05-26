@@ -62,20 +62,23 @@
     "stampit": "^4.3.2"
   },
   "devDependencies": {
-    "@types/node": "^18.11.9",
+    "@tsconfig/esm": "^1.0.3",
+    "@tsconfig/node20": "^1.0.1",
+    "@tsconfig/strictest": "^2.0.1",
+    "@types/node": "^20.2.4",
     "c8": "^7.12.0",
     "dotenv": "^16.0.3",
-    "eslint": "^8.28.0",
-    "eslint-config-prettier": "^8.5.0",
+    "eslint": "^8.41.0",
+    "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^4.2.1",
-    "np": "*",
-    "prettier": "^2.7.1",
-    "tape": "^5.6.1",
-    "typescript": "^4.9.3",
-    "undici": "^5.12.0",
-    "webpack": "^5.75.0",
-    "webpack-cli": "^5.0.0"
+    "np": "^7.7.0",
+    "prettier": "^2.8.8",
+    "tape": "^5.6.3",
+    "typescript": "^5.0.4",
+    "undici": "^5.22.1",
+    "webpack": "^5.84.1",
+    "webpack-cli": "^5.1.1"
   },
   "engines": {
     "node": ">=16.8"

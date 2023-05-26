@@ -17,15 +17,15 @@ declare namespace Moysklad {
      */
     GET(
       path: string,
-      query?: Query | null,
-      options?: RequestOptions
+      query?: Query | null | undefined,
+      options?: RequestOptions | undefined
     ): Promise<any>
 
     /** @deprecated */
     GET(
       path: string[],
-      query?: Query | null,
-      options?: RequestOptions
+      query?: Query | null | undefined,
+      options?: RequestOptions | undefined
     ): Promise<any>
 
     /** @deprecated */
@@ -33,9 +33,9 @@ declare namespace Moysklad {
       /** Путь к ресурсу */
       path: string | string[]
       /** Строка запроса */
-      query?: Query | null
+      query?: Query | null | undefined
       /** Опции запроса */
-      options?: RequestOptions
+      options?: RequestOptions | undefined
     }): Promise<any>
 
     /**
@@ -49,16 +49,16 @@ declare namespace Moysklad {
     POST(
       path: string,
       payload: any,
-      query?: Query | null,
-      options?: RequestOptions
+      query?: Query | null | undefined,
+      options?: RequestOptions | undefined
     ): Promise<any>
 
     /** @deprecated */
     POST(
       path: string[],
       payload: any,
-      query?: Query | null,
-      options?: RequestOptions
+      query?: Query | null | undefined,
+      options?: RequestOptions | undefined
     ): Promise<any>
 
     /** @deprecated */
@@ -68,9 +68,9 @@ declare namespace Moysklad {
       /** Тело запроса */
       payload: any
       /** Строка запроса */
-      query?: Query | null
+      query?: Query | null | undefined
       /** Опции запроса */
-      options?: RequestOptions
+      options?: RequestOptions | undefined
     }): Promise<any>
 
     /**
@@ -84,16 +84,16 @@ declare namespace Moysklad {
     PUT(
       path: string,
       payload: any,
-      query?: Query | null,
-      options?: RequestOptions
+      query?: Query | null | undefined,
+      options?: RequestOptions | undefined
     ): Promise<any>
 
     /** @deprecated */
     PUT(
       path: string[],
       payload: any,
-      query?: Query | null,
-      options?: RequestOptions
+      query?: Query | null | undefined,
+      options?: RequestOptions | undefined
     ): Promise<any>
 
     /** @deprecated */
@@ -103,9 +103,9 @@ declare namespace Moysklad {
       /** Тело запроса */
       payload: any
       /** Строка запроса */
-      query?: Query | null
+      query?: Query | null | undefined
       /** Опции запроса */
-      options?: RequestOptions
+      options?: RequestOptions | undefined
     }): Promise<any>
 
     /**
@@ -124,7 +124,7 @@ declare namespace Moysklad {
       /** Путь к ресурсу */
       path: string | string[]
       /** Опции запроса */
-      options?: RequestOptions
+      options?: RequestOptions | undefined
     }): Promise<any>
 
     /**
@@ -502,57 +502,57 @@ declare namespace Moysklad {
     /**
      * Равно `key=value`
      */
-    $eq?: QueryValue
+    $eq?: QueryValue | undefined
 
     /**
      * Не равно `key!=value`
      */
-    $ne?: QueryValue
+    $ne?: QueryValue | undefined
 
     /**
      * Больше `key>value`
      */
-    $gt?: QueryValue
+    $gt?: QueryValue | undefined
 
     /**
      * Больше или равно `key>=value`
      */
-    $gte?: QueryValue
+    $gte?: QueryValue | undefined
 
     /**
      * Меньше `key<value`
      */
-    $lt?: QueryValue
+    $lt?: QueryValue | undefined
 
     /**
      * Меньше или равно `key<=value`
      */
-    $lte?: QueryValue
+    $lte?: QueryValue | undefined
 
     /**
      * Начинается со строки `key~=value`
      */
-    $st?: QueryValue
+    $st?: QueryValue | undefined
 
     /**
      * Заканчивается строкой `key=~value`
      */
-    $et?: QueryValue
+    $et?: QueryValue | undefined
 
     /**
      * Содержит строку `key~value`
      */
-    $contains?: QueryValue
+    $contains?: QueryValue | undefined
 
     /**
      * Входит в `key=value1;key=value2;...`
      */
-    $in?: QueryValue[]
+    $in?: QueryValue[] | undefined
 
     /**
      * Не входит `key!=value1;key!=value2;...`
      */
-    $nin?: QueryValue[]
+    $nin?: QueryValue[] | undefined
 
     /**
      * Наличие значения (не null)
@@ -560,7 +560,7 @@ declare namespace Moysklad {
      * - `true` - `key!=`
      * - `false` - `key=`
      */
-    $exists?: boolean
+    $exists?: boolean | undefined
 
     /**
      * Объединение нескольких условий
@@ -593,12 +593,12 @@ declare namespace Moysklad {
      * }
      * ```
      */
-    $and?: QueryObject[]
+    $and?: QueryObject[] | undefined
 
     /**
      * Отрицание условия
      */
-    $not?: QueryObject
+    $not?: QueryObject | undefined
 
     /**
      * Равно `key=value`
@@ -635,10 +635,10 @@ declare namespace Moysklad {
      * }
      * ```
      */
-    filter?: QueryFilter | string
+    filter?: QueryFilter | string | undefined
 
     /** TODO */
-    search?: string
+    search?: string | undefined
 
     /**
      * Используется для раскрытия ссылок на связанные объекты
@@ -647,17 +647,17 @@ declare namespace Moysklad {
      *
      * Если указан `expand` и не указан `limit`, то `limit` будет автоматически установлен как `100`
      */
-    expand?: string
+    expand?: string | undefined
 
     /**
      * Задает ограничение на кол-во возвращаемых элементов в коллекции
      *
      * Если указан `expand` и не указан `limit`, то `limit` будет автоматически установлен как `100`
      */
-    limit?: number
+    limit?: number | undefined
 
     /** Задает смещение для первого элемента в коллекции */
-    offset?: number
+    offset?: number | undefined
 
     /**
      * Сортировка выборки
@@ -668,7 +668,7 @@ declare namespace Moysklad {
      * - `name;code,desc` или `['name', ['code','desc']]`
      * - `name,desc;code,asc` или `['name,desc', ['code','asc']]`
      */
-    order?: QueryOrder | string
+    order?: QueryOrder | string | undefined
 
     [key: string]: any
   }

@@ -38,6 +38,17 @@ ms.GET('path/to/doc', {
   order: 'foo'
 })
 
+let str1: string | undefined
+
+ms.GET('path/to/doc', {
+  filter: {
+    foo: 'bar',
+    moment: { $gt: str1 }
+  },
+  order: 'foo',
+  expand: str1
+})
+
 ms.GET(
   'path/to/doc',
   {
@@ -52,6 +63,7 @@ async function case1() {
   await ms.GET('foo/bar', null, { rawResponse: true })
   await ms.GET('foo/bar', null, { muteCollectionErrors: true })
 }
+case1
 
 const filter: Moysklad.QueryFilter = {
   foo: 'bar',
@@ -82,6 +94,7 @@ ms.GET('foo/bar', { filter: 'some filter' })
 
 //#region Ошибки
 const error = new Moysklad.MoyskladError('foo')
+error
 
 const requestError = new Moysklad.MoyskladRequestError('foo')
 requestError.status
@@ -91,6 +104,7 @@ requestError.url
 const cond1: Moysklad.MoyskladRequestError extends Moysklad.MoyskladError
   ? true
   : never = true
+cond1
 
 const apiError = new Moysklad.MoyskladApiError('foo')
 apiError.code
@@ -105,6 +119,7 @@ apiError.url
 const cond2: Moysklad.MoyskladApiError extends Moysklad.MoyskladRequestError
   ? true
   : never = true
+cond2
 
 // @ts-expect-error
 const cond3: Moysklad.MoyskladRequestError extends Moysklad.MoyskladApiError
@@ -114,6 +129,7 @@ const cond3: Moysklad.MoyskladRequestError extends Moysklad.MoyskladApiError
 const cond4: Moysklad.MoyskladUnexpectedRedirectError extends Moysklad.MoyskladRequestError
   ? true
   : never = true
+cond4
 
 if (apiError instanceof Moysklad.MoyskladError) true
 //#endregion

@@ -12,7 +12,7 @@ module.exports = function POST(...args) {
   } = have.strict(args, [
     {
       path: 'str or str arr',
-      payload: 'opt Object or Object arr',
+      payload: 'opt Object or Object arr or str',
       query: 'opt Object',
       options: 'opt Object'
     },
@@ -21,7 +21,11 @@ module.exports = function POST(...args) {
 
   const url = this.buildUrl(path, query)
   const fetchOptions = { method: 'POST' }
-  if (payload) fetchOptions.body = JSON.stringify(payload)
+
+  if (payload) {
+    fetchOptions.body =
+      typeof payload === 'string' ? payload : JSON.stringify(payload)
+  }
 
   return this.fetchUrl(url, { ...options, ...fetchOptions })
 }

@@ -1,39 +1,12 @@
 // https://www.typescriptlang.org/v2/en/tsconfig
 {
+  "extends": [
+    "@tsconfig/node20/tsconfig.json",
+    "@tsconfig/strictest/tsconfig.json",
+    "@tsconfig/esm/tsconfig.json"
+  ],
   "compilerOptions": {
-    "noEmit": true,
-    // -- Project Options
-    // "incremental": true,
-    "target": "ES2019", // Node 12.x
-    "module": "CommonJS",
-    "lib": [
-      "ES2019", // Node 12.x
-      "DOM"
-    ],
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    // "outDir": "dist",
-    // -- Strict Checks
-    "strict": true,
-    "strictNullChecks": true,
-    "strictFunctionTypes": true,
-    "strictBindCallApply": true,
-    "strictPropertyInitialization": true,
-    // -- Module Resolution
-    "moduleResolution": "node",
-    // "baseUrl": "src",
-    // "paths": {}
-    // "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    // -- Linter Checks
-    // "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    // "noImplicitReturns": true, // strict
-    // -- Advanced
-    "resolveJsonModule": true,
-    "newLine": "lf",
-    "forceConsistentCasingInFileNames": true
+    "noEmit": true
   },
   "include": [
     "typings.test.ts"

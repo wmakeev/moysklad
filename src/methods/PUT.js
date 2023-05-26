@@ -11,7 +11,7 @@ module.exports = function PUT(...args) {
   } = have.strict(args, [
     {
       path: 'str or str arr',
-      payload: 'opt Object',
+      payload: 'opt Object or str',
       query: 'opt Object',
       options: 'opt Object'
     },
@@ -20,7 +20,11 @@ module.exports = function PUT(...args) {
 
   const url = this.buildUrl(path, query)
   const fetchOptions = { method: 'PUT' }
-  if (payload) fetchOptions.body = JSON.stringify(payload)
+
+  if (payload) {
+    fetchOptions.body =
+      typeof payload === 'string' ? payload : JSON.stringify(payload)
+  }
 
   return this.fetchUrl(url, { ...options, ...fetchOptions })
 }

@@ -132,6 +132,9 @@ test('Request without fetch', async t => {
     password: 'password'
   }
 
+  const globalFetch = global.fetch
+  delete global.fetch
+
   const ms = Moysklad(options)
 
   try {
@@ -142,6 +145,8 @@ test('Request without fetch', async t => {
       'should throw error'
     )
   }
+
+  if (globalFetch) global.fetch = globalFetch
 })
 
 test('Request with global.fetch', async t => {
@@ -315,9 +320,33 @@ test('Moysklad#POST/PUT/DELETE', async t => {
 
   let newProduct = await ms.POST('entity/product', product)
 
+  newProduct = await ms.PUT(
+    `entity/product/${newProduct.id}`,
+    JSON.stringify({
+      description: 'with PUT'
+    })
+  )
+
+  const [newProduct2] = await ms.POST(
+    'entity/product',
+    JSON.stringify([
+      {
+        meta: newProduct.meta,
+        description: 'with POST'
+      }
+    ])
+  )
+
+  newProduct = newProduct2
+
   t.ok(newProduct, 'POST should create new entity')
   t.equals(newProduct.name, product.name, 'new entity name should equals')
   t.equals(newProduct.code, code, 'new entity name should have some property')
+  t.equals(
+    newProduct.description,
+    'with POST',
+    'new entity name should have description property'
+  )
 
   code = 'test-' + Date.now()
   newProduct = await ms.PUT(`entity/product/${newProduct.id}`, { code })

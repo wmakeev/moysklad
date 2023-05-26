@@ -2,7 +2,7 @@
 
 // Тесты для index.d.ts
 
-import Moysklad from '..'
+import Moysklad from '../index.js'
 
 //#region Работа с датами
 const msDate: string = Moysklad.getTimeString(new Date())

@@ -604,11 +604,11 @@ declare namespace Moysklad {
      * Равно `key=value`
      */
     [key: string]:
-      | QueryValue
-      | QueryValue[]
-      | QueryObject
-      | QueryObject[]
-      | undefined
+    | QueryValue
+    | QueryValue[]
+    | QueryObject
+    | QueryObject[]
+    | undefined
   }
 
   export type QueryFilter = {
@@ -690,6 +690,50 @@ declare namespace Moysklad {
   export function parseTimeString(date: string): Date
 
   /**
+     * Разбирает url ресурса API МойСклад на составные части
+     *
+     * @param url url, path или ref ресурса API МойСклад
+     *
+     * - url `https://...`
+     */
+  export function parseUrl(url: string): {
+    /**
+     * Точка досупа к API
+     *
+     * Пример: `https://online.moysklad.ru/api`
+     */
+    endpoint: string
+
+    /**
+     * Раздел API
+     *
+     * Пример: `remap`
+     */
+    api: string
+
+    /**
+     * Версия API
+     *
+     * Пример: `1.2`
+     */
+    apiVersion: string
+
+    /**
+     * Составные части пути к ресурсу
+     *
+     * Пример: `["entity", "customerorder"]`
+     */
+    path: string[]
+
+    /**
+     * Параметры строки запроса
+     *
+     * Пример: `{"expand": "agent"}`
+     */
+    query: Query
+  }
+
+  /**
    * Формирует не закодированную строку фильтра
    *
    * ```js
@@ -745,7 +789,7 @@ declare namespace Moysklad {
   /**
    * Внутренняя ошибка библиотеки не связанная с выполнением запроса к API
    */
-  export class MoyskladError extends Error {}
+  export class MoyskladError extends Error { }
 
   /**
    * Ошибка при выполнении запроса

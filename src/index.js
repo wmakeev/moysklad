@@ -78,6 +78,7 @@ module.exports = stampit({
   statics: {
     getTimeString,
     parseTimeString,
+    parseUrl,
     buildFilter,
     buildQuery,
     MoyskladError,

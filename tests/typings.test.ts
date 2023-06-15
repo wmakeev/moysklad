@@ -11,6 +11,11 @@ const msDate: string = Moysklad.getTimeString(new Date())
 Moysklad.getTimeString(new Date(), true)
 Moysklad.getTimeString(123, true)
 
+// Static methods
+Moysklad.parseUrl('123')
+Moysklad.buildFilter({ foo: 'bar' })
+Moysklad.buildQuery({ foo: 'bar' })
+
 const msParsedDate: Date = Moysklad.parseTimeString(msDate)
 //#endregion
 

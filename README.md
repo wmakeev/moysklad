@@ -25,6 +25,7 @@
 - [Статические методы](#%D1%81%D1%82%D0%B0%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B5-%D0%BC%D0%B5%D1%82%D0%BE%D0%B4%D1%8B)
   - [getTimeString](#gettimestring)
   - [parseTimeString](#parsetimestring)
+  - [parseUrl статический метод](#parseurl-%D1%81%D1%82%D0%B0%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B9-%D0%BC%D0%B5%D1%82%D0%BE%D0%B4)
   - [buildFilter](#buildfilter)
   - [buildQuery](#buildquery)
 - [Методы экземпляра](#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4%D1%8B-%D1%8D%D0%BA%D0%B7%D0%B5%D0%BC%D0%BF%D0%BB%D1%8F%D1%80%D0%B0)
@@ -231,6 +232,13 @@ const parsedDate = Moysklad.parseTimeString('2017-04-08 13:33:00.123')
 
 assert.equal(parsedDate.toISOString(), '2017-04-08T10:33:00.123Z')
 ```
+
+### parseUrl (статический метод)
+
+> Разбор url на составные компоненты
+
+Аналогичен [parseUrl](#parseurl) методу экземпляра, за тем исключением, что
+на вход принимает только строку в формате href МойСклад.
 
 ### buildFilter
 

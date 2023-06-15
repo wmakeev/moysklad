@@ -633,6 +633,7 @@ module.exports = stampit({
   statics: {
     getTimeString,
     parseTimeString,
+    parseUrl,
     buildFilter,
     buildQuery,
     MoyskladError,
@@ -1173,7 +1174,17 @@ module.exports = function parseUrl(...args) {
     { path: 'str or str arr' }
   ])
 
-  let { endpoint, api, apiVersion } = this.getOptions()
+  const isCalledOnInstance = !!(this && this.getOptions)
+
+  if (!url && !isCalledOnInstance) {
+    throw new MoyskladError(
+      'Для вызова статического метода parseUrl, необходимо передать url'
+    )
+  }
+
+  let { endpoint, api, apiVersion } = isCalledOnInstance
+    ? this.getOptions()
+    : {}
 
   let pathStr = ''
   let queryStr = ''

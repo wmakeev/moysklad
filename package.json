@@ -1,6 +1,6 @@
 {
   "name": "moysklad",
-  "version": "0.12.0",
+  "version": "0.12.1",
   "description": "Библиотека для работы с API сервиса МойСклад",
   "main": "index.js",
   "types": "index.d.ts",

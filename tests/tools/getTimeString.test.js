@@ -61,7 +61,7 @@ test('getTimeString', t => {
 
   t.equals(
     getTimeString(date5, true),
-    '2017-02-01 13:10:11',
+    '2017-02-01 13:10:11.000',
     'should return time string with 0 ms'
   )
 

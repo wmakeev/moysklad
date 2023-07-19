@@ -1539,7 +1539,7 @@ module.exports = function getTimeString(date, includeMs) {
     leftPad1(mskTime.getUTCMinutes()),
     ':',
     leftPad1(mskTime.getUTCSeconds()),
-    milliseconds !== 0 && includeMs ? `.${leftPad2(milliseconds)}` : ''
+    includeMs ? `.${leftPad2(milliseconds)}` : ''
   ].join('')
 }
 

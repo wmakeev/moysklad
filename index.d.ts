@@ -570,7 +570,7 @@ declare namespace Moysklad {
      * ```js
      * const filter1 = {
      *   name: {
-     *     $and: [
+     *     $or: [
      *       { $eq: 'foo' },
      *       {
      *         $not: {
@@ -593,7 +593,7 @@ declare namespace Moysklad {
      * }
      * ```
      */
-    $and?: QueryObject[] | undefined
+    $or?: QueryObject[] | undefined
 
     /**
      * Отрицание условия

@@ -47,7 +47,8 @@ test('MoyskladRequestError', async t => {
     })
 })
 
-test('MoyskladUnexpectedRedirectError', async t => {
+// TODO 2023-07-31 Редирект перестал выполняться (исправление или ошибка в API?) #fkjs94ys
+test.skip('MoyskladUnexpectedRedirectError', async t => {
   t.plan(2)
 
   const ms = Moysklad({ fetch })

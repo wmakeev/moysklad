@@ -1307,9 +1307,9 @@ function getFilterParts(path, value) {
 
   switch (true) {
     // Mongo logical selectors
-    case curKey === '$and':
+    case curKey === '$or':
       if (!(value instanceof Array)) {
-        throw new MoyskladError('$and: значение селектора должно быть массивом')
+        throw new MoyskladError('$or: значение селектора должно быть массивом')
       }
       return value.reduce(
         (res, val) => res.concat(getFilterParts(path.slice(0, -1), val)),

@@ -131,7 +131,7 @@ test('buildFilter with Mongo query comparison selectors', t => {
 test('buildFilter with Mongo query logical selectors', t => {
   const filter = {
     name: {
-      $and: [{ $eq: 'foo' }, { $eq: 'bar' }]
+      $or: [{ $eq: 'foo' }, { $eq: 'bar' }]
     },
     value: {
       $not: {
@@ -161,10 +161,10 @@ test('buildFilter with Mongo query logical selectors', t => {
   t.end()
 })
 
-test('buildFilter with $and query selectors', t => {
+test('buildFilter with $or query selectors', t => {
   const filter1 = {
     name: {
-      $and: [
+      $or: [
         { $eq: 'foo' },
         {
           $not: {
@@ -232,8 +232,8 @@ test('buildFilter errors', t => {
   }, /\$in: значение селектора foo должно быть массивом/)
 
   t.throws(() => {
-    buildFilter({ foo: { $and: { a: 1 } } })
-  }, /\$and: значение селектора должно быть массивом/)
+    buildFilter({ foo: { $or: { a: 1 } } })
+  }, /\$or: значение селектора должно быть массивом/)
 
   t.throws(() => {
     buildFilter({ foo: { $not: 3 } })

@@ -75,6 +75,12 @@ module.exports = async function fetchUrl(url, options = {}) {
     fetchOptions.headers['X-Lognex-WebHook-Disable'] = 'true'
     delete fetchOptions.webHookDisable
   }
+  if (fetchOptions.downloadExpirationSeconds) {
+    fetchOptions.headers['X-Lognex-Download-Expiration-Seconds'] = String(
+      fetchOptions.downloadExpirationSeconds
+    )
+    delete fetchOptions.downloadExpirationSeconds
+  }
 
   const authHeader = this.getAuthHeader()
   if (authHeader) {

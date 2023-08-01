@@ -477,6 +477,21 @@ declare namespace Moysklad {
     webHookDisable?: boolean
 
     /**
+     * В JSON API для скачивания файла формируется редирект на временный URL
+     * файла. Для корректной работы необходимо поддерживать обработку редиректов.
+     * Запрос на временный URL не требует авторизации. По умолчанию время жизни
+     * временного URL равно одной минуте.
+     *
+     * C помощью параметра можно изменить время жизни URL в секундах. Текущее
+     * максимально возможное значение - 86400 секунд (24 часа). Долгоживущие
+     * ссылки предназначены для экспорта. Использование этих ссылок на публично
+     * доступных web-страницах запрещено.
+     *
+     * [Ссылки на файлы](https://dev.moysklad.ru/doc/api/remap/1.2/#mojsklad-json-api-obschie-swedeniq-ssylki-na-fajly)
+     */
+    downloadExpirationSeconds?: number
+
+    /**
      * Можно добавить дополнительные заголовки запроса
      */
     headers?: {
@@ -570,7 +585,7 @@ declare namespace Moysklad {
      * ```js
      * const filter1 = {
      *   name: {
-     *     $or: [
+     *     $all: [
      *       { $eq: 'foo' },
      *       {
      *         $not: {
@@ -593,7 +608,7 @@ declare namespace Moysklad {
      * }
      * ```
      */
-    $or?: QueryObject[] | undefined
+    $all?: QueryObject[] | undefined
 
     /**
      * Отрицание условия

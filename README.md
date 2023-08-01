@@ -641,10 +641,16 @@ bar!=;bar.baz=1;code=03;code=1;code=2;foo=1999-12-31 22:00:00;moment<=2001-01-02
 | `key: { $nin: [..] }`                | `key!=value1;key!=value2;...` | не входит в                |
 | `key: { $exists: true }`             | `key!=`                       | наличие значения (не null) |
 | `key: { $exists: false }`            | `key=`                        | пустое значение (null)     |
-| `key: { $or: [{..}, ..] }`          |                               | объединение условий        |
+| `key: { $all: [{..}, ..] }`          |                               | объединение условий        |
 | `key: { $not: {..} }`                |                               | отрицание условия          |
 
-На один ключ можно использовать несколько селекторов
+На один ключ можно использовать несколько селекторов.
+
+Подробнее с правилами фильтрации можно ознакомится в документации МойСклад:
+
+- [Фильтрация выборки с помощью параметра filter](https://dev.moysklad.ru/doc/api/remap/1.2/#mojsklad-json-api-obschie-swedeniq-fil-traciq-wyborki-s-pomosch-u-parametra-filter)
+- [Оператор фильтрации "подобие"](https://dev.moysklad.ru/doc/api/remap/1.2/#mojsklad-json-api-obschie-swedeniq-operator-fil-tracii-quot-podobie-quot)
+- [Фильтрация](https://dev.moysklad.ru/doc/api/remap/1.2/workbook/#workbook-fil-traciq-listanie-poisk-i-sortirowka-fil-traciq)
 
 ##### order
 
@@ -680,6 +686,7 @@ bar!=;bar.baz=1;code=03;code=1;code=2;foo=1999-12-31 22:00:00;moment<=2001-01-02
 | `millisecond`          | `boolean` | (не используется начиная с Remap API 1.2) Если `true`, то в запрос будет включен заголовок `X-Lognex-Format-Millisecond` со значением `true` (все даты объекта будут возвращены с учетом миллисекунд).                                                                                                                        |
 | `precision`            | `boolean` | Если `true`, то в запрос будет включен заголовок `X-Lognex-Precision` со значением `true` (отключение округления цен и себестоимости до копеек).                                                                                                                                                                              |
 | `webHookDisable`       | `boolean` | Если `true`, то в запрос будет включен заголовок `X-Lognex-WebHook-Disable` со значением `true` (отключить уведомления вебхуков в контексте данного запроса).                                                                                                                                                                 |
+| `downloadExpirationSeconds`       | `number` | Устанавливает значение для заголовока `X-Lognex-Download-Expiration-Seconds` (подробнее см. [Ссылки на файлы](https://dev.moysklad.ru/doc/api/remap/1.2/#mojsklad-json-api-obschie-swedeniq-ssylki-na-fajly))                                                      |
 
 <details>
   <summary>Примеры</summary>
@@ -1098,8 +1105,6 @@ const getProduct = id => ms.GET(`entity/product/${id}`)
 try {
   await getProduct(uuidFromApp)
 } catch (err) {
-  logError(5, err)
-
   if (err instanceof Moysklad.MoyskladUnexpectedRedirectError) {
     uuidFromApi = ms.parseUrl(err.location).path.pop()
     await getProduct(uuidFromApi)

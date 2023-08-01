@@ -12,6 +12,7 @@ test('buildFilter', t => {
 test('buildFilter with simple filter', t => {
   const filter = {
     name: 'foo',
+    str: 'foo;bar',
     value: 3,
     moment: new Date('2017-01-09T19:15:06.556Z'),
     some: null,
@@ -25,6 +26,7 @@ test('buildFilter with simple filter', t => {
       'name=foo',
       'other=true',
       'some=',
+      'str=foo\\;bar',
       'value=3'
     ].join(';')
   )
@@ -131,7 +133,7 @@ test('buildFilter with Mongo query comparison selectors', t => {
 test('buildFilter with Mongo query logical selectors', t => {
   const filter = {
     name: {
-      $or: [{ $eq: 'foo' }, { $eq: 'bar' }]
+      $all: [{ $eq: 'foo' }, { $eq: 'bar' }]
     },
     value: {
       $not: {
@@ -161,10 +163,10 @@ test('buildFilter with Mongo query logical selectors', t => {
   t.end()
 })
 
-test('buildFilter with $or query selectors', t => {
+test('buildFilter with $all query selectors', t => {
   const filter1 = {
     name: {
-      $or: [
+      $all: [
         { $eq: 'foo' },
         {
           $not: {
@@ -232,8 +234,8 @@ test('buildFilter errors', t => {
   }, /\$in: значение селектора foo должно быть массивом/)
 
   t.throws(() => {
-    buildFilter({ foo: { $or: { a: 1 } } })
-  }, /\$or: значение селектора должно быть массивом/)
+    buildFilter({ foo: { $all: { a: 1 } } })
+  }, /\$all: значение селектора должно быть массивом/)
 
   t.throws(() => {
     buildFilter({ foo: { $not: 3 } })

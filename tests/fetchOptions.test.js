@@ -268,3 +268,30 @@ test('Request with webHookDisable option', t => {
     t.end()
   })
 })
+
+test('Request with downloadExpirationSeconds option', t => {
+  t.plan(2)
+
+  const ms = Moysklad({
+    fetch: (url, options) => {
+      t.equal(
+        options.headers['X-Lognex-Download-Expiration-Seconds'],
+        '3600',
+        'should add header'
+      )
+
+      t.notOk(
+        options.downloadExpirationSeconds,
+        'should remove option from fetch options'
+      )
+
+      throw new Error('stop')
+    }
+  })
+
+  ms.GET('entity/some', null, { downloadExpirationSeconds: 60 * 60 }).catch(
+    () => {
+      t.end()
+    }
+  )
+})

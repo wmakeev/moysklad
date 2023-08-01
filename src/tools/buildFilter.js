@@ -80,9 +80,9 @@ function getFilterParts(path, value) {
 
   switch (true) {
     // Mongo logical selectors
-    case curKey === '$or':
+    case curKey === '$all':
       if (!(value instanceof Array)) {
-        throw new MoyskladError('$or: значение селектора должно быть массивом')
+        throw new MoyskladError('$all: значение селектора должно быть массивом')
       }
       return value.reduce(
         (res, val) => res.concat(getFilterParts(path.slice(0, -1), val)),
@@ -163,7 +163,14 @@ module.exports = function buildFilter(filter) {
           case value instanceof Date:
             return [key, operator, getTimeString(value, true)]
 
-          case typeof value === 'string':
+          case typeof value === 'string': {
+            return [
+              key,
+              operator,
+              value.includes(';') ? value.replaceAll(';', '\\;') : value
+            ]
+          }
+
           case typeof value === 'number':
           case typeof value === 'boolean':
             return [key, operator, value]
@@ -176,6 +183,8 @@ module.exports = function buildFilter(filter) {
       })
       .filter(it => it != null)
       .map(part => `${part[0]}${part[1]}${part[2]}`)
+      // TODO Можно удалить эту сортировку (лишняя не нужная работа)
+      // только нужно адаптировать тесты
       .sort((p1, p2) => {
         if (p1 > p2) {
           return 1

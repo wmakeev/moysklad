@@ -790,6 +790,13 @@ declare namespace Moysklad {
     column?: number
     line?: number
     error_message?: string
+    dependencies?: {
+      href: string
+      type: string
+      mediaType: string
+      metadataHref?: string
+      uuidHref?: string
+    }[]
   }
 
   /**

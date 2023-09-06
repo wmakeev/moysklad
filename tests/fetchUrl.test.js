@@ -6,8 +6,7 @@ const { fetch } = require('undici')
 const Moysklad = require('..')
 
 test('fetchUrl redirect', async t => {
-  // TODO 2023-07-31 Редирект перестал выполняться (исправление или ошибка в API?) #fkjs94ys
-  t.plan(1)
+  t.plan(2)
 
   const ms = Moysklad({ fetch })
 

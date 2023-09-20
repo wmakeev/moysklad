@@ -21,7 +21,7 @@ const msParsedDate: Date = Moysklad.parseTimeString(msDate)
 
 //#region Инициализация библиотеки
 const ms = Moysklad({
-  endpoint: 'https://online.moysklad.ru/api',
+  endpoint: 'https://api.moysklad.ru/api',
   api: 'remap',
   apiVersion: '1.2',
   fetch: 'any',
@@ -58,9 +58,6 @@ ms.GET(
   'path/to/doc',
   {
     order: ['foo', ['bar', 'baz'], ['qux']]
-  },
-  {
-    millisecond: true
   }
 )
 

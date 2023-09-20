@@ -19,6 +19,7 @@ const getTimeString = require('./tools/getTimeString')
 const parseTimeString = require('./tools/parseTimeString')
 const buildFilter = require('./tools/buildFilter')
 const buildQuery = require('./tools/buildQuery')
+const getEnvVar = require('./getEnvVar.js')
 const getAuthHeader = require('./methods/getAuthHeader')
 const buildUrl = require('./methods/buildUrl')
 const parseUrl = require('./methods/parseUrl')
@@ -122,11 +123,18 @@ module.exports = stampit({
     this.emitter = options.emitter
   }
 
+  const MOYSKLAD_HOST = getEnvVar('MOYSKLAD_HOST', 'api.moysklad.ru')
+  const MOYSKLAD_API = getEnvVar('MOYSKLAD_API', 'remap')
+  const MOYSKLAD_USER_AGENT = getEnvVar(
+    'MOYSKLAD_USER_AGENT',
+    `moysklad/${version} (+https://github.com/wmakeev/moysklad)`
+  )
+
   const _options = Object.assign(
     {
-      endpoint: 'https://online.moysklad.ru/api',
-      api: 'remap',
-      userAgent: `moysklad/${version} (+https://github.com/wmakeev/moysklad)`
+      endpoint: `https://${MOYSKLAD_HOST}/api`,
+      api: MOYSKLAD_API,
+      userAgent: MOYSKLAD_USER_AGENT
     },
     options
   )

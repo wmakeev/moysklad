@@ -60,7 +60,7 @@
 
 ## Особенности
 
-Библиотека представляет максимально простой и прозрачный интерфейс к существующим методам [API МойСклад](https://online.moysklad.ru/api/remap/1.2/doc), не абстрагирует разработчика от API и не выполняет никаких внутренних преобразований отправляемых и получаемых данных.
+Библиотека представляет максимально простой и прозрачный интерфейс к существующим методам [API МойСклад](https://api.moysklad.ru/api/remap/1.2/doc), не абстрагирует разработчика от API и не выполняет никаких внутренних преобразований отправляемых и получаемых данных.
 
 Основная задача библиотеки - упростить ряд рутинных задач:
 
@@ -136,19 +136,21 @@ ms.GET('entity/customerorder', {
 
 Все параметры опциональные (имеют значения по умолчанию)
 
-| Параметр     | Значение по умолчанию                                       | Описание                                                                                                                                                                                                                                                                                                                           |
-| ------------ | ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `fetch`      | глобальный fetch                                            | Функция с интерфейсом [Fetch API](https://developer.mozilla.org/ru/docs/Web/API/Fetch_API). Если глобальный fetch не найден, то будет выброшена ошибка при попытке осуществить http запрос. Начиная с Node.js 18 [fetch](https://nodejs.org/dist/latest-v18.x/docs/api/globals.html#fetch) является частью стандратной библиотеки. |
-| `endpoint`   | `"https://online.moysklad.ru/api"`                          | Точка досупа к API                                                                                                                                                                                                                                                                                                                 |
-| `api`        | `"remap"`                                                   | Раздел API                                                                                                                                                                                                                                                                                                                         |
-| `apiVersion` | `"1.2"`                                                     | Версия API                                                                                                                                                                                                                                                                                                                         |
-| `token`      | `undefined`                                                 | Токен доступа к API (см. [Аутентификация](#аутентификация))                                                                                                                                                                                                                                                                        |
-| `login`      | `undefined`                                                 | Логин для доступа к API (см. [Аутентификация](#аутентификация))                                                                                                                                                                                                                                                                    |
-| `password`   | `undefined`                                                 | Пароль для доступа к API (см. [Аутентификация](#аутентификация))                                                                                                                                                                                                                                                                   |
-| `emitter`    | `undefined`                                                 | экземляр [EventEmitter](https://nodejs.org/api/events.html#events_class_eventemitter) для передачи [событий библиотеки](#события)                                                                                                                                                                                                  |
-| `userAgent`  | `moysklad/{version} (+https://github.com/wmakeev/moysklad)` | Содержимое заголовка "User-Agent" при выполнении запроса. Удобно использовать для контроля изменений через API на вкладке "Аудит".                                                                                                                                                                                                 |
+| Параметр     | Значение по умолчанию                                                                            | Описание                                                                                                                                                                                                                                                                                                                           |
+| ------------ | ------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `fetch`      | глобальный fetch                                                                                 | Функция с интерфейсом [Fetch API](https://developer.mozilla.org/ru/docs/Web/API/Fetch_API). Если глобальный fetch не найден, то будет выброшена ошибка при попытке осуществить http запрос. Начиная с Node.js 18 [fetch](https://nodejs.org/dist/latest-v18.x/docs/api/globals.html#fetch) является частью стандратной библиотеки. |
+| `endpoint`   | `"https://api.moysklad.ru/api"`                                                                  | Точка досупа к API (хост точки доступа можно указать через переменную окружения `MOYSKLAD_HOST`, по умолчанию `api.moysklad.ru`)                                                                                                                                                                                                   |
+| `api`        | `"remap"`                                                                                        | Раздел API (можно задать через переменную окружения `MOYSKLAD_API`)                                                                                                                                                                                                                                                                |
+| `apiVersion` | `"1.2"`                                                                                          | Версия API (можно задать через переменную окружения `MOYSKLAD_{NAME}_API_VERSION`, где `{NAME}` - название API в верхнем регистре, напр. `MOYSKLAD_REMAP_API_VERSION`)                                                                                                                                                             |
+| `token`      | `undefined`                                                                                      | Токен доступа к API (см. [Аутентификация](#аутентификация))                                                                                                                                                                                                                                                                        |
+| `login`      | `undefined`                                                                                      | Логин для доступа к API (см. [Аутентификация](#аутентификация))                                                                                                                                                                                                                                                                    |
+| `password`   | `undefined`                                                                                      | Пароль для доступа к API (см. [Аутентификация](#аутентификация))                                                                                                                                                                                                                                                                   |
+| `emitter`    | `undefined`                                                                                      | экземляр [EventEmitter](https://nodejs.org/api/events.html#events_class_eventemitter) для передачи [событий библиотеки](#события)                                                                                                                                                                                                  |
+| `userAgent`  | `moysklad/{ver} (+https://github.com/wmakeev/moysklad)`, где `{ver}` - текущая версия библиотеки | Содержимое заголовка "User-Agent" при выполнении запроса. Удобно использовать для контроля изменений через API на вкладке "Аудит". Можно задать через переменную окружения `MOYSKLAD_USER_AGENT`.                                                                                                                                  |
 
-Пример использования:
+Явное задание параметра переопределяет значение заданное в соотв. переменной окружения.
+
+**Пример использования:**
 
 ```js
 const Moysklad = require('moysklad')
@@ -185,8 +187,10 @@ const moysklad = Moysklad({ apiVersion: '1.2' })
 
    1. Переменная окружения `process.env.MOYSKLAD_TOKEN`
    2. Переменные окружения `process.env.MOYSKLAD_LOGIN` и `process.env.MOYSKLAD_PASSWORD`
-   3. Глобальная переменная `global.MOYSKLAD_TOKEN`
-   4. Глобальные переменные `global.MOYSKLAD_LOGIN` и `global.MOYSKLAD_PASSWORD`
+   3. Глобальная переменная `window.MOYSKLAD_TOKEN`
+   4. Глобальные переменные `window.MOYSKLAD_LOGIN` и `window.MOYSKLAD_PASSWORD`
+   5. Глобальная переменная `global.MOYSKLAD_TOKEN`
+   6. Глобальные переменные `global.MOYSKLAD_LOGIN` и `global.MOYSKLAD_PASSWORD`
 
 ## Статические методы
 
@@ -435,13 +439,13 @@ ms.buildUrl(url: string, query?: object): string
 
 ```js
 const url = ms.buildUrl(
-  'https://online.moysklad.ru/api/remap/1.2/entity/customerorder?expand=positions',
+  'https://api.moysklad.ru/api/remap/1.2/entity/customerorder?expand=positions',
   { limit: 100 }
 )
 
 assert.equal(
   url,
-  'https://online.moysklad.ru/api/remap/1.2/entity/customerorder?expand=positions&limit=100'
+  'https://api.moysklad.ru/api/remap/1.2/entity/customerorder?expand=positions&limit=100'
 )
 ```
 
@@ -450,7 +454,7 @@ const url = ms.buildUrl('entity/customerorder', { expand: 'positions' })
 
 assert.equal(
   url,
-  'https://online.moysklad.ru/api/remap/1.2/entity/customerorder?expand=positions'
+  'https://api.moysklad.ru/api/remap/1.2/entity/customerorder?expand=positions'
 )
 ```
 
@@ -486,10 +490,10 @@ ms.parseUrl(url: string): {
 **Пример использования:**
 
 ```js
-const parsedUri = ms.parseUrl('https://online.moysklad.ru/api/remap/1.2/entity/customerorder?expand=positions')
+const parsedUri = ms.parseUrl('https://api.moysklad.ru/api/remap/1.2/entity/customerorder?expand=positions')
 
 assert.deepEqual(parsedUri, {
-  endpoint: 'https://online.moysklad.ru/api',
+  endpoint: 'https://api.moysklad.ru/api',
   api: 'remap'
   apiVersion: '1.2',
   path: ['entity', 'customerorder'],
@@ -516,7 +520,7 @@ ms.fetchUrl(url: string, options?: object): Promise
 **Пример использования:**
 
 ```js
-const url = `https://online.moysklad.ru/api/remap/1.2/entity/customerorder/eb7bcc22-ae8d-11e3-9e32-002590a28eca`
+const url = `https://api.moysklad.ru/api/remap/1.2/entity/customerorder/eb7bcc22-ae8d-11e3-9e32-002590a28eca`
 
 const patch = { applicable: false }
 
@@ -538,7 +542,7 @@ Url запроса можно указать полностью
 
 ```js
 ms.GET(
-  `https://online.moysklad.ru/api/remap/1.2/entity/customerorder/${ORDER_ID}/positions/${POSITION_ID}?expand=assortment`
+  `https://api.moysklad.ru/api/remap/1.2/entity/customerorder/${ORDER_ID}/positions/${POSITION_ID}?expand=assortment`
 )
 ```
 
@@ -580,7 +584,7 @@ const query = {
   arr: ['str', 1, true, null, undefined]
 }
 
-// https://online.moysklad.ru/api/remap/1.2/entity/demand?str=some%20string&num=1&bool=true&nil=&arr=str&arr=1&arr=true&arr=
+// https://api.moysklad.ru/api/remap/1.2/entity/demand?str=some%20string&num=1&bool=true&nil=&arr=str&arr=1&arr=true&arr=
 ms.GET('entity/demand', query)
 ```
 
@@ -677,16 +681,15 @@ bar!=;bar.baz=1;code=03;code=1;code=2;foo=1999-12-31 22:00:00;moment<=2001-01-02
 
 Опции специфичные для библиотеки moysklad (не передаются в `fetch`):
 
-| Поле                   | Тип       | Описание                                                                                                                                                                                                                                                                                                                      |
-| ---------------------- | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `rawResponse`          | `boolean` | Если `true`, то метод вернет результат в виде объекта [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response). Код и содержимое ответа не проверяется на ошибки.                                                                                                                                                |
-| `rawRedirect`          | `boolean` | Если `true` и код запроса `3xx` (редирект), то метод вернет [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response). В обратном случае, будет выброшена ошибка `MoyskladRequestError`. Опция нужна для явного указания того, что вы ожидаете получить редирект при опции запроса `redirect` не равной `follow`. |
-| `muteApiErrors`        | `boolean` | Если `true`, то все ошибки API будут проигнорированы (метод не будет генерировать ошибку если код ответа сервера не в диапазоне 200-299 и тело ответа содержит описание ошибки МойСклад). Опция не затрагивает прочие ошибки, которые не возвращают JSON ответ.                                                               |
-| `muteCollectionErrors` | `boolean` | Если `true`, то все ошибки внутри коллекций при массовом обновлении сущностей будут проигнорированы.                                                                                                                                                                                                                          |
-| `millisecond`          | `boolean` | (не используется начиная с Remap API 1.2) Если `true`, то в запрос будет включен заголовок `X-Lognex-Format-Millisecond` со значением `true` (все даты объекта будут возвращены с учетом миллисекунд).                                                                                                                        |
-| `precision`            | `boolean` | Если `true`, то в запрос будет включен заголовок `X-Lognex-Precision` со значением `true` (отключение округления цен и себестоимости до копеек).                                                                                                                                                                              |
-| `webHookDisable`       | `boolean` | Если `true`, то в запрос будет включен заголовок `X-Lognex-WebHook-Disable` со значением `true` (отключить уведомления вебхуков в контексте данного запроса).                                                                                                                                                                 |
-| `downloadExpirationSeconds`       | `number` | Устанавливает значение для заголовока `X-Lognex-Download-Expiration-Seconds` (подробнее см. [Ссылки на файлы](https://dev.moysklad.ru/doc/api/remap/1.2/#mojsklad-json-api-obschie-swedeniq-ssylki-na-fajly))                                                      |
+| Поле                        | Тип       | Описание                                                                                                                                                                                                                                                                                                                      |
+| --------------------------- | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `rawResponse`               | `boolean` | Если `true`, то метод вернет результат в виде объекта [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response). Код и содержимое ответа не проверяется на ошибки.                                                                                                                                                |
+| `rawRedirect`               | `boolean` | Если `true` и код запроса `3xx` (редирект), то метод вернет [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response). В обратном случае, будет выброшена ошибка `MoyskladRequestError`. Опция нужна для явного указания того, что вы ожидаете получить редирект при опции запроса `redirect` не равной `follow`. |
+| `muteApiErrors`             | `boolean` | Если `true`, то все ошибки API будут проигнорированы (метод не будет генерировать ошибку если код ответа сервера не в диапазоне 200-299 и тело ответа содержит описание ошибки МойСклад). Опция не затрагивает прочие ошибки, которые не возвращают JSON ответ.                                                               |
+| `muteCollectionErrors`      | `boolean` | Если `true`, то все ошибки внутри коллекций при массовом обновлении сущностей будут проигнорированы.                                                                                                                                                                                                                          |
+| `precision`                 | `boolean` | Если `true`, то в запрос будет включен заголовок `X-Lognex-Precision` со значением `true` (отключение округления цен и себестоимости до копеек).                                                                                                                                                                              |
+| `webHookDisable`            | `boolean` | Если `true`, то в запрос будет включен заголовок `X-Lognex-WebHook-Disable` со значением `true` (отключить уведомления вебхуков в контексте данного запроса).                                                                                                                                                                 |
+| `downloadExpirationSeconds` | `number`  | Устанавливает значение для заголовока `X-Lognex-Download-Expiration-Seconds` (подробнее см. [Ссылки на файлы](https://dev.moysklad.ru/doc/api/remap/1.2/#mojsklad-json-api-obschie-swedeniq-ssylki-na-fajly))                                                                                                                 |
 
 <details>
   <summary>Примеры</summary>
@@ -784,7 +787,7 @@ bar!=;bar.baz=1;code=03;code=1;code=2;foo=1999-12-31 22:00:00;moment<=2001-01-02
   ```js
   const ms = Moysklad({ fetch })
 
-  // https://online.moysklad.ru/app/#good/edit?id=cb277549-34f4-4029-b9de-7b37e8e25a54
+  // https://api.moysklad.ru/app/#good/edit?id=cb277549-34f4-4029-b9de-7b37e8e25a54
   const PRODUCT_UI_ID = 'cb277549-34f4-4029-b9de-7b37e8e25a54'
 
   // Error: 308 Permanent Redirect
@@ -904,7 +907,7 @@ await ms.GET('foo/bar')
 {
   "name": "MoyskladRequestError",
   "message": "404 Not Found",
-  "url": "https://online.moysklad.ru/api/foo/0/foo/bar",
+  "url": "https://api.moysklad.ru/api/foo/0/foo/bar",
   "status": 404,
   "statusText": "Not Found"
 }
@@ -935,7 +938,7 @@ await ms.GET('entity/product2')
 {
   "name": "MoyskladApiError",
   "message": "Неизвестный тип: 'product2' (https://dev.moysklad.ru/doc/api/remap/1.2/#error_1005)",
-  "url": "https://online.moysklad.ru/api/remap/1.2/entity/product2",
+  "url": "https://api.moysklad.ru/api/remap/1.2/entity/product2",
   "status": 412,
   "statusText": "Precondition Failed",
   "code": 1005,
@@ -997,7 +1000,7 @@ await ms.POST('entity/product', [
 {
   "name": "MoyskladCollectionError",
   "message": "Ошибка сохранения объекта: поле 'name' не может быть пустым или отсутствовать (https://dev.moysklad.ru/doc/api/remap/1.2/#error_3000)",
-  "url": "https://online.moysklad.ru/api/remap/1.2/entity/product",
+  "url": "https://api.moysklad.ru/api/remap/1.2/entity/product",
   "status": 400,
   "statusText": "Bad Request",
   "code": 3000,

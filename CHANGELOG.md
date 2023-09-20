@@ -20,6 +20,12 @@
 
 ---
 
+## 0.16.0 (2023-09-20)
+
+- ⚡️ (api) [Переезд на новый домен](https://dev.moysklad.ru/doc/api/remap/1.2/#mojsklad-json-api-obschie-swedeniq-rekomendacii-po-pereezdu-na-nowyj-domen)
+- ⚡️ (api) Убран параметр запроса `millisecond` (использовался в remap API 1.1)
+- ➕ (api) Возможность указания опций через переменные окружения `MOYSKLAD_HOST`, `MOYSKLAD_API`, `MOYSKLAD_USER_AGENT`.
+
 ## 0.15.1 (2023-09-06)
 
 - ➕ (typings) Добавлен тайпинг для поля `dependencies` в ошибке (для случая когда нельзя удалить объект по причине наличия связи с другим)

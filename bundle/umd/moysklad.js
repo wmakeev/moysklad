@@ -482,9 +482,9 @@ module.exports = getApiDefaultVersion
 function getEnvVar(key, defaultValue) {
   if (typeof process !== 'undefined' && process.env && process.env[key]) {
     return process.env[key]
-  } else if (typeof window !== 'undefined' && window[key] != null) {
+  } else if (typeof window !== 'undefined' && window[key]) {
     return window[key]
-  } else if (typeof __webpack_require__.g !== 'undefined' && __webpack_require__.g[key] != null) {
+  } else if (typeof __webpack_require__.g !== 'undefined' && __webpack_require__.g[key]) {
     return __webpack_require__.g[key]
   } else {
     return defaultValue !== undefined ? defaultValue : null
@@ -574,6 +574,7 @@ const getTimeString = __webpack_require__(9)
 const parseTimeString = __webpack_require__(562)
 const buildFilter = __webpack_require__(656)
 const buildQuery = __webpack_require__(467)
+const getEnvVar = __webpack_require__(489)
 const getAuthHeader = __webpack_require__(706)
 const buildUrl = __webpack_require__(831)
 const parseUrl = __webpack_require__(60)
@@ -677,11 +678,18 @@ module.exports = stampit({
     this.emitter = options.emitter
   }
 
+  const MOYSKLAD_HOST = getEnvVar('MOYSKLAD_HOST', 'api.moysklad.ru')
+  const MOYSKLAD_API = getEnvVar('MOYSKLAD_API', 'remap')
+  const MOYSKLAD_USER_AGENT = getEnvVar(
+    'MOYSKLAD_USER_AGENT',
+    `moysklad/${version} (+https://github.com/wmakeev/moysklad)`
+  )
+
   const _options = Object.assign(
     {
-      endpoint: 'https://online.moysklad.ru/api',
-      api: 'remap',
-      userAgent: `moysklad/${version} (+https://github.com/wmakeev/moysklad)`
+      endpoint: `https://${MOYSKLAD_HOST}/api`,
+      api: MOYSKLAD_API,
+      userAgent: MOYSKLAD_USER_AGENT
     },
     options
   )
@@ -973,6 +981,7 @@ module.exports = async function fetchUrl(url, options = {}) {
     headers: {
       'User-Agent': this.getOptions().userAgent,
       'Content-Type': 'application/json',
+      'Accept-Encoding': 'gzip',
       ...options.headers
     }
   }
@@ -1004,10 +1013,6 @@ module.exports = async function fetchUrl(url, options = {}) {
   }
 
   // X-Lognex
-  if (fetchOptions.millisecond) {
-    fetchOptions.headers['X-Lognex-Format-Millisecond'] = 'true'
-    delete fetchOptions.millisecond
-  }
   if (fetchOptions.precision) {
     fetchOptions.headers['X-Lognex-Precision'] = 'true'
     delete fetchOptions.precision

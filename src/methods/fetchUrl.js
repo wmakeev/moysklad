@@ -32,6 +32,7 @@ module.exports = async function fetchUrl(url, options = {}) {
     headers: {
       'User-Agent': this.getOptions().userAgent,
       'Content-Type': 'application/json',
+      'Accept-Encoding': 'gzip',
       ...options.headers
     }
   }
@@ -63,10 +64,6 @@ module.exports = async function fetchUrl(url, options = {}) {
   }
 
   // X-Lognex
-  if (fetchOptions.millisecond) {
-    fetchOptions.headers['X-Lognex-Format-Millisecond'] = 'true'
-    delete fetchOptions.millisecond
-  }
   if (fetchOptions.precision) {
     fetchOptions.headers['X-Lognex-Precision'] = 'true'
     delete fetchOptions.precision

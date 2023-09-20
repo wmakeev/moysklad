@@ -10,11 +10,15 @@ const BASIC_AUTH = 'Basic ' + base64encode('login:password')
 
 const MOYSKLAD_LOGIN = process.env.MOYSKLAD_LOGIN
 const MOYSKLAD_PASSWORD = process.env.MOYSKLAD_PASSWORD
+const MOYSKLAD_HOST = process.env.MOYSKLAD_HOST
+const MOYSKLAD_API = process.env.MOYSKLAD_API
 
 const clearEnv = () => {
   delete process.env.MOYSKLAD_LOGIN
   delete process.env.MOYSKLAD_PASSWORD
   delete process.env.MOYSKLAD_TOKEN
+  delete process.env.MOYSKLAD_HOST
+  delete process.env.MOYSKLAD_API
   delete global.MOYSKLAD_LOGIN
   delete global.MOYSKLAD_PASSWORD
   delete global.MOYSKLAD_TOKEN
@@ -24,10 +28,14 @@ const clearEnv = () => {
 const restoreEnv = () => {
   process.env.MOYSKLAD_LOGIN = MOYSKLAD_LOGIN
   process.env.MOYSKLAD_PASSWORD = MOYSKLAD_PASSWORD
+  process.env.MOYSKLAD_HOST = MOYSKLAD_HOST || ''
+  process.env.MOYSKLAD_API = MOYSKLAD_API || ''
   delete process.env.MOYSKLAD_TOKEN
   delete global.MOYSKLAD_LOGIN
   delete global.MOYSKLAD_PASSWORD
   delete global.MOYSKLAD_TOKEN
+  delete global.MOYSKLAD_HOST
+  delete global.MOYSKLAD_API
   delete global.window
 }
 
@@ -185,6 +193,30 @@ test('Moysklad#getAuthHeader (window)', t => {
       msToken.getAuthHeader(),
       BEARER_AUTH,
       'should return Bearer auth with MOYSKLAD_TOKEN global'
+    )
+  } finally {
+    restoreEnv()
+  }
+
+  t.end()
+})
+
+test('Moysklad env', t => {
+  clearEnv()
+
+  try {
+    global.MOYSKLAD_HOST = 'foo.bar.ru'
+    process.env.MOYSKLAD_API = 'example'
+    global.MOYSKLAD_EXAMPLE_API_VERSION = '9.9'
+
+    const ms = Moysklad()
+
+    const url = ms.buildUrl('entity/some')
+
+    t.equals(
+      url,
+      'https://foo.bar.ru/api/example/9.9/entity/some',
+      'should use MOYSKLAD_HOST and MOYSKLAD_API env'
     )
   } finally {
     restoreEnv()

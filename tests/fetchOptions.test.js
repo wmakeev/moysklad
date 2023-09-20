@@ -203,28 +203,6 @@ test('Response with redirect follow', async t => {
   t.notEquals(product.id, uuidFromApp)
 })
 
-test('Response with millisecond option (remap 1.1)', t => {
-  t.plan(2)
-
-  const ms = Moysklad({ apiVersion: '1.1', fetch })
-
-  const { parseTimeString } = Moysklad
-
-  ms.GET('entity/product/0010fe40-307d-11e5-7a07-673d0013045f', {
-    limit: 1
-  }).then(async res => {
-    t.ok(parseTimeString(res.updated).getMilliseconds() === 0)
-  })
-
-  ms.GET(
-    'entity/product/0010fe40-307d-11e5-7a07-673d0013045f',
-    { limit: 1 },
-    { millisecond: true }
-  ).then(async res => {
-    t.ok(parseTimeString(res.updated).getMilliseconds() !== 0)
-  })
-})
-
 test('Request with precision option', t => {
   t.plan(2)
 

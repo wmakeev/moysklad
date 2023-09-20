@@ -679,7 +679,7 @@ module.exports = stampit({
 
   const _options = Object.assign(
     {
-      endpoint: 'https://online.moysklad.ru/api',
+      endpoint: 'https://api.moysklad.ru/api',
       api: 'remap',
       userAgent: `moysklad/${version} (+https://github.com/wmakeev/moysklad)`
     },
@@ -1754,7 +1754,7 @@ module.exports = { version: '0.15.1' }
 /************************************************************************/
 /******/ 	// The module cache
 /******/ 	var __webpack_module_cache__ = {};
-/******/ 	
+/******/
 /******/ 	// The require function
 /******/ 	function __webpack_require__(moduleId) {
 /******/ 		// Check if module is in cache
@@ -1768,14 +1768,14 @@ module.exports = { version: '0.15.1' }
 /******/ 			// no module.loaded needed
 /******/ 			exports: {}
 /******/ 		};
-/******/ 	
+/******/
 /******/ 		// Execute the module function
 /******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
-/******/ 	
+/******/
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
 /******/ 	}
-/******/ 	
+/******/
 /************************************************************************/
 /******/ 	/* webpack/runtime/global */
 /******/ 	(() => {
@@ -1788,14 +1788,14 @@ module.exports = { version: '0.15.1' }
 /******/ 			}
 /******/ 		})();
 /******/ 	})();
-/******/ 	
+/******/
 /************************************************************************/
-/******/ 	
+/******/
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
 /******/ 	var __webpack_exports__ = __webpack_require__(138);
 /******/ 	window.MoyskladClient = __webpack_exports__;
-/******/ 	
+/******/
 /******/ })()
 ;

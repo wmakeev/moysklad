@@ -45,8 +45,8 @@ ms.GET('entity/customerorder', { limit: 1 }).then(res => {
 })
 
 /*
-(1) GET https://online.moysklad.ru/api/remap/1.2/entity/customerorder?limit=1
-(1) GET OK 200 https://online.moysklad.ru/api/remap/1.2/entity/customerorder?limit=1 (+601ms)
-(1) GET BODY https://online.moysklad.ru/api/remap/1.2/entity/customerorder?limit=1 (+611ms)
+(1) GET https://api.moysklad.ru/api/remap/1.2/entity/customerorder?limit=1
+(1) GET OK 200 https://api.moysklad.ru/api/remap/1.2/entity/customerorder?limit=1 (+601ms)
+(1) GET BODY https://api.moysklad.ru/api/remap/1.2/entity/customerorder?limit=1 (+611ms)
 Order name: NV-ord-082432
 */

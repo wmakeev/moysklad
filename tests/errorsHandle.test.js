@@ -42,7 +42,7 @@ test('MoyskladRequestError', async t => {
         t.equal(err.message, '404 Not Found')
         t.equal(err.status, 404)
         t.equal(err.statusText, 'Not Found')
-        t.equal(err.url, 'https://online.moysklad.ru/api/foo/0/foo/bar')
+        t.equal(err.url, 'https://api.moysklad.ru/api/foo/0/foo/bar')
       }
     })
 })
@@ -91,7 +91,7 @@ test('MoyskladApiError', async t => {
         t.equal(err.statusText, 'Bad Request')
         t.equal(
           err.url,
-          'https://online.moysklad.ru/api/remap/1.2/entity/product'
+          'https://api.moysklad.ru/api/remap/1.2/entity/product'
         )
         t.equal(err.errors[0].code, err.code)
         t.equal(err.errors[0].error, 'Не указан идентификатор объекта')

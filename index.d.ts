@@ -137,7 +137,7 @@ declare namespace Moysklad {
      * const options = ms.getOptions()
      *
      * console.log(options)
-     * // { endpoint: "https://online.moysklad.ru/api", api: "remap", apiVersion: "1.2", fetch }
+     * // { endpoint: "https://api.moysklad.ru/api", api: "remap", apiVersion: "1.2", fetch }
      *
      * ```
      */
@@ -160,7 +160,7 @@ declare namespace Moysklad {
      *
      * ```js
      * ms.buildUrl('entity/customerorder', { expand: 'agent' })
-     * // https://online.moysklad.ru/api/remap/1.2/entity/customerorder?expand=agent
+     * // https://api.moysklad.ru/api/remap/1.2/entity/customerorder?expand=agent
      * ```
      */
     buildUrl(path: string, query?: Query): string
@@ -183,7 +183,7 @@ declare namespace Moysklad {
       /**
        * Точка досупа к API
        *
-       * Пример: `https://online.moysklad.ru/api`
+       * Пример: `https://api.moysklad.ru/api`
        */
       endpoint: string
 
@@ -224,7 +224,7 @@ declare namespace Moysklad {
      *
      * Пример:
      * ```js
-     * const url = `https://online.moysklad.ru/api/remap/1.2/entity/customerorder/eb7bc422-ae8d-11e3-9e32-002590a28eca`
+     * const url = `https://api.moysklad.ru/api/remap/1.2/entity/customerorder/eb7bc422-ae8d-11e3-9e32-002590a28eca`
      *
      * const patch = { applicable: false }
      *
@@ -256,7 +256,7 @@ declare namespace Moysklad {
     /**
      * Точка досупа к API
      *
-     * по умолчанию `https://online.moysklad.ru/api`
+     * по умолчанию `https://api.moysklad.ru/api`
      */
     endpoint?: string
 
@@ -337,9 +337,9 @@ declare namespace Moysklad {
      * Вывод в консоли:
      *
      * ```text
-     * GET https://online.moysklad.ru/api/remap/1.2/entity/customerorder?limit=1 (+4ms)
-     * GET OK 200 https://online.moysklad.ru/api/remap/1.2/entity/customerorder?limit=1 (+575ms)
-     * GET BODY https://online.moysklad.ru/api/remap/1.2/entity/customerorder?limit=1 (+580ms)
+     * GET https://api.moysklad.ru/api/remap/1.2/entity/customerorder?limit=1 (+4ms)
+     * GET OK 200 https://api.moysklad.ru/api/remap/1.2/entity/customerorder?limit=1 (+575ms)
+     * GET BODY https://api.moysklad.ru/api/remap/1.2/entity/customerorder?limit=1 (+580ms)
      * Order name: 00600
      * ```
      *
@@ -715,7 +715,7 @@ declare namespace Moysklad {
     /**
      * Точка досупа к API
      *
-     * Пример: `https://online.moysklad.ru/api`
+     * Пример: `https://api.moysklad.ru/api`
      */
     endpoint: string
 

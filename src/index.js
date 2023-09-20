@@ -124,7 +124,7 @@ module.exports = stampit({
 
   const _options = Object.assign(
     {
-      endpoint: 'https://online.moysklad.ru/api',
+      endpoint: 'https://api.moysklad.ru/api',
       api: 'remap',
       userAgent: `moysklad/${version} (+https://github.com/wmakeev/moysklad)`
     },

@@ -22,7 +22,7 @@ test('Moysklad events (request)', t => {
 
       t.equal(
         url,
-        'https://online.moysklad.ru/api/remap/1.2/entity/customerorder?limit=1',
+        'https://api.moysklad.ru/api/remap/1.2/entity/customerorder?limit=1',
         'should emit request url'
       )
 
@@ -33,7 +33,7 @@ test('Moysklad events (request)', t => {
 
       t.equal(
         url,
-        'https://online.moysklad.ru/api/remap/1.2/entity/customerorder?limit=1',
+        'https://api.moysklad.ru/api/remap/1.2/entity/customerorder?limit=1',
         'should emit response url'
       )
 
@@ -46,7 +46,7 @@ test('Moysklad events (request)', t => {
 
       t.equal(
         url,
-        'https://online.moysklad.ru/api/remap/1.2/entity/customerorder?limit=1',
+        'https://api.moysklad.ru/api/remap/1.2/entity/customerorder?limit=1',
         'should emit response:body url'
       )
 
@@ -79,7 +79,7 @@ test('Moysklad events (request error)', t => {
 
       t.equal(
         url,
-        'https://online.moysklad.ru/api/remap/1.2/entity/customerorder2?limit=1',
+        'https://api.moysklad.ru/api/remap/1.2/entity/customerorder2?limit=1',
         'should emit request url'
       )
       t.equal(options.method, 'GET', 'should emit request options')
@@ -87,7 +87,7 @@ test('Moysklad events (request error)', t => {
     .on('response', ({ url, options, response }) => {
       t.equal(
         url,
-        'https://online.moysklad.ru/api/remap/1.2/entity/customerorder2?limit=1',
+        'https://api.moysklad.ru/api/remap/1.2/entity/customerorder2?limit=1',
         'should emit response url'
       )
       t.equal(options.method, 'GET', 'should emit response options')
@@ -96,7 +96,7 @@ test('Moysklad events (request error)', t => {
     .on('response:body', ({ url, options, response, body }) => {
       t.equal(
         url,
-        'https://online.moysklad.ru/api/remap/1.2/entity/customerorder2?limit=1',
+        'https://api.moysklad.ru/api/remap/1.2/entity/customerorder2?limit=1',
         'should emit response:body url'
       )
       t.equal(options.method, 'GET', 'should emit response:body options')

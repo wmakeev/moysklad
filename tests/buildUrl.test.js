@@ -10,13 +10,13 @@ test('Moysklad#buildUrl method', t => {
 
   t.equals(
     ms.buildUrl('/path/To//My/Res/'),
-    'https://online.moysklad.ru/api/remap/1.2/path/To/My/Res'
+    'https://api.moysklad.ru/api/remap/1.2/path/To/My/Res'
   )
 
   // TODO deprecated
   t.equals(
     ms.buildUrl(['/path/', 'To//My', 'Res/']),
-    'https://online.moysklad.ru/api/remap/1.2/path/To/My/Res'
+    'https://api.moysklad.ru/api/remap/1.2/path/To/My/Res'
   )
 
   // TODO deprecated
@@ -27,7 +27,7 @@ test('Moysklad#buildUrl method', t => {
       c: true,
       d: [0, '2']
     }),
-    'https://online.moysklad.ru/api/remap/1.2/path/to/res?a=1&b=tow&c=true&d=0&d=2'
+    'https://api.moysklad.ru/api/remap/1.2/path/to/res?a=1&b=tow&c=true&d=0&d=2'
   )
 
   // TODO deprecated
@@ -36,77 +36,77 @@ test('Moysklad#buildUrl method', t => {
       a: 1,
       filter: { name: 'foo', value: { $eq: 'bar' } }
     }),
-    'https://online.moysklad.ru/api/remap/1.2/path/to/res?a=1&filter=name%3Dfoo%3Bvalue%3Dbar'
+    'https://api.moysklad.ru/api/remap/1.2/path/to/res?a=1&filter=name%3Dfoo%3Bvalue%3Dbar'
   )
 
   t.equals(
     ms.buildUrl(
-      'https://online.moysklad.ru/api/remap/1.2/entity/purchaseorder' +
+      'https://api.moysklad.ru/api/remap/1.2/entity/purchaseorder' +
         '/191ebffa-45df-11e6-7a69-93a7000513f8?expand=agent'
     ),
-    'https://online.moysklad.ru/api/remap/1.2/entity/purchaseorder' +
+    'https://api.moysklad.ru/api/remap/1.2/entity/purchaseorder' +
       '/191ebffa-45df-11e6-7a69-93a7000513f8?expand=agent&limit=100'
   )
 
   t.equals(
     ms.buildUrl(
-      'https://online.moysklad.ru/api/remap/1.2/entity/purchaseorder' +
+      'https://api.moysklad.ru/api/remap/1.2/entity/purchaseorder' +
         '/191ebffa-45df-11e6-7a69-93a7000513f8/positions?expand=assortment'
     ),
-    'https://online.moysklad.ru/api/remap/1.2/entity/purchaseorder' +
+    'https://api.moysklad.ru/api/remap/1.2/entity/purchaseorder' +
       '/191ebffa-45df-11e6-7a69-93a7000513f8/positions?expand=assortment&limit=100'
   )
 
   t.equals(
     ms.buildUrl(
-      'https://online.moysklad.ru/api/remap/1.2/entity/purchaseorder' +
+      'https://api.moysklad.ru/api/remap/1.2/entity/purchaseorder' +
         '/191ebffa-45df-11e6-7a69-93a7000513f8/positions?expand=assortment&limit=10',
       {
         expand: 'agent',
         offset: 100
       }
     ),
-    'https://online.moysklad.ru/api/remap/1.2/entity/purchaseorder' +
+    'https://api.moysklad.ru/api/remap/1.2/entity/purchaseorder' +
       '/191ebffa-45df-11e6-7a69-93a7000513f8/positions?expand=agent&limit=10&offset=100'
   )
 
   t.equals(
     ms.buildUrl(
-      'https://online.moysklad.ru/api/remap/1.2/entity/purchaseorder' +
+      'https://api.moysklad.ru/api/remap/1.2/entity/purchaseorder' +
         '/191ebffa-45df-11e6-7a69-93a7000513f8/positions',
       null
     ),
-    'https://online.moysklad.ru/api/remap/1.2/entity/purchaseorder' +
+    'https://api.moysklad.ru/api/remap/1.2/entity/purchaseorder' +
       '/191ebffa-45df-11e6-7a69-93a7000513f8/positions'
   )
 
   t.equals(
     ms.buildUrl(
-      'https://online.moysklad.ru/api/remap/1.2/entity/purchaseorder' +
+      'https://api.moysklad.ru/api/remap/1.2/entity/purchaseorder' +
         '/191ebffa-45df-11e6-7a69-93a7000513f8/positions?expand=agent&limit=10&offset=100',
       null
     ),
-    'https://online.moysklad.ru/api/remap/1.2/entity/purchaseorder' +
+    'https://api.moysklad.ru/api/remap/1.2/entity/purchaseorder' +
       '/191ebffa-45df-11e6-7a69-93a7000513f8/positions?expand=agent&limit=10&offset=100'
   )
 
   t.equals(
     ms.buildUrl(
-      'https://online.moysklad.ru/api/remap/1.2/entity/purchaseorder' +
+      'https://api.moysklad.ru/api/remap/1.2/entity/purchaseorder' +
         '/191ebffa-45df-11e6-7a69-93a7000513f8/positions',
       {}
     ),
-    'https://online.moysklad.ru/api/remap/1.2/entity/purchaseorder' +
+    'https://api.moysklad.ru/api/remap/1.2/entity/purchaseorder' +
       '/191ebffa-45df-11e6-7a69-93a7000513f8/positions'
   )
 
   t.equals(
     ms.buildUrl(
-      'https://online.moysklad.ru/api/remap/1.2/entity/purchaseorder' +
+      'https://api.moysklad.ru/api/remap/1.2/entity/purchaseorder' +
         '/191ebffa-45df-11e6-7a69-93a7000513f8/positions?expand=agent&limit=10&offset=100',
       {}
     ),
-    'https://online.moysklad.ru/api/remap/1.2/entity/purchaseorder' +
+    'https://api.moysklad.ru/api/remap/1.2/entity/purchaseorder' +
       '/191ebffa-45df-11e6-7a69-93a7000513f8/positions?expand=agent&limit=10&offset=100'
   )
 

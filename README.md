@@ -60,7 +60,7 @@
 
 ## Особенности
 
-Библиотека представляет максимально простой и прозрачный интерфейс к существующим методам [API МойСклад](https://online.moysklad.ru/api/remap/1.2/doc), не абстрагирует разработчика от API и не выполняет никаких внутренних преобразований отправляемых и получаемых данных.
+Библиотека представляет максимально простой и прозрачный интерфейс к существующим методам [API МойСклад](https://api.moysklad.ru/api/remap/1.2/doc), не абстрагирует разработчика от API и не выполняет никаких внутренних преобразований отправляемых и получаемых данных.
 
 Основная задача библиотеки - упростить ряд рутинных задач:
 
@@ -139,7 +139,7 @@ ms.GET('entity/customerorder', {
 | Параметр     | Значение по умолчанию                                       | Описание                                                                                                                                                                                                                                                                                                                           |
 | ------------ | ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `fetch`      | глобальный fetch                                            | Функция с интерфейсом [Fetch API](https://developer.mozilla.org/ru/docs/Web/API/Fetch_API). Если глобальный fetch не найден, то будет выброшена ошибка при попытке осуществить http запрос. Начиная с Node.js 18 [fetch](https://nodejs.org/dist/latest-v18.x/docs/api/globals.html#fetch) является частью стандратной библиотеки. |
-| `endpoint`   | `"https://online.moysklad.ru/api"`                          | Точка досупа к API                                                                                                                                                                                                                                                                                                                 |
+| `endpoint`   | `"https://api.moysklad.ru/api"`                          | Точка досупа к API                                                                                                                                                                                                                                                                                                                 |
 | `api`        | `"remap"`                                                   | Раздел API                                                                                                                                                                                                                                                                                                                         |
 | `apiVersion` | `"1.2"`                                                     | Версия API                                                                                                                                                                                                                                                                                                                         |
 | `token`      | `undefined`                                                 | Токен доступа к API (см. [Аутентификация](#аутентификация))                                                                                                                                                                                                                                                                        |
@@ -435,13 +435,13 @@ ms.buildUrl(url: string, query?: object): string
 
 ```js
 const url = ms.buildUrl(
-  'https://online.moysklad.ru/api/remap/1.2/entity/customerorder?expand=positions',
+  'https://api.moysklad.ru/api/remap/1.2/entity/customerorder?expand=positions',
   { limit: 100 }
 )
 
 assert.equal(
   url,
-  'https://online.moysklad.ru/api/remap/1.2/entity/customerorder?expand=positions&limit=100'
+  'https://api.moysklad.ru/api/remap/1.2/entity/customerorder?expand=positions&limit=100'
 )
 ```
 
@@ -450,7 +450,7 @@ const url = ms.buildUrl('entity/customerorder', { expand: 'positions' })
 
 assert.equal(
   url,
-  'https://online.moysklad.ru/api/remap/1.2/entity/customerorder?expand=positions'
+  'https://api.moysklad.ru/api/remap/1.2/entity/customerorder?expand=positions'
 )
 ```
 
@@ -486,10 +486,10 @@ ms.parseUrl(url: string): {
 **Пример использования:**
 
 ```js
-const parsedUri = ms.parseUrl('https://online.moysklad.ru/api/remap/1.2/entity/customerorder?expand=positions')
+const parsedUri = ms.parseUrl('https://api.moysklad.ru/api/remap/1.2/entity/customerorder?expand=positions')
 
 assert.deepEqual(parsedUri, {
-  endpoint: 'https://online.moysklad.ru/api',
+  endpoint: 'https://api.moysklad.ru/api',
   api: 'remap'
   apiVersion: '1.2',
   path: ['entity', 'customerorder'],
@@ -516,7 +516,7 @@ ms.fetchUrl(url: string, options?: object): Promise
 **Пример использования:**
 
 ```js
-const url = `https://online.moysklad.ru/api/remap/1.2/entity/customerorder/eb7bcc22-ae8d-11e3-9e32-002590a28eca`
+const url = `https://api.moysklad.ru/api/remap/1.2/entity/customerorder/eb7bcc22-ae8d-11e3-9e32-002590a28eca`
 
 const patch = { applicable: false }
 
@@ -538,7 +538,7 @@ Url запроса можно указать полностью
 
 ```js
 ms.GET(
-  `https://online.moysklad.ru/api/remap/1.2/entity/customerorder/${ORDER_ID}/positions/${POSITION_ID}?expand=assortment`
+  `https://api.moysklad.ru/api/remap/1.2/entity/customerorder/${ORDER_ID}/positions/${POSITION_ID}?expand=assortment`
 )
 ```
 
@@ -580,7 +580,7 @@ const query = {
   arr: ['str', 1, true, null, undefined]
 }
 
-// https://online.moysklad.ru/api/remap/1.2/entity/demand?str=some%20string&num=1&bool=true&nil=&arr=str&arr=1&arr=true&arr=
+// https://api.moysklad.ru/api/remap/1.2/entity/demand?str=some%20string&num=1&bool=true&nil=&arr=str&arr=1&arr=true&arr=
 ms.GET('entity/demand', query)
 ```
 
@@ -784,7 +784,7 @@ bar!=;bar.baz=1;code=03;code=1;code=2;foo=1999-12-31 22:00:00;moment<=2001-01-02
   ```js
   const ms = Moysklad({ fetch })
 
-  // https://online.moysklad.ru/app/#good/edit?id=cb277549-34f4-4029-b9de-7b37e8e25a54
+  // https://api.moysklad.ru/app/#good/edit?id=cb277549-34f4-4029-b9de-7b37e8e25a54
   const PRODUCT_UI_ID = 'cb277549-34f4-4029-b9de-7b37e8e25a54'
 
   // Error: 308 Permanent Redirect
@@ -904,7 +904,7 @@ await ms.GET('foo/bar')
 {
   "name": "MoyskladRequestError",
   "message": "404 Not Found",
-  "url": "https://online.moysklad.ru/api/foo/0/foo/bar",
+  "url": "https://api.moysklad.ru/api/foo/0/foo/bar",
   "status": 404,
   "statusText": "Not Found"
 }
@@ -935,7 +935,7 @@ await ms.GET('entity/product2')
 {
   "name": "MoyskladApiError",
   "message": "Неизвестный тип: 'product2' (https://dev.moysklad.ru/doc/api/remap/1.2/#error_1005)",
-  "url": "https://online.moysklad.ru/api/remap/1.2/entity/product2",
+  "url": "https://api.moysklad.ru/api/remap/1.2/entity/product2",
   "status": 412,
   "statusText": "Precondition Failed",
   "code": 1005,
@@ -997,7 +997,7 @@ await ms.POST('entity/product', [
 {
   "name": "MoyskladCollectionError",
   "message": "Ошибка сохранения объекта: поле 'name' не может быть пустым или отсутствовать (https://dev.moysklad.ru/doc/api/remap/1.2/#error_3000)",
-  "url": "https://online.moysklad.ru/api/remap/1.2/entity/product",
+  "url": "https://api.moysklad.ru/api/remap/1.2/entity/product",
   "status": 400,
   "statusText": "Bad Request",
   "code": 3000,

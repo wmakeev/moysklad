@@ -1750,7 +1750,7 @@ module.exports = function parseTimeString(timeString) {
 /***/ 345:
 /***/ ((module) => {
 
-module.exports = { version: '0.15.1' }
+module.exports = { version: '0.16.0' }
 
 
 /***/ })

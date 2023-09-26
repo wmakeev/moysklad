@@ -39,9 +39,9 @@ test('MoyskladRequestError', async t => {
     .catch(err => {
       if (err instanceof MoyskladRequestError) {
         t.equal(err.name, 'MoyskladRequestError')
-        t.equal(err.message, '404 Not Found')
-        t.equal(err.status, 404)
-        t.equal(err.statusText, 'Not Found')
+        t.equal(err.message, '503 Service Unavailable')
+        t.equal(err.status, 503)
+        t.equal(err.statusText, 'Service Unavailable')
         t.equal(err.url, 'https://api.moysklad.ru/api/foo/0/foo/bar')
       }
     })

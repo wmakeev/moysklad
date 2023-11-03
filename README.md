@@ -466,7 +466,7 @@ const positionUrl = `/positions/${posId}/`
 
 const url = ms.buildUrl(`entity/customerorder/` + positionUrl)
 
-assert.equal(url, `entity/customerorder/positions/${posId}`)
+assert.equal(url, `https://api.moysklad.ru/api/remap/1.2/entity/customerorder/positions/${posId}`)
 ```
 
 ### parseUrl

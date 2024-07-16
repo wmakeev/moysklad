@@ -119,7 +119,40 @@ module.exports = async function fetchUrl(url, options = {}) {
     const resBodyText = await response.text()
 
     if (resBodyText) {
-      result = JSON.parse(resBodyText)
+      try {
+        const rate = {}
+
+        if (response.headers.has('X-RateLimit-Limit')) {
+          rate.limit = +response.headers.get('X-RateLimit-Limit')
+        }
+
+        if (response.headers.has('X-Lognex-Retry-TimeInterval')) {
+          rate.limitTimeInterval = +response.headers.get(
+            'X-Lognex-Retry-TimeInterval'
+          )
+        }
+
+        if (response.headers.has('X-RateLimit-Remaining')) {
+          rate.limitRemaining = +response.headers.get('X-RateLimit-Remaining')
+        }
+
+        if (response.headers.has('X-Lognex-Reset')) {
+          rate.limitReset = +response.headers.get('X-Lognex-Reset')
+        }
+
+        if (response.headers.has('X-Lognex-Retry-After')) {
+          rate.limitAfter = +response.headers.get('X-Lognex-Retry-After')
+        }
+
+        result = {
+          // JSON.parse может вызвать ошибку, если тело ответа неверное
+          ...JSON.parse(resBodyText),
+          // проверка на заполненность полей объекта rate
+          ...(Object.keys(rate).length && { rate })
+        }
+      } catch (e) {
+        error = getResponseError(undefined, response) || e
+      }
     } else {
       result = undefined
     }

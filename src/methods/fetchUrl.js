@@ -50,7 +50,7 @@ module.exports = async function fetchUrl(url, options = {}) {
     rawRedirect = true
     delete fetchOptions.rawRedirect
   }
-  if (/* depricated */ fetchOptions.muteErrors) {
+  if (/* deprecated */ fetchOptions.muteErrors) {
     muteApiErrors = true
     delete fetchOptions.muteErrors
   }

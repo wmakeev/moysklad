@@ -1,7 +1,7 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 52:
+/***/ 659:
 /***/ ((module) => {
 
 "use strict";
@@ -42,7 +42,7 @@ module.exports = function base64encode(value) {
 
 /***/ }),
 
-/***/ 91:
+/***/ 69:
 /***/ ((module) => {
 
 "use strict";
@@ -341,14 +341,14 @@ module.exports = (function () {
 
 /***/ }),
 
-/***/ 992:
+/***/ 646:
 /***/ ((module) => {
 
 !function(){"use strict";var u,c,a,s,f,y="properties",l="deepProperties",b="propertyDescriptors",d="staticProperties",O="staticDeepProperties",h="staticPropertyDescriptors",g="configuration",m="deepConfiguration",P="deepProps",A="deepStatics",j="deepConf",v="initializers",_="methods",w="composers",D="compose";function S(r){return Object.getOwnPropertyNames(r).concat(Object.getOwnPropertySymbols?Object.getOwnPropertySymbols(r):[])}function r(r,t){return Array.prototype.slice.call(arguments,2).reduce(r,t)}var x=r.bind(0,function r(t,e){if(e)for(var n=S(e),o=0;o<n.length;o+=1)Object.defineProperty(t,n[o],Object.getOwnPropertyDescriptor(e,n[o]));return t});function C(r){return"function"==typeof r}function N(r){return r&&"object"==typeof r||C(r)}function z(r){return r&&"object"==typeof r&&r.__proto__==Object.prototype}var E=r.bind(0,function r(t,e){if(e===u)return t;if(Array.isArray(e))return(Array.isArray(t)?t:[]).concat(e);if(!z(e))return e;for(var n,o,i=S(e),p=0;p<i.length;)n=i[p++],(o=Object.getOwnPropertyDescriptor(e,n)).hasOwnProperty("value")?o.value!==u&&(t[n]=r(z(t[n])||Array.isArray(e[n])?t[n]:{},e[n])):Object.defineProperty(t,n,o);return t});function I(){return(c=Array.prototype.concat.apply([],arguments).filter(function(r,t,e){return C(r)&&e.indexOf(r)===t})).length?c:u}function t(r){return c=function r(){return function r(t){var e,n,o=r[D]||{},i={__proto__:o[_]},p=o[v],c=Array.prototype.slice.apply(arguments),a=o[l];if(a&&E(i,a),(a=o[y])&&x(i,a),(a=o[b])&&Object.defineProperties(i,a),!p||!p.length)return i;for(t===u&&(t={}),o=0;o<p.length;)C(e=p[o++])&&(i=(n=e.call(i,t,{instance:i,stamp:r,args:c}))===u?i:n);return i}}(),(a=r[O])&&E(c,a),(a=r[d])&&x(c,a),(a=r[h])&&Object.defineProperties(c,a),a=C(c[D])?c[D]:R,x(c[D]=function(){return a.apply(this,arguments)},r),c}function e(e,n){function r(r,t){N(n[r])&&(N(e[r])||(e[r]={}),(t||x)(e[r],n[r]))}function t(r){(c=I(e[r],n[r]))&&(e[r]=c)}return n&&N(n=n[D]||n)&&(r(_),r(y),r(l,E),r(b),r(d),r(O,E),r(h),r(g),r(m,E),t(v),t(w)),e}function R(){return t(Array.prototype.concat.apply([this],arguments).reduce(e,{}))}function V(r){return C(r)&&C(r[D])}var n={};function o(r,t){return function(){return(s={})[r]=t.apply(u,Array.prototype.concat.apply([{}],arguments)),((c=this)&&c[D]||a).call(c,s)}}n[_]=o(_,x),n[y]=n.props=o(y,x),n[v]=n.init=o(v,I),n[w]=o(w,I),n[l]=n[P]=o(l,E),n[d]=n.statics=o(d,x),n[O]=n[A]=o(O,E),n[g]=n.conf=o(g,x),n[m]=n[j]=o(m,E),n[b]=o(b,x),n[h]=o(h,x),a=n[D]=x(function r(){for(var t,e,n=0,o=[],i=arguments,p=this;n<i.length;)N(t=i[n++])&&o.push(V(t)?t:((s={})[_]=(e=t)[_]||u,a=e.props,s[y]=N((c=e[y])||a)?x({},a,c):u,s[v]=I(e.init,e[v]),s[w]=I(e[w]),a=e[P],s[l]=N((c=e[l])||a)?E({},a,c):u,s[b]=e[b],a=e.statics,s[d]=N((c=e[d])||a)?x({},a,c):u,a=e[A],s[O]=N((c=e[O])||a)?E({},a,c):u,c=e[h],s[h]=N((a=e.name&&{name:{value:e.name}})||c)?x({},c,a):u,a=e.conf,s[g]=N((c=e[g])||a)?x({},a,c):u,a=e[j],s[m]=N((c=e[m])||a)?E({},a,c):u,s));if(t=R.apply(p||f,o),p&&o.unshift(p),Array.isArray(i=t[D][w]))for(n=0;n<i.length;)t=V(p=i[n++]({stamp:t,composables:o}))?p:t;return t},n),n.create=function(){return this.apply(u,arguments)},(s={})[d]=n,f=R(s),a[D]=a.bind(),a.version="4.3.2",typeof u!="object"?module.exports=a:self.stampit=a}();
 
 /***/ }),
 
-/***/ 658:
+/***/ 325:
 /***/ ((module) => {
 
 "use strict";
@@ -430,13 +430,13 @@ module.exports = {
 
 /***/ }),
 
-/***/ 112:
+/***/ 9:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 "use strict";
 
 
-const getEnvVar = __webpack_require__(489)
+const getEnvVar = __webpack_require__(80)
 
 const DEFAULT_VERSIONS = {
   'remap': '1.2',
@@ -465,7 +465,7 @@ module.exports = getApiDefaultVersion
 
 /***/ }),
 
-/***/ 489:
+/***/ 80:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 "use strict";
@@ -496,13 +496,13 @@ module.exports = getEnvVar
 
 /***/ }),
 
-/***/ 418:
+/***/ 705:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 "use strict";
 
 
-const { MoyskladApiError, MoyskladCollectionError } = __webpack_require__(658)
+const { MoyskladApiError, MoyskladCollectionError } = __webpack_require__(325)
 
 module.exports = function getResponseError(responseBody, response) {
   if (!responseBody) return null
@@ -535,21 +535,21 @@ module.exports = function getResponseError(responseBody, response) {
 
 /***/ }),
 
-/***/ 83:
+/***/ 900:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 "use strict";
 
 
-const have = __webpack_require__(91)
-const matchers = __webpack_require__(823)
+const have = __webpack_require__(69)
+const matchers = __webpack_require__(477)
 
 module.exports = have.with(matchers)
 
 
 /***/ }),
 
-/***/ 138:
+/***/ 44:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 "use strict";
@@ -563,26 +563,26 @@ module.exports = have.with(matchers)
 
 
 
-const stampit = __webpack_require__(992)
+const stampit = __webpack_require__(646)
 
-const have = __webpack_require__(83)
-const getApiDefaultVersion = __webpack_require__(112)
-const { version } = __webpack_require__(345)
+const have = __webpack_require__(900)
+const getApiDefaultVersion = __webpack_require__(9)
+const { version } = __webpack_require__(424)
 
 // methods
-const getTimeString = __webpack_require__(9)
-const parseTimeString = __webpack_require__(562)
-const buildFilter = __webpack_require__(656)
-const buildQuery = __webpack_require__(467)
-const getEnvVar = __webpack_require__(489)
-const getAuthHeader = __webpack_require__(706)
-const buildUrl = __webpack_require__(831)
-const parseUrl = __webpack_require__(60)
-const fetchUrl = __webpack_require__(579)
-const GET = __webpack_require__(573)
-const POST = __webpack_require__(397)
-const PUT = __webpack_require__(874)
-const DELETE = __webpack_require__(200)
+const getTimeString = __webpack_require__(308)
+const parseTimeString = __webpack_require__(727)
+const buildFilter = __webpack_require__(766)
+const buildQuery = __webpack_require__(338)
+const getEnvVar = __webpack_require__(80)
+const getAuthHeader = __webpack_require__(758)
+const buildUrl = __webpack_require__(772)
+const parseUrl = __webpack_require__(349)
+const fetchUrl = __webpack_require__(680)
+const GET = __webpack_require__(693)
+const POST = __webpack_require__(455)
+const PUT = __webpack_require__(648)
+const DELETE = __webpack_require__(738)
 
 // errors
 const {
@@ -591,7 +591,7 @@ const {
   MoyskladRequestError,
   MoyskladCollectionError,
   MoyskladUnexpectedRedirectError
-} = __webpack_require__(658)
+} = __webpack_require__(325)
 
 // TODO Remove old methods
 module.exports = stampit({
@@ -716,7 +716,7 @@ module.exports = stampit({
 
 /***/ }),
 
-/***/ 823:
+/***/ 477:
 /***/ ((module) => {
 
 "use strict";
@@ -760,13 +760,13 @@ module.exports = {
 
 /***/ }),
 
-/***/ 200:
+/***/ 738:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 "use strict";
 
 
-const have = __webpack_require__(83)
+const have = __webpack_require__(900)
 
 module.exports = function DELETE(...args) {
   const { path, options = {} } = have.strict(args, [
@@ -782,13 +782,13 @@ module.exports = function DELETE(...args) {
 
 /***/ }),
 
-/***/ 573:
+/***/ 693:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 "use strict";
 
 
-const have = __webpack_require__(83)
+const have = __webpack_require__(900)
 
 module.exports = function GET(...args) {
   const {
@@ -808,13 +808,13 @@ module.exports = function GET(...args) {
 
 /***/ }),
 
-/***/ 397:
+/***/ 455:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 "use strict";
 
 
-const have = __webpack_require__(83)
+const have = __webpack_require__(900)
 
 module.exports = function POST(...args) {
   // TODO Test payload: 'Object or Object arr'
@@ -847,13 +847,13 @@ module.exports = function POST(...args) {
 
 /***/ }),
 
-/***/ 874:
+/***/ 648:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 "use strict";
 
 
-const have = __webpack_require__(83)
+const have = __webpack_require__(900)
 
 module.exports = function PUT(...args) {
   const {
@@ -885,15 +885,15 @@ module.exports = function PUT(...args) {
 
 /***/ }),
 
-/***/ 831:
+/***/ 772:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 "use strict";
 
 
-const have = __webpack_require__(83)
-const buildQuery = __webpack_require__(467)
-const normalizeUrl = __webpack_require__(461)
+const have = __webpack_require__(900)
+const buildQuery = __webpack_require__(338)
+const normalizeUrl = __webpack_require__(846)
 
 let pathArrayDeprecationNoticeShown = false
 
@@ -943,20 +943,20 @@ module.exports = function buildUrl(...args) {
 
 /***/ }),
 
-/***/ 579:
+/***/ 680:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 "use strict";
 
 
-const have = __webpack_require__(83)
-const getResponseError = __webpack_require__(418)
+const have = __webpack_require__(900)
+const getResponseError = __webpack_require__(705)
 const {
   MoyskladRequestError,
   MoyskladApiError,
   MoyskladCollectionError,
   MoyskladUnexpectedRedirectError
-} = __webpack_require__(658)
+} = __webpack_require__(325)
 
 let globalRequestId = 0
 
@@ -999,7 +999,7 @@ module.exports = async function fetchUrl(url, options = {}) {
     rawRedirect = true
     delete fetchOptions.rawRedirect
   }
-  if (/* depricated */ fetchOptions.muteErrors) {
+  if (/* deprecated */ fetchOptions.muteErrors) {
     muteApiErrors = true
     delete fetchOptions.muteErrors
   }
@@ -1068,7 +1068,40 @@ module.exports = async function fetchUrl(url, options = {}) {
     const resBodyText = await response.text()
 
     if (resBodyText) {
-      result = JSON.parse(resBodyText)
+      try {
+        const rate = {}
+
+        if (response.headers.has('X-RateLimit-Limit')) {
+          rate.limit = +response.headers.get('X-RateLimit-Limit')
+        }
+
+        if (response.headers.has('X-Lognex-Retry-TimeInterval')) {
+          rate.limitTimeInterval = +response.headers.get(
+            'X-Lognex-Retry-TimeInterval'
+          )
+        }
+
+        if (response.headers.has('X-RateLimit-Remaining')) {
+          rate.limitRemaining = +response.headers.get('X-RateLimit-Remaining')
+        }
+
+        if (response.headers.has('X-Lognex-Reset')) {
+          rate.limitReset = +response.headers.get('X-Lognex-Reset')
+        }
+
+        if (response.headers.has('X-Lognex-Retry-After')) {
+          rate.limitAfter = +response.headers.get('X-Lognex-Retry-After')
+        }
+
+        result = {
+          // JSON.parse может вызвать ошибку, если тело ответа неверное
+          ...JSON.parse(resBodyText),
+          // проверка на заполненность полей объекта rate
+          ...(Object.keys(rate).length && { rate })
+        }
+      } catch (e) {
+        error = getResponseError(undefined, response) || e
+      }
     } else {
       result = undefined
     }
@@ -1105,20 +1138,20 @@ module.exports = async function fetchUrl(url, options = {}) {
 
 /***/ }),
 
-/***/ 706:
+/***/ 758:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 "use strict";
 
 
-const { MoyskladError } = __webpack_require__(658)
+const { MoyskladError } = __webpack_require__(325)
 
 /* global MOYSKLAD_LOGIN, MOYSKLAD_PASSWORD */
 /* eslint no-undef:0 no-unused-vars:0 */
 
-const base64encode = __webpack_require__(52)
+const base64encode = __webpack_require__(659)
 
-const getEnvVar = __webpack_require__(489)
+const getEnvVar = __webpack_require__(80)
 
 const bearerAuth = token => `Bearer ${token}`
 const basicAuth = (login, password) =>
@@ -1166,15 +1199,15 @@ module.exports = function getAuthHeader() {
 
 /***/ }),
 
-/***/ 60:
+/***/ 349:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 'use srict'
 
-const { MoyskladError } = __webpack_require__(658)
-const have = __webpack_require__(83)
-const normalizeUrl = __webpack_require__(461)
-const parseQueryString = __webpack_require__(565)
+const { MoyskladError } = __webpack_require__(325)
+const have = __webpack_require__(900)
+const normalizeUrl = __webpack_require__(846)
+const parseQueryString = __webpack_require__(146)
 
 // https://regex101.com/r/yQgvn4/4
 const URL_REGEX = /^(https:\/\/.+\/api)\/(.+)\/(\d+\.\d+)\/([^?]+)(?:\?(.+))?$/
@@ -1232,16 +1265,16 @@ module.exports = function parseUrl(...args) {
 
 /***/ }),
 
-/***/ 656:
+/***/ 766:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 "use strict";
 
 
-const { MoyskladError } = __webpack_require__(658)
-const getTimeString = __webpack_require__(9)
-const isPlainObject = __webpack_require__(226)
-const isSimpleValue = __webpack_require__(981)
+const { MoyskladError } = __webpack_require__(325)
+const getTimeString = __webpack_require__(308)
+const isPlainObject = __webpack_require__(459)
+const isSimpleValue = __webpack_require__(51)
 
 const createValueSelector = selector => (path, value) => {
   if (!isSimpleValue(value)) {
@@ -1439,15 +1472,15 @@ module.exports = function buildFilter(filter) {
 
 /***/ }),
 
-/***/ 467:
+/***/ 338:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 "use strict";
 
 
-const { MoyskladError } = __webpack_require__(658)
-const buildFilter = __webpack_require__(656)
-const isPlainObject = __webpack_require__(226)
+const { MoyskladError } = __webpack_require__(325)
+const buildFilter = __webpack_require__(766)
+const isPlainObject = __webpack_require__(459)
 
 const addQueryPart = (res, key) => val => {
   if (val === null) {
@@ -1513,13 +1546,13 @@ module.exports = function buildQuery(query) {
 
 /***/ }),
 
-/***/ 9:
+/***/ 308:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 "use strict";
 
 
-const getTimezoneShift = __webpack_require__(928)
+const getTimezoneShift = __webpack_require__(243)
 
 const timezoneFix = getTimezoneShift()
 
@@ -1566,11 +1599,11 @@ module.exports = function getTimeString(date, includeMs) {
 
 /***/ }),
 
-/***/ 928:
+/***/ 243:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-const { MoyskladError } = __webpack_require__(658)
-const getEnvVar = __webpack_require__(489)
+const { MoyskladError } = __webpack_require__(325)
+const getEnvVar = __webpack_require__(80)
 
 /**
  * @deprecated Работать с датами нужно в UTC либо преобразовывать
@@ -1604,7 +1637,7 @@ module.exports = function getTimezoneShift() {
 
 /***/ }),
 
-/***/ 226:
+/***/ 459:
 /***/ ((module) => {
 
 "use strict";
@@ -1617,7 +1650,7 @@ module.exports = function isPlainObject(value) {
 
 /***/ }),
 
-/***/ 981:
+/***/ 51:
 /***/ ((module) => {
 
 "use strict";
@@ -1630,7 +1663,7 @@ module.exports = function isSimpleValue(value) {
 
 /***/ }),
 
-/***/ 461:
+/***/ 846:
 /***/ ((module) => {
 
 "use strict";
@@ -1646,7 +1679,7 @@ module.exports = function normalizeUrl(url) {
 
 /***/ }),
 
-/***/ 565:
+/***/ 146:
 /***/ ((module) => {
 
 "use strict";
@@ -1704,14 +1737,14 @@ module.exports = function parseQueryString(queryString) {
 
 /***/ }),
 
-/***/ 562:
+/***/ 727:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 "use strict";
 
 
-const { MoyskladError } = __webpack_require__(658)
-const getTimezoneShift = __webpack_require__(928)
+const { MoyskladError } = __webpack_require__(325)
+const getTimezoneShift = __webpack_require__(243)
 
 const timezoneFix = getTimezoneShift()
 
@@ -1747,7 +1780,7 @@ module.exports = function parseTimeString(timeString) {
 
 /***/ }),
 
-/***/ 345:
+/***/ 424:
 /***/ ((module) => {
 
 module.exports = { version: '0.16.0' }
@@ -1799,7 +1832,7 @@ module.exports = { version: '0.16.0' }
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__(138);
+/******/ 	var __webpack_exports__ = __webpack_require__(44);
 /******/ 	window.MoyskladClient = __webpack_exports__;
 /******/ 	
 /******/ })()

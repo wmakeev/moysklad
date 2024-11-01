@@ -82,14 +82,6 @@ test('buildQuery', t => {
 
   t.equals(
     buildQuery({
-      expand: 'foo'
-    }),
-    'expand=foo&limit=100',
-    'should append query.limit=100 for expand field without limit'
-  )
-
-  t.equals(
-    buildQuery({
       expand: 'foo',
       limit: 0
     }),

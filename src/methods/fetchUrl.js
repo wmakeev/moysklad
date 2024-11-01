@@ -21,6 +21,7 @@ module.exports = async function fetchUrl(url, options = {}) {
   // Специфические параметры (не передаются в опции fetch)
   let rawResponse = false
   let rawRedirect = false
+  let includeResponse = false
   let muteApiErrors = false
   let muteCollectionErrors = false
 
@@ -46,11 +47,15 @@ module.exports = async function fetchUrl(url, options = {}) {
     rawResponse = true
     delete fetchOptions.rawResponse
   }
+  if (fetchOptions.includeResponse) {
+    includeResponse = true
+    delete fetchOptions.includeResponse
+  }
   if (fetchOptions.rawRedirect) {
     rawRedirect = true
     delete fetchOptions.rawRedirect
   }
-  if (/* depricated */ fetchOptions.muteErrors) {
+  if (/* deprecated */ fetchOptions.muteErrors) {
     muteApiErrors = true
     delete fetchOptions.muteErrors
   }
@@ -71,6 +76,11 @@ module.exports = async function fetchUrl(url, options = {}) {
   if (fetchOptions.webHookDisable) {
     fetchOptions.headers['X-Lognex-WebHook-Disable'] = 'true'
     delete fetchOptions.webHookDisable
+  }
+  if (typeof fetchOptions.webHookDisableByPrefix === 'string') {
+    fetchOptions.headers['X-Lognex-WebHook-DisableByPrefix'] =
+      fetchOptions.webHookDisableByPrefix
+    delete fetchOptions.webHookDisableByPrefix
   }
   if (fetchOptions.downloadExpirationSeconds) {
     fetchOptions.headers['X-Lognex-Download-Expiration-Seconds'] = String(
@@ -118,13 +128,22 @@ module.exports = async function fetchUrl(url, options = {}) {
     // response.json() может вызвать ошибку, если тело ответа пустое
     const resBodyText = await response.text()
 
-    if (resBodyText) {
-      result = JSON.parse(resBodyText)
-    } else {
-      result = undefined
-    }
+    try {
+      if (resBodyText) {
+        result = JSON.parse(resBodyText)
+      } else {
+        result = undefined
+      }
 
-    error = getResponseError(result, response) || error
+      error = getResponseError(result, response) || error
+    } catch (err) {
+      // для обработки ошибки в JSON.parse
+      error = new MoyskladRequestError(
+        'Некорректный JSON в теле ответа - ' + err.message,
+        response,
+        { cause: err }
+      )
+    }
   }
 
   if (emit) {
@@ -148,6 +167,10 @@ module.exports = async function fetchUrl(url, options = {}) {
 
     if (emit) emit('error', error, { requestId })
     throw error
+  }
+
+  if (includeResponse) {
+    return [result, response]
   }
 
   return result

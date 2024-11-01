@@ -45,7 +45,7 @@ test('Moysklad#buildUrl method', t => {
         '/191ebffa-45df-11e6-7a69-93a7000513f8?expand=agent'
     ),
     'https://api.moysklad.ru/api/remap/1.2/entity/purchaseorder' +
-      '/191ebffa-45df-11e6-7a69-93a7000513f8?expand=agent&limit=100'
+      '/191ebffa-45df-11e6-7a69-93a7000513f8?expand=agent'
   )
 
   t.equals(
@@ -54,7 +54,7 @@ test('Moysklad#buildUrl method', t => {
         '/191ebffa-45df-11e6-7a69-93a7000513f8/positions?expand=assortment'
     ),
     'https://api.moysklad.ru/api/remap/1.2/entity/purchaseorder' +
-      '/191ebffa-45df-11e6-7a69-93a7000513f8/positions?expand=assortment&limit=100'
+      '/191ebffa-45df-11e6-7a69-93a7000513f8/positions?expand=assortment'
   )
 
   t.equals(

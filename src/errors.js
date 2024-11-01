@@ -12,8 +12,8 @@ class MoyskladError extends Error {
 }
 
 class MoyskladRequestError extends MoyskladError {
-  constructor(message, response) {
-    super(message)
+  constructor(message, response, ...args) {
+    super(message, ...args)
 
     if (response) {
       this.url = response.url

@@ -6,6 +6,7 @@ __old
 .idea
 .c9revisions
 *.sublime*
+tsconfig.tsbuildinfo
 
 # Env
 .env

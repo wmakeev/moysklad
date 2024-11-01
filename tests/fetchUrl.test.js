@@ -4,14 +4,14 @@ const test = require('tape')
 const { fetch } = require('undici')
 
 const Moysklad = require('..')
+const { TEST_PRODUCT_01_APP_ID } = require('./env')
 
 test('fetchUrl redirect', async t => {
   t.plan(2)
 
   const ms = Moysklad({ fetch })
 
-  const PRODUCT_UI_ID = 'cb277549-34f4-4029-b9de-7b37e8e25a54'
-  const href = ms.buildUrl(`entity/product/${PRODUCT_UI_ID}`)
+  const href = ms.buildUrl(`entity/product/${TEST_PRODUCT_01_APP_ID}`)
 
   try {
     await ms.fetchUrl(href)

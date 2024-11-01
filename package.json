@@ -16,13 +16,12 @@
     "lint": "eslint . --fix",
     "clean": "echo 'no clean'",
     "pick-version": "node ./scripts/lib-version.js",
-    "bundle": "webpack",
     "build": "npm run clean",
     "test-src": "node -r dotenv/config tests",
     "test-typings": "tsc --build tests/tsconfig.json",
-    "test": "npm run lint && npm run test-typings && npm run build && npm run bundle && npm run test-src",
+    "test": "npm run lint && npm run test-typings && npm run build && npm run test-src",
     "coverage": "c8 node -r dotenv/config ./tests --src src --reporter text --reporter lcov --skip-full",
-    "version": "npm run pick-version && npm run bundle && git add src/version.js bundle/*",
+    "version": "npm run pick-version && git add src/version.js",
     "release": "np"
   },
   "repository": {
@@ -62,23 +61,22 @@
     "stampit": "^4.3.2"
   },
   "devDependencies": {
-    "@tsconfig/esm": "^1.0.3",
-    "@tsconfig/node20": "^1.0.1",
-    "@tsconfig/strictest": "^2.0.1",
-    "@types/node": "^20.2.4",
-    "c8": "^7.12.0",
-    "dotenv": "^16.0.3",
-    "eslint": "^8.41.0",
-    "eslint-config-prettier": "^8.8.0",
+    "@tsconfig/esm": "^1.0.5",
+    "@tsconfig/node20": "^1.0.2",
+    "@tsconfig/strictest": "^2.0.5",
+    "@types/node": "^20.17.5",
+    "c8": "^7.14.0",
+    "dotenv": "^16.4.5",
+    "envalid": "^8.0.0",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^8.10.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^4.2.1",
     "np": "^7.7.0",
     "prettier": "^2.8.8",
-    "tape": "^5.6.3",
-    "typescript": "^5.0.4",
-    "undici": "^5.22.1",
-    "webpack": "^5.84.1",
-    "webpack-cli": "^5.1.1"
+    "tape": "^5.9.0",
+    "typescript": "^5.6.3",
+    "undici": "^5.28.4"
   },
   "engines": {
     "node": ">=16.8"

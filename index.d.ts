@@ -374,15 +374,25 @@ declare namespace Moysklad {
     rawResponse?: boolean
 
     /**
-     * Если `true` и код запроса `3xx` (редирект), то метод вернет
-     * [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response).
+     * Если ответ сервера с кодом в диапазоне 300-399 (редирект), то будет
+     * выброшена ошибка [MoyskladUnexpectedRedirectError](#moyskladunexpectedredirecterror),
+     * поэтому, для явной обработки редиректа необходимо указать опцию `rawRedirect` со
+     * значением `true`. В этом случае метод вернет объект
+     * [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response),
+     * из которого можно получить Location заголовок.
      *
-     * В обратном случае, будет выброшена ошибка `MoyskladRequestError`.
-     *
-     * Опция нужна для явного указания того, что вы ожидаете получить редирект
-     * при опции запроса `redirect` не равной `follow`.
+     * Такое поведение сработает,
+     * только если явно не указана опция [redirect](https://developer.mozilla.org/en-US/docs/Web/API/RequestInit#redirect)
+     * со значением `follow`.
      */
     rawRedirect?: boolean
+
+    /**
+     * Если `true`, то метод вернет массив из двух элементов - результат и
+     * исходный объект [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response).
+     * Ошибки будут обработаны как при обычном запросе.
+     */
+    includeResponse?: boolean
 
     /**
      * Если `true`, то все ошибки API (тип ошибки `MoyskladApiError`) будут проигнорированы.
@@ -463,10 +473,18 @@ declare namespace Moysklad {
     precision?: boolean
 
     /**
-     * Если `true`, то в запрос будет включен заголовок `X-Lognex-WebHook-Disable` со значением
-     * `true` (отключить уведомления вебхуков в контексте данного запроса).
+     * Если `true`, то в запрос будет включен заголовок `X-Lognex-WebHook-Disable`
+     * со значением `true` (отключить уведомления вебхуков в контексте данного запроса).
+     *
+     * @deprecated Не рекомендуется использовать данную опцию, применяйте `webHookDisableByPrefix`.
      */
     webHookDisable?: boolean
+
+    /**
+     * Префикс url для выборочного отключения вебхуков, будет добавлен в
+     * качестве значения заголовка `X-Lognex-WebHook-DisableByPrefix`.
+     */
+    webHookDisableByPrefix?: string
 
     /**
      * В JSON API для скачивания файла формируется редирект на временный URL
@@ -676,6 +694,48 @@ declare namespace Moysklad {
      * - `name,desc;code,asc` или `['name,desc', ['code','asc']]`
      */
     order?: QueryOrder | string | undefined
+
+    /**
+     * Запустить запрос в [асинхронном режиме](https://dev.moysklad.ru/doc/api/remap/1.2/workbook/#workbook-rabota-s-asinhronnym-obmenom).
+     * Асинхронный обмен предоставляет возможность получать результаты длительных запросов асинхронно, не используя многократные запросы с листанием.
+     *
+     * Параметры запроса limit и offset указывать не нужно, так как отчет будет построен полностью.
+     *
+     * [Список запросов](https://dev.moysklad.ru/doc/api/remap/1.2/#mojsklad-json-api-asinhronnyj-obmen), которые могут быть выполнены асинхронно
+     *
+     * Пример:
+     *
+     * ```js
+     * const resp = await ms.GET(
+     *   'entity/assortment',
+     *   {
+     *     filter: {
+     *       "stockStore": {
+     *         "$in": [
+     *           "https://api.moysklad.ru/api/remap/1.2/entity/store/b63b4250-ad44-11e9-912f-f3d4000759d7"
+     *         ]
+     *       },
+     *       "stockMode": {
+     *         "$eq": "positiveOnly"
+     *       }
+     *     },
+     *     async: true
+     *   },
+     *   { rawResponse: true }
+     * )
+     *
+     * if (resp.status !== 202) {
+     *   throw new Error('Ожидался ответ асинхронной задачи с кодом 202')
+     * }
+     *
+     * const statusUrl = resp.headers.get('Content-Location')
+     * const resultUrl = resp.headers.get('Location')
+     *
+     * // ... проверка статуса запроса по ссылке statusUrl и получение результата по ссылке resultUrl
+     *
+     * ```
+     */
+    async?: boolean
 
     [key: string]: any
   }

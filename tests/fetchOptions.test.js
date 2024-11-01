@@ -5,6 +5,7 @@ const { fetch, Response } = require('undici')
 
 const Moysklad = require('..')
 const { MoyskladApiError } = require('../src/errors')
+const { TEST_PRODUCT_01_APP_ID, TEST_PRODUCT_01_ID } = require('./env')
 
 test('Response with muteApiErrors option', t => {
   const ms = Moysklad({ fetch })
@@ -135,7 +136,7 @@ test('Response with rawRedirect option', async t => {
   const ms = Moysklad({ fetch })
 
   /** id товара из приложения МойСклад */
-  const uuidFromApp = 'cb277549-34f4-4029-b9de-7b37e8e25a54'
+  const uuidFromApp = TEST_PRODUCT_01_APP_ID
 
   /** id товара из API (отличается от id из приложения) */
   let uuidFromApi
@@ -151,9 +152,24 @@ test('Response with rawRedirect option', async t => {
 
     product = await ms.GET(`entity/product/${uuidFromApi}`)
   } else {
-    // TODO 2023-07-31 Редирект перестал выполняться (исправление или ошибка в API?) #fkjs94ys
-    // t.fail('redirected response expected')
+    t.fail('redirected response expected')
   }
+
+  t.notEquals(product.id, uuidFromApp)
+})
+
+test('Response with rawRedirect option and redirect=follow', async t => {
+  const ms = Moysklad({ fetch })
+
+  /** id товара из приложения МойСклад */
+  const uuidFromApp = TEST_PRODUCT_01_APP_ID
+
+  const product = await ms.GET(`entity/product/${uuidFromApp}`, null, {
+    rawRedirect: true,
+    redirect: 'follow'
+  })
+
+  t.ok(product.id, 'should return product')
 
   t.notEquals(product.id, uuidFromApp)
 })
@@ -161,21 +177,31 @@ test('Response with rawRedirect option', async t => {
 test('Response with rawRedirect (print document)', async t => {
   const ms = Moysklad({ fetch })
 
+  const customTemplate = (
+    await ms.GET('entity/customerorder/metadata/embeddedtemplate')
+  ).rows[0]
+
   const body = {
     template: {
       meta: {
         href: ms.buildUrl(
-          'entity/demand/metadata/customtemplate/8a686b8a-9e4a-11e5-7a69-97110004af3e'
+          `entity/customerorder/metadata/embeddedtemplate/${customTemplate.id}`
         ),
-        type: 'customtemplate',
+        type: 'embeddedtemplate',
         mediaType: 'application/json'
       }
     },
     extension: 'pdf'
   }
 
+  const customerOrderId = (
+    await ms.GET('entity/customerorder', {
+      limit: 1
+    })
+  ).rows[0].id
+
   const { headers, status: code } = await ms.POST(
-    'entity/demand/13abf361-e9c6-45ea-a940-df70289a7f95/export',
+    `entity/customerorder/${customerOrderId}/export`,
     body,
     null,
     { rawRedirect: true }
@@ -184,8 +210,11 @@ test('Response with rawRedirect (print document)', async t => {
   t.equal(code, 303, 'response.status should to be 303')
 
   t.ok(headers.get, 'headers should have get method')
+
+  const location = headers.get('location').split('/').pop()
+
   t.ok(
-    /vensi_tov_check-03033.pdf/.test(headers.get('location')),
+    location.endsWith('.pdf'),
     'headers Location header should contain url to from'
   )
 })
@@ -194,13 +223,28 @@ test('Response with redirect follow', async t => {
   const ms = Moysklad({ fetch })
 
   /** id товара из приложения МойСклад */
-  const uuidFromApp = 'cb277549-34f4-4029-b9de-7b37e8e25a54'
+  const uuidFromApp = TEST_PRODUCT_01_APP_ID
 
   const product = await ms.GET(`entity/product/${uuidFromApp}`, null, {
     redirect: 'follow'
   })
 
   t.notEquals(product.id, uuidFromApp)
+})
+
+test('Response with includeResponse', async t => {
+  const ms = Moysklad({ fetch })
+
+  const [product, response] = await ms.GET(
+    `entity/product/${TEST_PRODUCT_01_ID}`,
+    null,
+    {
+      includeResponse: true
+    }
+  )
+
+  t.ok(product.id, 'should return result')
+  t.ok(response instanceof Response, 'should return Response')
 })
 
 test('Request with precision option', t => {
@@ -243,6 +287,33 @@ test('Request with webHookDisable option', t => {
   })
 
   ms.GET('entity/some', null, { webHookDisable: true }).catch(() => {
+    t.end()
+  })
+})
+
+test('Request with webHookDisableByPrefix option', t => {
+  t.plan(2)
+
+  const ms = Moysklad({
+    fetch: (url, options) => {
+      t.equal(
+        options.headers['X-Lognex-WebHook-DisableByPrefix'],
+        'https://example.com/',
+        'should add header'
+      )
+
+      t.notOk(
+        options.webHookDisableByPrefix,
+        'should remove option from fetch options'
+      )
+
+      throw new Error('stop')
+    }
+  })
+
+  ms.GET('entity/some', null, {
+    webHookDisableByPrefix: 'https://example.com/'
+  }).catch(() => {
     t.end()
   })
 })

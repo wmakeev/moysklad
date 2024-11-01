@@ -3,10 +3,6 @@
 # moysklad
 
 [![npm](https://img.shields.io/npm/v/moysklad.svg?cacheSeconds=1800&style=flat-square)](https://www.npmjs.com/package/moysklad)
-[![Travis](https://img.shields.io/travis/wmakeev/moysklad.svg?cacheSeconds=1800&style=flat-square)](https://travis-ci.org/wmakeev/moysklad)
-![Code Climate coverage](https://img.shields.io/codeclimate/coverage/wmakeev/moysklad?style=flat-square)
-![Code Climate maintainability](https://img.shields.io/codeclimate/maintainability-percentage/wmakeev/moysklad.svg?cacheSeconds=1800&style=flat-square)
-![Code Climate tech-debt](https://img.shields.io/codeclimate/tech-debt/wmakeev/moysklad.svg?cacheSeconds=1800&style=flat-square)
 
 > Библиотека для взаимодействия с [JSON API сервиса МойСклад](https://dev.moysklad.ru/) для node.js и браузера.
 
@@ -17,7 +13,6 @@
 <!-- TOC depthfrom:2 -->
 
 - [Содержание](#%D1%81%D0%BE%D0%B4%D0%B5%D1%80%D0%B6%D0%B0%D0%BD%D0%B8%D0%B5)
-- [Особенности](#%D0%BE%D1%81%D0%BE%D0%B1%D0%B5%D0%BD%D0%BD%D0%BE%D1%81%D1%82%D0%B8)
 - [Установка](#%D1%83%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%BA%D0%B0)
 - [Использование](#%D0%B8%D1%81%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5)
 - [Параметры инициализации](#%D0%BF%D0%B0%D1%80%D0%B0%D0%BC%D0%B5%D1%82%D1%80%D1%8B-%D0%B8%D0%BD%D0%B8%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D0%B7%D0%B0%D1%86%D0%B8%D0%B8)
@@ -57,8 +52,6 @@
 - [TODO](#todo)
 
 <!-- /TOC -->
-
-## Особенности
 
 Библиотека представляет максимально простой и прозрачный интерфейс к существующим методам [API МойСклад](https://api.moysklad.ru/api/remap/1.2/doc), не абстрагирует разработчика от API и не выполняет никаких внутренних преобразований отправляемых и получаемых данных.
 
@@ -671,25 +664,25 @@ bar!=;bar.baz=1;code=03;code=1;code=2;foo=1999-12-31 22:00:00;moment<=2001-01-02
 
 ##### expand и limit
 
-Если указано значение expand, но не указан limit, то в поле limit по умолчанию будет подставлено значение `100`. Это важно, т.к. в версии API remap 1.2 expand не работает, если не указан limit.
+Обратите внимание на то, что если указано значение expand, то необходимо явно указать значение для limit меньше или равное 100, иначе expand [будет проигнорирован](https://dev.moysklad.ru/doc/api/remap/1.2/workbook/#workbook-chto-takoe-expand).
 
 #### `options` (параметры запроса)
 
-Все опции переданные в объекте `options` (за исключением описанных ниже) передаются напрямую в опции метода `fetch` ([Fetch API](http://github.github.io/fetch/)) при осуществлении запроса.
+Все поля указанные в объекте `options`, за исключением описанных в этом разделе, передаются напрямую в опции fetch ([fetch options](https://developer.mozilla.org/en-US/docs/Web/API/Window/fetch#options)).
 
-С опциями fetch API можно ознакомиться по [этой ссылке](https://github.com/node-fetch/node-fetch#options)
+Поля описанные ниже обрабатываются только библиотекой moysklad и не передаются в fetch:
 
-Опции специфичные для библиотеки moysklad (не передаются в `fetch`):
-
-| Поле                        | Тип       | Описание                                                                                                                                                                                                                                                                                                                      |
-| --------------------------- | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `rawResponse`               | `boolean` | Если `true`, то метод вернет результат в виде объекта [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response). Код и содержимое ответа не проверяется на ошибки.                                                                                                                                                |
-| `rawRedirect`               | `boolean` | Если `true` и код запроса `3xx` (редирект), то метод вернет [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response). В обратном случае, будет выброшена ошибка `MoyskladRequestError`. Опция нужна для явного указания того, что вы ожидаете получить редирект при опции запроса `redirect` не равной `follow`. |
-| `muteApiErrors`             | `boolean` | Если `true`, то все ошибки API будут проигнорированы (метод не будет генерировать ошибку если код ответа сервера не в диапазоне 200-299 и тело ответа содержит описание ошибки МойСклад). Опция не затрагивает прочие ошибки, которые не возвращают JSON ответ.                                                               |
-| `muteCollectionErrors`      | `boolean` | Если `true`, то все ошибки внутри коллекций при массовом обновлении сущностей будут проигнорированы.                                                                                                                                                                                                                          |
-| `precision`                 | `boolean` | Если `true`, то в запрос будет включен заголовок `X-Lognex-Precision` со значением `true` (отключение округления цен и себестоимости до копеек).                                                                                                                                                                              |
-| `webHookDisable`            | `boolean` | Если `true`, то в запрос будет включен заголовок `X-Lognex-WebHook-Disable` со значением `true` (отключить уведомления вебхуков в контексте данного запроса).                                                                                                                                                                 |
-| `downloadExpirationSeconds` | `number`  | Устанавливает значение для заголовока `X-Lognex-Download-Expiration-Seconds` (подробнее см. [Ссылки на файлы](https://dev.moysklad.ru/doc/api/remap/1.2/#mojsklad-json-api-obschie-swedeniq-ssylki-na-fajly))                                                                                                                 |
+| Поле                        | Тип       | Описание                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| --------------------------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `rawResponse`               | `boolean` | Если `true`, то метод вернет исходный объект [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response). Код и содержимое ответа не проверяется на ошибки. Тело ответа нужно [прочитать самостоятельно](https://github.com/nodejs/undici?tab=readme-ov-file#garbage-collection).                                                                                                                                                                                                                                                                                            |
+| `includeResponse`           | `boolean` | Если `true`, то метод вернет массив из двух элементов - результат и объект [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response). Ошибки будут обработаны как при обычном запросе.                                                                                                                                                                                                                                                                                                                                                                            |
+| `rawRedirect`               | `boolean` | Если ответ сервера с кодом в диапазоне 300-399 (редирект), то будет выброшена ошибка [MoyskladUnexpectedRedirectError](#moyskladunexpectedredirecterror), поэтому, явной обработки редиректа необходимо указать опцию `rawRedirect` со значением `true`. В этом случае метод вернет объект [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response), из которого можно получить Location заголовок. Такое поведение сработает, только если явно не указана опция [redirect](https://developer.mozilla.org/en-US/docs/Web/API/RequestInit#redirect) со значением `follow`. |
+| `muteApiErrors`             | `boolean` | Если `true` и запрос завершился ошибкой API, то метод вернет объект с описанием ошибки из тела ответа как результат. Такое поведение уместно если вы хотите вручную обработать ошибку. Прочие ошибки, которые не содержат JSON ответа (напр. ошибки соединения), продолжат выбрасываться в штатном режиме. Для игнорирования ошибок только внутри коллекций, используйте опцию `muteCollectionErrors`.                                                                                                                                                                                 |
+| `muteCollectionErrors`      | `boolean` | Если `true`, то все ошибки внутри коллекций при массовом обновлении сущностей будут проигнорированы. В этом случае ошибки нужно будет отфильтровать и обработать вручную.                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `precision`                 | `boolean` | Если `true`, то в запрос будет включен заголовок `X-Lognex-Precision` со значением `true` (отключение округления цен и себестоимости до копеек).                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| ~~`webHookDisable`~~        | `boolean` | (deprecated) Если `true`, то в запрос будет включен заголовок `X-Lognex-WebHook-Disable` со значением `true` (отключить уведомления вебхуков в контексте данного запроса). Не рекомендуется использовать данную опцию, применяйте `webHookDisableByPrefix`.                                                                                                                                                                                                                                                                                                                            |
+| `webHookDisableByPrefix`    | `string`  | Префикс url для выборочного отключения вебхуков, будет добавлен в качестве значения заголовка `X-Lognex-WebHook-DisableByPrefix`.                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `downloadExpirationSeconds` | `number`  | Устанавливает значение для заголовока `X-Lognex-Download-Expiration-Seconds` (подробнее см. [Ссылки на файлы](https://dev.moysklad.ru/doc/api/remap/1.2/#mojsklad-json-api-obschie-swedeniq-ssylki-na-fajly))                                                                                                                                                                                                                                                                                                                                                                          |
 
 <details>
   <summary>Примеры</summary>
@@ -813,7 +806,8 @@ bar!=;bar.baz=1;code=03;code=1;code=2;foo=1999-12-31 22:00:00;moment<=2001-01-02
 | `response:body` | `{ requestId, url, options, response, body }` | Загружено тело ответа         |
 | `error`         | `Error`, `{ requestId }`                      | Ошибка при выполнении запроса |
 
-Пример использования:
+<details>
+  <summary>Примеры</summary>
 
 ```js
 const { fetch } = require('undici')
@@ -840,13 +834,15 @@ ms.GET('entity/customerorder', { limit: 1 }).then(res => {
 
 Более подробный пример смотрите в [examples/events.js](https://github.com/wmakeev/moysklad/blob/master/examples/events.js).
 
+</details>
+
 ## Работа с ошибками
 
 В рамках работы с библиотекой выделены следующие виды ошибок:
 
 | №   | Название ошибки         | Класс ошибки                                                        | Описание                                                                                                                                           |
 | --- | ----------------------- | ------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | **Ошибка библиотеки**   | [MoyskladError](#moyskladerror)                                     | Напр. не верно указаны параметры одного из методов.                                                                                                |
+| 1   | **Ошибка библиотеки**   | [MoyskladError](#moyskladerror)                                     | Ошибка библиотеки (например не верно указаны параметры одного из методов).                                                                         |
 | 2   | **Ошибка запроса**      | [MoyskladRequestError](#moyskladrequesterror)                       | Ответ получен с кодом ошибки, тело ответа НЕ содержит JSON с описанием ошибки в формате МойСклад.                                                  |
 | 3   | **Ошибка API МойСклад** | [MoyskladApiError](#moyskladapierror)                               | Ответ получен с кодом ошибки, тело ответа содержит JSON с описанием ошибки в формате МойСклад.                                                     |
 | 4   | **Ошибка в коллекции**  | [MoyskladCollectionError](#moyskladcollectionerror)                 | Ошибка в одном из элементов внутри коллекции.                                                                                                      |

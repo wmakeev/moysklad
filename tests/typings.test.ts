@@ -62,8 +62,12 @@ ms.GET(
 )
 
 async function case1() {
-  await ms.GET('foo/bar', null, { rawResponse: true })
-  await ms.GET('foo/bar', null, { muteCollectionErrors: true })
+  // @ts-expect-error
+  await ms.GET('foo/bar', null, { rawResponse: 'foo' })
+  // @ts-expect-error
+  await ms.GET('foo/bar', null, { includeResponse: 'foo' })
+  // @ts-expect-error
+  await ms.GET('foo/bar', null, { muteCollectionErrors: 'foo' })
 }
 case1
 
@@ -84,7 +88,7 @@ ms.POST('foo/bar', 'any', {
 ms.GET('foo/bar', {
   filter: {
     foo: 'bar',
-    baz: undefined, // Можно указывать undefined (парамерт будет опущен)
+    baz: undefined, // Можно указывать undefined (параметр будет опущен)
     some: {
       empty: undefined
     }

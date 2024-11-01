@@ -9,6 +9,7 @@ const {
   MoyskladApiError,
   MoyskladError
 } = require('..')
+const { TEST_PRODUCT_01_ID, TEST_PRODUCT_01_APP_ID } = require('./env')
 
 const Moysklad = require('..')
 
@@ -47,14 +48,13 @@ test('MoyskladRequestError', async t => {
     })
 })
 
-// TODO 2023-07-31 Редирект перестал выполняться (исправление или ошибка в API?) #fkjs94ys
-test.skip('MoyskladUnexpectedRedirectError', async t => {
+test('MoyskladUnexpectedRedirectError', async t => {
   t.plan(2)
 
   const ms = Moysklad({ fetch })
 
   /** id товара из приложения МойСклад */
-  const uuidFromApp = 'cb277549-34f4-4029-b9de-7b37e8e25a54'
+  const uuidFromApp = TEST_PRODUCT_01_APP_ID
 
   try {
     await ms.GET(`entity/product/${uuidFromApp}`)
@@ -102,7 +102,7 @@ test('MoyskladCollectionError', t => {
 
   const ms = Moysklad({ fetch })
 
-  const uuidFromApi = '2b461f14-0c41-48d2-bdd8-d6f8b36dfab8'
+  const uuidFromApi = TEST_PRODUCT_01_ID
 
   ms.POST('entity/product', [
     { foo: 'bar1' },

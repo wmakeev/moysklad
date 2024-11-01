@@ -2,6 +2,9 @@
 
 const { fetch } = require('undici')
 const test = require('tape')
+const env = require('./env')
+
+const { TEST_ORGANIZATION_ID, TEST_PRODUCT_01_ID, TEST_PRODUCT_02_ID } = env
 
 const Moysklad = require('..')
 
@@ -19,9 +22,7 @@ test('Moysklad#DELETE', async t => {
         organization: {
           meta: {
             type: 'organization',
-            href: ms.buildUrl(
-              'entity/organization/bf6bc7ce-444e-4fd2-9826-3134ce89c54b'
-            )
+            href: ms.buildUrl(`entity/organization/${TEST_ORGANIZATION_ID}`)
           }
         },
         positions: [
@@ -29,9 +30,7 @@ test('Moysklad#DELETE', async t => {
             assortment: {
               meta: {
                 type: 'product',
-                href: ms.buildUrl(
-                  'entity/product/d29f9d08-30d1-11e7-7a34-5acf004eda99'
-                )
+                href: ms.buildUrl(`entity/product/${TEST_PRODUCT_01_ID}`)
               }
             },
             quantity: 1
@@ -40,9 +39,7 @@ test('Moysklad#DELETE', async t => {
             assortment: {
               meta: {
                 type: 'product',
-                href: ms.buildUrl(
-                  'entity/product/d29f038e-30d1-11e7-7a34-5acf004eda8c'
-                )
+                href: ms.buildUrl(`entity/product/${TEST_PRODUCT_02_ID}`)
               }
             },
             quantity: 1

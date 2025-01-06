@@ -22,6 +22,7 @@ test('Moysklad static methods', t => {
   t.equals(typeof Moysklad.MoyskladError, 'function')
   t.equals(typeof Moysklad.MoyskladRequestError, 'function')
   t.equals(typeof Moysklad.MoyskladUnexpectedRedirectError, 'function')
+  t.equals(typeof Moysklad.getVersion, 'function')
   t.end()
 })
 

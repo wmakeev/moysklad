@@ -38,6 +38,8 @@ const {
   MoyskladUnexpectedRedirectError
 } = require('./errors')
 
+const getVersion = () => version
+
 // TODO Remove old methods
 module.exports = stampit({
   methods: {
@@ -77,6 +79,7 @@ module.exports = stampit({
   },
 
   statics: {
+    getVersion,
     getTimeString,
     parseTimeString,
     parseUrl,

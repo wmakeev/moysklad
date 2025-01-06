@@ -629,11 +629,11 @@ declare namespace Moysklad {
      * Равно `key=value`
      */
     [key: string]:
-    | QueryValue
-    | QueryValue[]
-    | QueryObject
-    | QueryObject[]
-    | undefined
+      | QueryValue
+      | QueryValue[]
+      | QueryObject
+      | QueryObject[]
+      | undefined
   }
 
   export type QueryFilter = {
@@ -741,6 +741,13 @@ declare namespace Moysklad {
   }
 
   /**
+   * Возвращает текущую версию библиотеки.
+   *
+   * Версия из package.json (поле `version`)
+   */
+  export function getVersion(): string
+
+  /**
    * Преобразует дату в строку в формате API МойСклад в часовом поясе Москвы
    * @param date дата
    * @param includeMs если `true`, то в результирующую дату будут включены миллисекунды
@@ -757,12 +764,12 @@ declare namespace Moysklad {
   export function parseTimeString(date: string): Date
 
   /**
-     * Разбирает url ресурса API МойСклад на составные части
-     *
-     * @param url url, path или ref ресурса API МойСклад
-     *
-     * - url `https://...`
-     */
+   * Разбирает url ресурса API МойСклад на составные части
+   *
+   * @param url url, path или ref ресурса API МойСклад
+   *
+   * - url `https://...`
+   */
   export function parseUrl(url: string): {
     /**
      * Точка досупа к API
@@ -863,7 +870,7 @@ declare namespace Moysklad {
   /**
    * Внутренняя ошибка библиотеки не связанная с выполнением запроса к API
    */
-  export class MoyskladError extends Error { }
+  export class MoyskladError extends Error {}
 
   /**
    * Ошибка при выполнении запроса

@@ -4,7 +4,7 @@ const test = require('tape')
 const { fetch, Response } = require('undici')
 
 const Moysklad = require('..')
-const { MoyskladApiError } = require('../src/errors')
+const { MoyskladApiError, MoyskladError } = require('../src/errors')
 const { TEST_PRODUCT_01_APP_ID, TEST_PRODUCT_01_ID } = require('./env')
 
 test('Response with muteApiErrors option', t => {
@@ -245,6 +245,49 @@ test('Response with includeResponse', async t => {
 
   t.ok(product.id, 'should return result')
   t.ok(response instanceof Response, 'should return Response')
+})
+
+test('Response with includeResponse and muteApiErrors', async t => {
+  const ms = Moysklad({ fetch })
+
+  const [result, response] = await ms.GET('entity/foo', null, {
+    includeResponse: true,
+    muteApiErrors: true
+  })
+
+  t.ok(Array.isArray(result.errors), 'should return result (error)')
+  t.ok(response instanceof Response, 'should return Response')
+  t.ok(response.ok === false, 'should return not ok Response')
+})
+
+test('Response options not compatible: includeResponse and rawResponse', async t => {
+  const ms = Moysklad({ fetch })
+
+  try {
+    await ms.GET('entity/foo', null, {
+      includeResponse: true,
+      rawResponse: true
+    })
+
+    t.fail('should fail')
+  } catch (err) {
+    t.ok(err instanceof MoyskladError)
+  }
+})
+
+test('Response options not compatible: includeResponse and rawRedirect', async t => {
+  const ms = Moysklad({ fetch })
+
+  try {
+    await ms.GET('entity/foo', null, {
+      includeResponse: true,
+      rawRedirect: true
+    })
+
+    t.fail('should fail')
+  } catch (err) {
+    t.ok(err instanceof MoyskladError)
+  }
 })
 
 test('Request with precision option', t => {

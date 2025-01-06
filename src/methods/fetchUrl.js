@@ -3,6 +3,7 @@
 const have = require('../have')
 const getResponseError = require('../getResponseError')
 const {
+  MoyskladError,
   MoyskladRequestError,
   MoyskladApiError,
   MoyskladCollectionError,
@@ -43,15 +44,25 @@ module.exports = async function fetchUrl(url, options = {}) {
   }
 
   // получаем специфичные параметры
-  if (fetchOptions.rawResponse) {
-    rawResponse = true
-    delete fetchOptions.rawResponse
-  }
   if (fetchOptions.includeResponse) {
     includeResponse = true
     delete fetchOptions.includeResponse
   }
+  if (fetchOptions.rawResponse) {
+    if (includeResponse) {
+      throw new MoyskladError(
+        'Опция запроса "rawResponse" несовместима с опцией "includeResponse"'
+      )
+    }
+    rawResponse = true
+    delete fetchOptions.rawResponse
+  }
   if (fetchOptions.rawRedirect) {
+    if (includeResponse) {
+      throw new MoyskladError(
+        'Опция запроса "rawRedirect" несовместима с опцией "includeResponse"'
+      )
+    }
     rawRedirect = true
     delete fetchOptions.rawRedirect
   }
@@ -158,20 +169,16 @@ module.exports = async function fetchUrl(url, options = {}) {
 
   if (error) {
     if (error instanceof MoyskladApiError && muteApiErrors) {
-      return result
+      return includeResponse ? [result, response] : result
     }
 
     if (error instanceof MoyskladCollectionError && muteCollectionErrors) {
-      return result
+      return includeResponse ? [result, response] : result
     }
 
     if (emit) emit('error', error, { requestId })
     throw error
   }
 
-  if (includeResponse) {
-    return [result, response]
-  }
-
-  return result
+  return includeResponse ? [result, response] : result
 }

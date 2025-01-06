@@ -23,12 +23,14 @@
   - [parseUrl статический метод](#parseurl-%D1%81%D1%82%D0%B0%D1%82%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B9-%D0%BC%D0%B5%D1%82%D0%BE%D0%B4)
   - [buildFilter](#buildfilter)
   - [buildQuery](#buildquery)
+  - [getVersion](#getversion)
 - [Методы экземпляра](#%D0%BC%D0%B5%D1%82%D0%BE%D0%B4%D1%8B-%D1%8D%D0%BA%D0%B7%D0%B5%D0%BC%D0%BF%D0%BB%D1%8F%D1%80%D0%B0)
   - [GET](#get)
   - [POST](#post)
   - [PUT](#put)
   - [DELETE](#delete)
   - [getOptions](#getoptions)
+  - [getVersion - метод экземпляра](#getversion---%D0%BC%D0%B5%D1%82%D0%BE%D0%B4-%D1%8D%D0%BA%D0%B7%D0%B5%D0%BC%D0%BF%D0%BB%D1%8F%D1%80%D0%B0)
   - [buildUrl](#buildurl)
   - [parseUrl](#parseurl)
   - [fetchUrl](#fetchurl)
@@ -260,6 +262,10 @@ Moysklad.buildQuery({
 // 'filter=name%3Dfoo&limit=100&foo=bar'
 ```
 
+### getVersion
+
+> Возвращает текущую версию библиотеки. Версия из package.json (поле `version`)
+
 ## Методы экземпляра
 
 ### GET
@@ -412,6 +418,10 @@ assert.equal(msOptions.login, 'login')
 assert.equal(msOptions.password, 'password')
 ```
 
+### getVersion - метод экземпляра
+
+> Аналогичен статическому методу [getVersion](#getversion)
+
 ### buildUrl
 
 > Формирует url запроса
@@ -525,7 +535,7 @@ const updatedOrder = await ms.fetchUrl(url, {
 
 ### Основные аргументы
 
-#### `path`
+#### path
 
 Строка.
 
@@ -559,7 +569,7 @@ const positionUrl = `/positions/${posId}`
 ms.GET(`entity/customerorder/` + positionUrl)
 ```
 
-#### `query`
+#### query
 
 ##### querystring
 
@@ -666,7 +676,7 @@ bar!=;bar.baz=1;code=03;code=1;code=2;foo=1999-12-31 22:00:00;moment<=2001-01-02
 
 Обратите внимание на то, что если указано значение expand, то необходимо явно указать значение для limit меньше или равное 100, иначе expand [будет проигнорирован](https://dev.moysklad.ru/doc/api/remap/1.2/workbook/#workbook-chto-takoe-expand).
 
-#### `options` (параметры запроса)
+#### options (параметры запроса)
 
 Все поля указанные в объекте `options`, за исключением описанных в этом разделе, передаются напрямую в опции fetch ([fetch options](https://developer.mozilla.org/en-US/docs/Web/API/Window/fetch#options)).
 

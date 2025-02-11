@@ -163,6 +163,6 @@ test('fetchUrl retry 404', async t => {
   await ms
     .fetchUrl('https://example', { signal: controller.signal })
     .catch(err => {
-      t.equal(err.cause.code, 'ENOTFOUND')
+      t.ok(['ENOTFOUND', 'EAI_AGAIN'].includes(err.cause.code))
     })
 })

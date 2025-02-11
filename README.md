@@ -4,7 +4,7 @@
 
 [![npm](https://img.shields.io/npm/v/moysklad.svg?cacheSeconds=1800&style=flat-square)](https://www.npmjs.com/package/moysklad)
 [![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/wmakeev/moysklad/main.yml?style=flat-square)](https://github.com/wmakeev/moysklad/actions/workflows/main.yml)
-[![Codecov](https://img.shields.io/codecov/c/github/wmakeev/moysklad?style=flat-square)](https://app.codecov.io/gh/wmakeev/moysklad/tree/master/)
+<!-- [![Codecov](https://img.shields.io/codecov/c/github/wmakeev/moysklad?style=flat-square)](https://app.codecov.io/gh/wmakeev/moysklad/tree/master/) -->
 
 Библиотека для взаимодействия с [JSON API сервиса МойСклад](https://dev.moysklad.ru/) для node.js.
 

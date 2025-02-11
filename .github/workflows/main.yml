@@ -28,8 +28,8 @@ jobs:
           TEST_PRODUCT_01_ID: ${{ vars.TEST_PRODUCT_01_ID }}
           TEST_PRODUCT_02_ID: ${{ vars.TEST_PRODUCT_02_ID }}
 
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v5
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          slug: wmakeev/moysklad
+      # - name: Upload coverage reports to Codecov
+      #   uses: codecov/codecov-action@v5
+      #   with:
+      #     token: ${{ secrets.CODECOV_TOKEN }}
+      #     slug: wmakeev/moysklad

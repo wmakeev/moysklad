@@ -73,7 +73,7 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^4.2.1",
     "moysklad-fetch-planner": "^3.0.0",
-    "np": "^7.7.0",
+    "np": "^10.2.0",
     "p-retry": "^6.2.1",
     "prettier": "^2.8.8",
     "tape": "^5.9.0",

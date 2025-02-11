@@ -53,7 +53,6 @@
       - [expand и limit](#expand-и-limit)
     - [options (параметры запроса)](#options-параметры-запроса)
 - [Управление потоком запросов](#управление-потоком-запросов)
-- [События](#события)
 - [Обработка ошибок](#обработка-ошибок)
   - [Повтор запроса при ошибке](#повтор-запроса-при-ошибке)
   - [Виды ошибок](#виды-ошибок)
@@ -62,6 +61,7 @@
     - [MoyskladApiError](#moyskladapierror)
     - [MoyskladCollectionError](#moyskladcollectionerror)
     - [MoyskladUnexpectedRedirectError](#moyskladunexpectedredirecterror)
+- [События](#события)
 - [История изменений](#история-изменений)
 - [Планы развития](#планы-развития)
 - [TODO](#todo)
@@ -133,7 +133,7 @@ ms.GET('entity/customerorder', {
 | Параметр     | Значение по умолчанию                                                                            | Описание                                                                                                                                                                                                                                                                                                                           |
 | ------------ | ------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `fetch`      | глобальный fetch                                                                                 | Функция с интерфейсом [Fetch API](https://developer.mozilla.org/ru/docs/Web/API/Fetch_API). Если глобальный fetch не найден, то будет выброшена ошибка при попытке осуществить http запрос. Начиная с Node.js 18 [fetch](https://nodejs.org/dist/latest-v18.x/docs/api/globals.html#fetch) является частью стандартной библиотеки. |
-| `retry`      | функция вида `(thunk) => thunk()`                                                                | Функция для управления поведением при возникновении ошибок.                                                                                                                                                                                                                                                                        |
+| `retry`      | функция вида `(thunk) => thunk()`                                                                | Функция для управления поведением при возникновении ошибок (см. [Повтор запроса при ошибке](#повтор-запроса-при-ошибке)).                                                                                                                                                                                                          |
 | `endpoint`   | `"https://api.moysklad.ru/api"`                                                                  | Точка доступа к API (хост точки доступа можно указать через переменную окружения `MOYSKLAD_HOST`, по умолчанию `api.moysklad.ru`)                                                                                                                                                                                                  |
 | `api`        | `"remap"`                                                                                        | Раздел API (можно задать через переменную окружения `MOYSKLAD_API`)                                                                                                                                                                                                                                                                |
 | `apiVersion` | `"1.2"`                                                                                          | Версия API (можно задать через переменную окружения `MOYSKLAD_{NAME}_API_VERSION`, где `{NAME}` - название API в верхнем регистре, напр. `MOYSKLAD_REMAP_API_VERSION`)                                                                                                                                                             |
@@ -824,53 +824,91 @@ import { wrapFetchApi } from 'moysklad-fetch-planner'
 const ms = Moysklad({ fetch: wrapFetchApi(fetch) })
 ```
 
-## События
-
-| Событие         | Передаваемый объект                           | Момент наступления            |
-| --------------- | --------------------------------------------- | ----------------------------- |
-| `request`       | `{ requestId, url, options }`                 | Отправлен http запрос         |
-| `response`      | `{ requestId, url, options, response }`       | Получен ответ на запрос       |
-| `response:body` | `{ requestId, url, options, response, body }` | Загружено тело ответа         |
-| `error`         | `Error`, `{ requestId }`                      | Ошибка при выполнении запроса |
-
-<details>
-  <summary>Примеры</summary>
-
-```js
-import { fetch } from 'undici'
-import { EventEmitter } from 'events'
-import Moysklad from 'moysklad'
-
-/** @type {Moysklad.MoyskladEmitter} */
-const emitter = new EventEmitter()
-
-const ms = Moysklad({ fetch, emitter })
-
-emitter
-  .on('request', ({ requestId, url, options }) => {
-    console.log(`${requestId} ${options.method} ${url}`)
-  })
-  .on('error', (err, { requestId }) => {
-    console.log(requestId, err)
-  })
-
-ms.GET('entity/customerorder', { limit: 1 }).then(res => {
-  console.log('Order name: ' + res.rows[0].name)
-})
-```
-
-Более подробный пример смотрите в [examples/events.js](https://github.com/wmakeev/moysklad/blob/master/examples/events.js).
-
-</details>
-
 ## Обработка ошибок
 
 ### Повтор запроса при ошибке
 
-Пример кода для автоматического повтора запроса при получении ошибки:
+При инициализации клиента есть возможность задать свою логику обработки ошибочных запросов. В примере ниже код для автоматического повтора запроса при получении ошибки.
+
+<details>
+  <summary>Пример</summary>
 
 ```js
+import Moysklad from 'moysklad'
+import { wrapFetch } from 'moysklad-fetch-planner'
+import pRetry from 'p-retry'
+import { fetch } from 'undici'
+
+/**
+ * Пример настройки клиента для API МойСклад.
+ *
+ * 1. Подключается планировщик запросов `moysklad-fetch-planner` для автоматического
+ * контроля за лимитами для предотвращения возникновения ошибки `429 Too Many Request`.
+ *
+ * 2. Подключается механизм повтора ошибочных запросов для случаев когда ошибка
+ * могла быть вызвана временными неполадками в процессе выполнения запроса (для
+ * примера используется npm библиотека `p-retry`).
+ */
+const ms = Moysklad({
+  fetch: wrapFetch(fetch),
+  retry: (thunk, signal) => {
+    return pRetry(thunk, {
+      retries: 2,
+      shouldRetry: Moysklad.shouldRetryError,
+      onFailedAttempt: error => {
+        console.log(
+          `Attempt ${error.attemptNumber} failed. There are ${error.retriesLeft} retries left.`
+        )
+      },
+      signal
+    })
+  }
+})
+
+try {
+  // Запрос с ошибкой в url-запроса повторяться не будет, если API МойСклад
+  // вернул об этом сообщение.
+  await ms.GET('foo')
+  // ↳ Attempt 1 failed. There are 2 retries left.
+} catch (err) {
+  console.log(err)
+  // ↳ MoyskladApiError: Неопознанный путь: https://api.moysklad.ru/api/remap/1.2/foo (https://dev.moysklad.ru/doc/api/remap/1.2/#error_1002)
+}
+
+try {
+  // Запрос с ошибкой которая имеет HTTP код `503` (в том числе, и другие коды
+  // `5xx`) будет повторяться. Т.к. подобная ошибка иногда может быть вызвана
+  // временными сбоями на стороне сервера API МойСклад.
+  await ms.fetchUrl(
+    'https://api.moysklad.ru/api/remap/1.0/entity/customerorder'
+  )
+  // ↳ Attempt 1 failed. There are 2 retries left.
+  // ↳ Attempt 2 failed. There are 1 retries left.
+  // ↳ Attempt 3 failed. There are 0 retries left.
+} catch (err) {
+  console.log(err)
+  // ↳ MoyskladRequestError: 503 Service Unavailable
+}
+
+try {
+  // Запрос с ошибкой которая имеет код `ENOTFOUND` (и ряд других) будет
+  // повторяться. Т.к. такая ошибка иногда может быть вызвана сбоями в процессе
+  // HTTP соединения.
+  await ms.fetchUrl('https://example')
+  // ↳ Attempt 1 failed. There are 2 retries left.
+  // ↳ Attempt 2 failed. There are 1 retries left.
+  // ↳ Attempt 3 failed. There are 0 retries left.
+} catch (err) {
+  console.log(err)
+  // ↳ TypeError: fetch failed
+}
+
+// Запросы вызвавшие ошибки с кодами 429 обрабатываются и повторяются внутри
+// планировщика. При подключении планировщика обрабатывать в `retry` такие
+// ошибки не нужно.
 ```
+
+</details>
 
 ### Виды ошибок
 
@@ -1174,6 +1212,45 @@ const product = await ms.GET(`entity/product/${uuidFromApp}`, null, {
 
 console.log(product.id === uuidFromApp) // false
 ```
+
+</details>
+
+## События
+
+| Событие         | Передаваемый объект                           | Момент наступления            |
+| --------------- | --------------------------------------------- | ----------------------------- |
+| `request`       | `{ requestId, url, options }`                 | Отправлен http запрос         |
+| `response`      | `{ requestId, url, options, response }`       | Получен ответ на запрос       |
+| `response:body` | `{ requestId, url, options, response, body }` | Загружено тело ответа         |
+| `error`         | `Error`, `{ requestId }`                      | Ошибка при выполнении запроса |
+
+<details>
+  <summary>Примеры</summary>
+
+```js
+import { fetch } from 'undici'
+import { EventEmitter } from 'events'
+import Moysklad from 'moysklad'
+
+/** @type {Moysklad.MoyskladEmitter} */
+const emitter = new EventEmitter()
+
+const ms = Moysklad({ fetch, emitter })
+
+emitter
+  .on('request', ({ requestId, url, options }) => {
+    console.log(`${requestId} ${options.method} ${url}`)
+  })
+  .on('error', (err, { requestId }) => {
+    console.log(requestId, err)
+  })
+
+ms.GET('entity/customerorder', { limit: 1 }).then(res => {
+  console.log('Order name: ' + res.rows[0].name)
+})
+```
+
+Более подробный пример смотрите в [examples/events.js](https://github.com/wmakeev/moysklad/blob/master/examples/events.js).
 
 </details>
 

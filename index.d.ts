@@ -1,13 +1,13 @@
 export = Moysklad
 
 /**
- * Создает экземпляр клиента для рабты с API МойСклад
+ * Создает экземпляр клиента для работы с API МойСклад
  * @param options Параметры инициализации экземпляра
  */
 declare function Moysklad(options?: Moysklad.Options): Moysklad.Instance
 
 declare namespace Moysklad {
-  export type RetryFunction = <U, T extends (...agrs: any[]) => Promise<U>>(
+  export type RetryFunction = <U, T extends (...args: any[]) => Promise<U>>(
     thunk: T,
     signal?: AbortSignal | undefined
   ) => Promise<U>
@@ -443,7 +443,7 @@ declare namespace Moysklad {
 
     /**
      * Если ответ сервера с кодом в диапазоне 300-399 (редирект), то будет
-     * выброшена ошибка [MoyskladUnexpectedRedirectError](#moyskladunexpectedredirecterror),
+     * выброшена ошибка [MoyskladUnexpectedRedirectError](https://github.com/wmakeev/moysklad?tab=readme-ov-file#moyskladunexpectedredirecterror),
      * поэтому, для явной обработки редиректа необходимо указать опцию `rawRedirect` со
      * значением `true`. В этом случае метод вернет объект
      * [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response),
@@ -469,7 +469,7 @@ declare namespace Moysklad {
      * - если код ответа сервера не 2xx и тело ответа содержит поле `errors`
      * - если ответ коллекция и хотя бы один элемент коллекции содержит поле `errors`
      *
-     * Результат будет содержать ответ сервера с ошибокой или коллекцию.
+     * Результат будет содержать ответ сервера с ошибкой или коллекцию.
      *
      * Ошибка сервера или протокола проигнорированы не будут.
      *
@@ -513,7 +513,7 @@ declare namespace Moysklad {
     muteErrors?: boolean
 
     /**
-     * Если `true`, то будут проигнорированны ошибки внутри коллекций.
+     * Если `true`, то будут проигнорированы ошибки внутри коллекций.
      *
      * Если ответ коллекция и хотя бы один элемент коллекции содержит поле `errors`,
      * то ошибка `MoyskladApiError` выброшена не будет.
@@ -556,7 +556,8 @@ declare namespace Moysklad {
 
     /**
      * В JSON API для скачивания файла формируется редирект на временный URL
-     * файла. Для корректной работы необходимо поддерживать обработку редиректов.
+     * файла. Для корректной работы необходимо поддерживать обработку
+     * перенаправлений запросов.
      * Запрос на временный URL не требует авторизации. По умолчанию время жизни
      * временного URL равно одной минуте.
      *
@@ -721,7 +722,7 @@ declare namespace Moysklad {
      *
      * ```js
      * const filter = {
-     *    applicale: true,
+     *    applicable: true,
      *    moment: {
      *      $gt: '2019-08-10 11:00'
      *    }
@@ -840,7 +841,7 @@ declare namespace Moysklad {
    */
   export function parseUrl(url: string): {
     /**
-     * Точка досупа к API
+     * Точка доступа к API
      *
      * Пример: `https://api.moysklad.ru/api`
      */

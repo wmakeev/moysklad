@@ -15,7 +15,8 @@ const RETRYABLE_ERROR_CODES = [
   'EHOSTDOWN',
   'EHOSTUNREACH',
   'EPIPE',
-  'UND_ERR_SOCKET'
+  'UND_ERR_SOCKET',
+  'EAI_AGAIN' // Node.js 18
 ]
 
 /**

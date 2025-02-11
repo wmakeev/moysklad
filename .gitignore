@@ -1,4 +1,4 @@
-# Loacal temp files
+# Local temp files
 __temp*
 __old
 
@@ -14,7 +14,6 @@ tsconfig.tsbuildinfo
 # Dependency directories
 node_modules
 typings
-package-lock.json
 
 # Local dependency directory
 !/examples/node_modules

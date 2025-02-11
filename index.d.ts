@@ -7,6 +7,11 @@ export = Moysklad
 declare function Moysklad(options?: Moysklad.Options): Moysklad.Instance
 
 declare namespace Moysklad {
+  export type RetryFunction = <U, T extends (...agrs: any[]) => Promise<U>>(
+    thunk: T,
+    signal?: AbortSignal | undefined
+  ) => Promise<U>
+
   export interface Instance {
     /**
      * Выполняет GET запрос по указанному ресурсу
@@ -181,7 +186,7 @@ declare namespace Moysklad {
      */
     parseUrl(url: string): {
       /**
-       * Точка досупа к API
+       * Точка доступа к API
        *
        * Пример: `https://api.moysklad.ru/api`
        */
@@ -247,14 +252,77 @@ declare namespace Moysklad {
    */
   export interface Options {
     /**
-     * Функция с интерфейсом [Fetch API](https://developer.mozilla.org/ru/docs/Web/API/Fetch_API)
+     * Функция с интерфейсом [Fetch API](https://developer.mozilla.org/ru/docs/Web/API/Fetch_API).
      *
-     * по умолчанию используется глобальный fetch (если глобальный fetch не найден, то будет выброшена ошибка)
+     * По умолчанию используется глобальный fetch (если глобальный fetch не
+     * найден, то при первом запросе будет выброшена ошибка).
+     *
+     * Для управления потоком запросов с целью уложиться в [ограничения](https://dev.moysklad.ru/doc/api/remap/1.2/#mojsklad-json-api-ogranicheniq)
+     * API МойСклад можно использовать модуль [moysklad-fetch-planner](https://www.npmjs.com/package/moysklad-fetch-planner).
+     * Модуль считывает информацию о текущих лимитах из заголовков ответов API
+     * МойСклад и ограничивает скорость выполнения запросов, предотвращая появления
+     * ошибок 429 Too Many Requests. В случае если ошибки 429 избежать не удалось,
+     * запрос будет повторен при восстановлении доступного лимита.
+     *
+     * Пример использования:
+     *
+     * ```ts
+     * import Moysklad from 'moysklad'
+     * import { fetch } from 'undici'
+     * import { wrapFetchApi } from 'moysklad-fetch-planner'
+     *
+     * const ms = Moysklad({ fetch: wrapFetchApi(fetch) })
+     * ```
      */
     fetch?: any
 
     /**
-     * Точка досупа к API
+     * Функция для управления поведением при возникновении ошибок.
+     *
+     * В функцию `retry` передается аргумент - `thunk`. `thunk` - асинхронная
+     * функция без аргументов, при выполнении которой выполняется текущий
+     * HTTP-запрос.
+     *
+     * Логика внутри функции `retry` должна возвращать результат выполнения
+     * функции `thunk`, там же обрабатываются ошибки и при необходимости
+     * повторяется выполнение запроса через повторный вызов `thunk`.
+     *
+     * Можно использовать готовые модули в которых уже реализована стратегия
+     * повторения запросов.
+     *
+     * Пример с применением модуля [p-retry](https://github.com/sindresorhus/p-retry):
+     *
+     * ```ts
+     * import Moysklad from 'moysklad'
+     * import pRetry from 'p-retry'
+     *
+     * const ms = Moysklad({
+     *   retry: (thunk, signal) => {
+     *     return pRetry(thunk, {
+     *       retries: 2,
+     *       shouldRetry: Moysklad.shouldRetryError,
+     *       onFailedAttempt: error => {
+     *         console.log(
+     *           `Attempt ${error.attemptNumber} failed. There are ${error.retriesLeft} retries left.`
+     *         )
+     *       },
+     *       signal
+     *     })
+     *   }
+     * })
+     * ```
+     *
+     * Для обработки ошибок `429 Too Many Requests` рекомендуется использовать модуль
+     * планировщик запросов [moysklad-fetch-planner](https://www.npmjs.com/package/moysklad-fetch-planner)
+     * (см. описание опции `fetch`). Использование планировщика можно совмещать с
+     * опцией `retry`.
+     *
+     * [Пример настройки](https://github.com/wmakeev/moysklad/blob/master/examples/retry.js) клиента с retry и планировщиком.
+     */
+    retry?: RetryFunction
+
+    /**
+     * Точка доступа к API
      *
      * по умолчанию `https://api.moysklad.ru/api`
      */
@@ -299,7 +367,7 @@ declare namespace Moysklad {
     password?: string
 
     /**
-     * Экземляр [EventEmitter](https://nodejs.org/api/events.html#events_class_eventemitter) для получения событий
+     * Экземпляр [EventEmitter](https://nodejs.org/api/events.html#events_class_eventemitter) для получения событий
      *
      * Пример использования:
      *
@@ -835,6 +903,23 @@ declare namespace Moysklad {
    * @param query Параметры запроса
    */
   export function buildQuery(query: Query): string
+
+  /**
+   * Вспомогательная функция, которую можно использовать в реализации логики
+   * повторения запросов при возникновении ошибки.
+   *
+   * Возвращает:
+   *
+   * - `true` - причина ошибка, скорее всего, вызвана временными неполадками,
+   * поэтому запрос можно повторить.
+   *
+   * - `false` - запрос содержит ошибку, повторять запрос нецелесообразно.
+   *
+   * @param {Error} error Объект ошибки
+   * @returns {boolean} `true` - если следует сделать повторную попытку, иначе `false`
+   */
+  export function shouldRetryError(error: Error): boolean
+
   /**
    * Метод используется для расширения библиотеки внешними модулями
    * @param extension Модуль расширения
@@ -887,7 +972,7 @@ declare namespace Moysklad {
   }
 
   /**
-   * Ошибка если запрос вернул перенапраление (код `3xx`), когда явно не
+   * Ошибка если запрос вернул перенаправление (код `3xx`), когда явно не
    * указана опция запроса `rawRedirect` и опция `redirect` не равна `follow`
    */
   export class MoyskladUnexpectedRedirectError extends MoyskladRequestError {
@@ -914,7 +999,7 @@ declare namespace Moysklad {
    */
   export class MoyskladCollectionError extends MoyskladApiError {
     /**
-     * Ошибки в соответствии с идексами переданных сущностей в исходной коллекции.
+     * Ошибки в соответствии с индексами переданных сущностей в исходной коллекции.
      *
      * Позволяет точно сопоставить ошибки с конкретной сущностью из коллекции.
      */

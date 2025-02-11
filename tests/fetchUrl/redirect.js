@@ -3,8 +3,8 @@
 const test = require('tape')
 const { fetch } = require('undici')
 
-const Moysklad = require('..')
-const { TEST_PRODUCT_01_APP_ID } = require('./env')
+const Moysklad = require('../../index.js')
+const { TEST_PRODUCT_01_APP_ID } = require('../env.js')
 
 test('fetchUrl redirect', async t => {
   t.plan(2)

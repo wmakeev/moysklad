@@ -6,5 +6,26 @@
   "vsicons.presets.angular": false,
   "files.eol": "\n",
   "editor.guides.indentation": true,
-  "editor.formatOnSave": true
+  "editor.formatOnSave": true,
+  "cSpell.words": [
+    "companysettings",
+    "customerorder",
+    "customtemplate",
+    "Dfoo",
+    "productfolder",
+    "RETRYABLE",
+    "stampit",
+    "автогенерацией",
+    "бандла",
+    "бандлов",
+    "вебхуков",
+    "легаси",
+    "минифицированной",
+    "предсобранных",
+    "сериализованной",
+    "тайпинг",
+    "тайпинге",
+    "тайпингов",
+    "экcпорт"
+  ]
 }

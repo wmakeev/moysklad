@@ -2,8 +2,7 @@
  * moysklad
  * Клиент для JSON API МойСклад
  *
- * Copyright (c) 2017, Vitaliy V. Makeev
- * Licensed under MIT.
+ * https://github.com/wmakeev/moysklad
  */
 
 'use strict'
@@ -11,8 +10,9 @@
 const stampit = require('stampit')
 
 const have = require('./have')
-const getApiDefaultVersion = require('./getApiDefaultVersion')
 const { version } = require('./version')
+const getApiDefaultVersion = require('./getApiDefaultVersion')
+const shouldRetryError = require('./shouldRetryError')
 
 // methods
 const getTimeString = require('./tools/getTimeString')
@@ -85,6 +85,7 @@ module.exports = stampit({
     parseUrl,
     buildFilter,
     buildQuery,
+    shouldRetryError,
     MoyskladError,
     MoyskladRequestError,
     MoyskladUnexpectedRedirectError,
@@ -104,6 +105,8 @@ module.exports = stampit({
     // queue: 'opt bool',
     // emitter: 'opt obj'
   })
+
+  this.retry = options.retry == null ? thunk => thunk() : options.retry
 
   if (options.fetch) {
     this.fetch = options.fetch

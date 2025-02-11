@@ -1,0 +1,35 @@
+name: Test and coverage action
+on:
+  push:
+    branches:
+      - master
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ['18.x', '22.x']
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - run: npm ci
+      - run: npm run test
+        env:
+          MOYSKLAD_LOGIN: ${{ secrets.MOYSKLAD_LOGIN }}
+          MOYSKLAD_PASSWORD: ${{ secrets.MOYSKLAD_PASSWORD }}
+          TEST_ORGANIZATION_ID: ${{ vars.TEST_ORGANIZATION_ID }}
+          TEST_PRODUCT_01_APP_ID: ${{ vars.TEST_PRODUCT_01_APP_ID }}
+          TEST_PRODUCT_01_ID: ${{ vars.TEST_PRODUCT_01_ID }}
+          TEST_PRODUCT_02_ID: ${{ vars.TEST_PRODUCT_02_ID }}
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: wmakeev/moysklad

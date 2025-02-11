@@ -12,173 +12,182 @@ const {
 
 let globalRequestId = 0
 
-module.exports = async function fetchUrl(url, options = {}) {
-  const requestId = ++globalRequestId
+function createFetchThunk(ctx, url, options = {}) {
+  have.strict(arguments, { ctx: 'Object', url: 'url', options: 'opt Object' })
 
-  have.strict(arguments, { url: 'url', options: 'opt Object' })
+  return async () => {
+    const requestId = ++globalRequestId
 
-  let result, error
+    let result, error
 
-  // Специфические параметры (не передаются в опции fetch)
-  let rawResponse = false
-  let rawRedirect = false
-  let includeResponse = false
-  let muteApiErrors = false
-  let muteCollectionErrors = false
+    // Специфические параметры (не передаются в опции fetch)
+    let rawResponse = false
+    let rawRedirect = false
+    let includeResponse = false
+    let muteApiErrors = false
+    let muteCollectionErrors = false
 
-  const emit = this.emitter ? this.emitter.emit.bind(this.emitter) : null
+    const emit = ctx.emitter ? ctx.emitter.emit.bind(ctx.emitter) : null
 
-  const fetchOptions = {
-    redirect: 'manual',
-    ...options,
-    headers: {
-      'User-Agent': this.getOptions().userAgent,
-      'Content-Type': 'application/json',
-      'Accept-Encoding': 'gzip',
-      ...options.headers
+    const fetchOptions = {
+      redirect: 'manual',
+      ...options,
+      headers: {
+        'User-Agent': ctx.getOptions().userAgent,
+        'Content-Type': 'application/json',
+        'Accept-Encoding': 'gzip',
+        ...options.headers
+      }
     }
-  }
 
-  if (!fetchOptions.headers.Authorization) {
-    fetchOptions.credentials = 'include'
-  }
+    if (!fetchOptions.headers.Authorization) {
+      fetchOptions.credentials = 'include'
+    }
 
-  // получаем специфичные параметры
-  if (fetchOptions.includeResponse) {
-    includeResponse = true
-    delete fetchOptions.includeResponse
-  }
-  if (fetchOptions.rawResponse) {
-    if (includeResponse) {
-      throw new MoyskladError(
-        'Опция запроса "rawResponse" несовместима с опцией "includeResponse"'
+    // получаем специфичные параметры
+    if (fetchOptions.includeResponse) {
+      includeResponse = true
+      delete fetchOptions.includeResponse
+    }
+    if (fetchOptions.rawResponse) {
+      if (includeResponse) {
+        throw new MoyskladError(
+          'Опция запроса "rawResponse" несовместима с опцией "includeResponse"'
+        )
+      }
+      rawResponse = true
+      delete fetchOptions.rawResponse
+    }
+    if (fetchOptions.rawRedirect) {
+      if (includeResponse) {
+        throw new MoyskladError(
+          'Опция запроса "rawRedirect" несовместима с опцией "includeResponse"'
+        )
+      }
+      rawRedirect = true
+      delete fetchOptions.rawRedirect
+    }
+    if (/* deprecated */ fetchOptions.muteErrors) {
+      muteApiErrors = true
+      delete fetchOptions.muteErrors
+    }
+    if (fetchOptions.muteApiErrors) {
+      muteApiErrors = true
+      delete fetchOptions.muteApiErrors
+    }
+    if (fetchOptions.muteCollectionErrors) {
+      muteCollectionErrors = true
+      delete fetchOptions.muteCollectionErrors
+    }
+
+    // X-Lognex
+    if (fetchOptions.precision) {
+      fetchOptions.headers['X-Lognex-Precision'] = 'true'
+      delete fetchOptions.precision
+    }
+    if (fetchOptions.webHookDisable) {
+      fetchOptions.headers['X-Lognex-WebHook-Disable'] = 'true'
+      delete fetchOptions.webHookDisable
+    }
+    if (typeof fetchOptions.webHookDisableByPrefix === 'string') {
+      fetchOptions.headers['X-Lognex-WebHook-DisableByPrefix'] =
+        fetchOptions.webHookDisableByPrefix
+      delete fetchOptions.webHookDisableByPrefix
+    }
+    if (fetchOptions.downloadExpirationSeconds) {
+      fetchOptions.headers['X-Lognex-Download-Expiration-Seconds'] = String(
+        fetchOptions.downloadExpirationSeconds
       )
+      delete fetchOptions.downloadExpirationSeconds
     }
-    rawResponse = true
-    delete fetchOptions.rawResponse
-  }
-  if (fetchOptions.rawRedirect) {
-    if (includeResponse) {
-      throw new MoyskladError(
-        'Опция запроса "rawRedirect" несовместима с опцией "includeResponse"'
-      )
+
+    const authHeader = ctx.getAuthHeader()
+    if (authHeader) {
+      fetchOptions.headers.Authorization = ctx.getAuthHeader()
     }
-    rawRedirect = true
-    delete fetchOptions.rawRedirect
-  }
-  if (/* deprecated */ fetchOptions.muteErrors) {
-    muteApiErrors = true
-    delete fetchOptions.muteErrors
-  }
-  if (fetchOptions.muteApiErrors) {
-    muteApiErrors = true
-    delete fetchOptions.muteApiErrors
-  }
-  if (fetchOptions.muteCollectionErrors) {
-    muteCollectionErrors = true
-    delete fetchOptions.muteCollectionErrors
-  }
 
-  // X-Lognex
-  if (fetchOptions.precision) {
-    fetchOptions.headers['X-Lognex-Precision'] = 'true'
-    delete fetchOptions.precision
-  }
-  if (fetchOptions.webHookDisable) {
-    fetchOptions.headers['X-Lognex-WebHook-Disable'] = 'true'
-    delete fetchOptions.webHookDisable
-  }
-  if (typeof fetchOptions.webHookDisableByPrefix === 'string') {
-    fetchOptions.headers['X-Lognex-WebHook-DisableByPrefix'] =
-      fetchOptions.webHookDisableByPrefix
-    delete fetchOptions.webHookDisableByPrefix
-  }
-  if (fetchOptions.downloadExpirationSeconds) {
-    fetchOptions.headers['X-Lognex-Download-Expiration-Seconds'] = String(
-      fetchOptions.downloadExpirationSeconds
-    )
-    delete fetchOptions.downloadExpirationSeconds
-  }
+    if (emit) emit('request', { requestId, url, options: fetchOptions })
 
-  const authHeader = this.getAuthHeader()
-  if (authHeader) {
-    fetchOptions.headers.Authorization = this.getAuthHeader()
-  }
+    /** @type {Response} */
+    const response = await ctx.fetch(url, fetchOptions)
 
-  if (emit) emit('request', { requestId, url, options: fetchOptions })
+    if (emit)
+      emit('response', { requestId, url, options: fetchOptions, response })
 
-  /** @type {Response} */
-  const response = await this.fetch(url, fetchOptions)
+    if (rawResponse) return response
 
-  if (emit)
-    emit('response', { requestId, url, options: fetchOptions, response })
-
-  if (rawResponse) return response
-
-  if (response.status >= 300 && response.status < 400) {
-    if (rawRedirect) {
-      return response
-    } else {
-      throw new MoyskladUnexpectedRedirectError(response)
-    }
-  }
-
-  // response.ok → response.status >= 200 && response.status < 300
-  if (response.status < 200 || response.status >= 300) {
-    error = new MoyskladRequestError(
-      [response.status, response.statusText].filter(it => it).join(' '),
-      response
-    )
-  }
-
-  // разбираем тело запроса
-  if (
-    response.headers.has('Content-Type') &&
-    response.headers.get('Content-Type').indexOf('application/json') !== -1
-  ) {
-    // response.json() может вызвать ошибку, если тело ответа пустое
-    const resBodyText = await response.text()
-
-    try {
-      if (resBodyText) {
-        result = JSON.parse(resBodyText)
+    if (response.status >= 300 && response.status < 400) {
+      if (rawRedirect) {
+        return response
       } else {
-        result = undefined
+        throw new MoyskladUnexpectedRedirectError(response)
+      }
+    }
+
+    // response.ok → response.status >= 200 && response.status < 300
+    if (response.status < 200 || response.status >= 300) {
+      error = new MoyskladRequestError(
+        [response.status, response.statusText].filter(it => it).join(' '),
+        response
+      )
+    }
+
+    // разбираем тело запроса
+    if (
+      response.headers.has('Content-Type') &&
+      response.headers.get('Content-Type').indexOf('application/json') !== -1
+    ) {
+      // response.json() может вызвать ошибку, если тело ответа пустое
+      const resBodyText = await response.text()
+
+      try {
+        if (resBodyText) {
+          result = JSON.parse(resBodyText)
+        } else {
+          result = undefined
+        }
+
+        error = getResponseError(result, response) || error
+      } catch (err) {
+        // для обработки ошибки в JSON.parse
+        error = new MoyskladRequestError(
+          'Некорректный JSON в теле ответа - ' + err.message,
+          response,
+          { cause: err }
+        )
+      }
+    }
+
+    if (emit) {
+      emit('response:body', {
+        requestId,
+        url,
+        options: fetchOptions,
+        response,
+        body: result
+      })
+    }
+
+    if (error) {
+      if (error instanceof MoyskladApiError && muteApiErrors) {
+        return includeResponse ? [result, response] : result
       }
 
-      error = getResponseError(result, response) || error
-    } catch (err) {
-      // для обработки ошибки в JSON.parse
-      error = new MoyskladRequestError(
-        'Некорректный JSON в теле ответа - ' + err.message,
-        response,
-        { cause: err }
-      )
-    }
-  }
+      if (error instanceof MoyskladCollectionError && muteCollectionErrors) {
+        return includeResponse ? [result, response] : result
+      }
 
-  if (emit) {
-    emit('response:body', {
-      requestId,
-      url,
-      options: fetchOptions,
-      response,
-      body: result
-    })
-  }
-
-  if (error) {
-    if (error instanceof MoyskladApiError && muteApiErrors) {
-      return includeResponse ? [result, response] : result
+      if (emit) emit('error', error, { requestId })
+      throw error
     }
 
-    if (error instanceof MoyskladCollectionError && muteCollectionErrors) {
-      return includeResponse ? [result, response] : result
-    }
-
-    if (emit) emit('error', error, { requestId })
-    throw error
+    return includeResponse ? [result, response] : result
   }
+}
 
-  return includeResponse ? [result, response] : result
+module.exports = async function fetchUrl(url, options = {}) {
+  return this.retry(
+    createFetchThunk(this, url, options),
+    options ? options.signal : undefined
+  )
 }

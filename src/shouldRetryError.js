@@ -2,11 +2,18 @@
 
 const { MoyskladRequestError } = require('./errors.js')
 
+const objectToString = Object.prototype.toString
+
+const isError = value => objectToString.call(value) === '[object Error]'
+
 // https://dev.moysklad.ru/doc/api/remap/1.2/#mojsklad-json-api-obschie-swedeniq-obrabotka-oshibok
-const RETRYABLE_STATUS_CODES = [500, 502, 503, 504]
+const RETRYABLE_STATUS_CODES_SET = new Set([500, 502, 503, 504])
+
+// https://github.com/sindresorhus/is-network-error/blob/main/index.js#L5
+const RETRYABLE_ERROR_MESSAGES_SET = new Set(['fetch failed', 'terminated'])
 
 // https://github.com/nodejs/undici/blob/main/lib/handler/retry-handler.js#L50
-const RETRYABLE_ERROR_CODES = [
+const RETRYABLE_ERROR_CODES_SET = new Set([
   'ECONNRESET',
   'ECONNREFUSED',
   'ENOTFOUND',
@@ -17,7 +24,7 @@ const RETRYABLE_ERROR_CODES = [
   'EPIPE',
   'UND_ERR_SOCKET',
   'EAI_AGAIN' // Node.js 18
-]
+])
 
 /**
  * @param {unknown} err
@@ -55,7 +62,7 @@ function shouldRetryError(error) {
   // Повторяем в случае HTTP ошибок с кодом 5xx
   if (
     error instanceof MoyskladRequestError &&
-    RETRYABLE_STATUS_CODES.includes(error.status)
+    RETRYABLE_STATUS_CODES_SET.has(error.status)
   ) {
     return true
   }
@@ -64,19 +71,11 @@ function shouldRetryError(error) {
     checkErrWithCauseChain(
       error,
       err =>
-        err instanceof Error &&
-        'code' in err &&
-        RETRYABLE_ERROR_CODES.includes(err.code)
-    )
-  ) {
-    return true
-  }
-
-  // Сервер оборвал соединение на этапе получения тела сообщения
-  if (
-    checkErrWithCauseChain(
-      error,
-      err => err instanceof TypeError && err.message === 'terminated'
+        isError(err) &&
+        // Ошибки HTTP-запроса
+        ((err.name === 'TypeError' &&
+          RETRYABLE_ERROR_MESSAGES_SET.has(err.message)) ||
+          ('code' in err && RETRYABLE_ERROR_CODES_SET.has(err.code)))
     )
   ) {
     return true

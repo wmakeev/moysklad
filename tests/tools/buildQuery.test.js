@@ -120,5 +120,21 @@ test('buildQuery', t => {
     'should drop empty filter object'
   )
 
+  t.equals(
+    buildQuery({
+      filter: null
+    }),
+    '',
+    'should drop null filter string'
+  )
+
+  t.equals(
+    buildQuery({
+      filter: undefined
+    }),
+    '',
+    'should drop undefined filter string'
+  )
+
   t.end()
 })

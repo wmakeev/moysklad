@@ -31,7 +31,7 @@ module.exports = function buildQuery(query) {
           } else if (typeof query.filter === 'string') {
             if (query.filter != null && query.filter !== '')
               addPart(query.filter)
-          } else {
+          } else if (query.filter != null) {
             throw new MoyskladError(
               'Поле filter запроса должно быть строкой или объектом'
             )

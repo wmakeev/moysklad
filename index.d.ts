@@ -993,6 +993,35 @@ declare namespace Moysklad {
 
     /** Список ошибок запроса */
     errors: ApiErrorInfo[]
+
+    /** Тело запроса */
+    requestBody?: string
+
+    /**
+     * Место нахождения первой ошибки в теле запроса.
+     *
+     * Пример форматированного вывода ошибки с указанием места проблемы:
+     *
+     * ```ts
+     * import { codeFrameColumns } from 'awesome-code-frame'
+     *
+     * try {
+     *   // some code ...
+     * } catch(err) {
+     *   if (err instanceof MoyskladApiError && err.requestBody && err.location) {
+     *     const codeFrame = codeFrameColumns(err.requestBody, err.location)
+     *     console.log(codeFrame)
+     *   }
+     *   throw err
+     * }
+     * ```
+     */
+    location?: {
+      start: {
+        line: number
+        column?: number
+      }
+    }
   }
 
   /**

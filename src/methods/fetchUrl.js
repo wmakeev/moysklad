@@ -147,7 +147,7 @@ function createFetchThunk(ctx, url, options = {}) {
           result = undefined
         }
 
-        error = getResponseError(result, response) || error
+        error = getResponseError(result, response, fetchOptions.body) || error
       } catch (err) {
         // для обработки ошибки в JSON.parse
         error = new MoyskladRequestError(

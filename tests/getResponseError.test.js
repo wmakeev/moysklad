@@ -16,8 +16,8 @@ const createFooError = (message, code) => ({
   error: message,
   moreInfo: 'https://path/to/info',
   parameter: 'foo',
-  column: 10,
-  line: 1
+  line: 1,
+  column: 10
 })
 
 test('getResponseError (empty response)', async t => {
@@ -47,8 +47,8 @@ test('getResponseError (multi error response)', async t => {
   )
   t.equal(error.code, 1000, 'should set error code')
   t.equal(error.moreInfo, 'https://path/to/info', 'should set error moreInfo')
-  t.equal(error.line, 1, 'should set error line')
-  t.equal(error.column, 10, 'should set error column')
+  t.equal(error.location.start.line, 1, 'should set error line')
+  t.equal(error.location.start.column, 10, 'should set error column')
   t.deepEqual(error.errors, responseBody.errors, 'should set errors array')
 })
 

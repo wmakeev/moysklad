@@ -43,7 +43,7 @@ class MoyskladUnexpectedRedirectError extends MoyskladRequestError {
 }
 
 class MoyskladApiError extends MoyskladRequestError {
-  constructor(errors, response) {
+  constructor(errors, response, requestBody) {
     const error = errors[0]
     /* c8 ignore next */
     const message = error.error + (error.moreInfo ? ` (${error.moreInfo})` : '')
@@ -52,15 +52,22 @@ class MoyskladApiError extends MoyskladRequestError {
 
     this.code = error.code
     this.moreInfo = error.moreInfo
-    if (error.line != null) this.line = error.line
-    if (error.column != null) this.column = error.column
+    if (error.line != null) {
+      this.location = {
+        start: {
+          line: error.line,
+          column: error.column
+        }
+      }
+    }
+    this.requestBody = requestBody
     this.errors = errors
   }
 }
 
 class MoyskladCollectionError extends MoyskladApiError {
-  constructor(errors, errorsIndexes, response) {
-    super(errors, response)
+  constructor(errors, errorsIndexes, response, requestBody) {
+    super(errors, response, requestBody)
     this.errorsIndexes = errorsIndexes
   }
 }

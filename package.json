@@ -61,6 +61,7 @@
     "stampit": "^4.3.2"
   },
   "devDependencies": {
+    "@babel/code-frame": "^7.26.2",
     "@tsconfig/esm": "^1.0.5",
     "@tsconfig/node20": "^20.1.4",
     "@tsconfig/strictest": "^2.0.5",
@@ -72,6 +73,7 @@
     "eslint-config-prettier": "^8.10.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^4.2.1",
+    "json-source-map": "^0.6.1",
     "moysklad-fetch-planner": "^3.0.0",
     "np": "^10.2.0",
     "p-retry": "^6.2.1",

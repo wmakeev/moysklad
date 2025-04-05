@@ -2,6 +2,8 @@
 
 const test = require('tape')
 const { fetch } = require('undici')
+const { codeFrameColumns } = require('@babel/code-frame')
+const jsonMap = require('json-source-map')
 const {
   MoyskladUnexpectedRedirectError,
   MoyskladCollectionError,
@@ -93,6 +95,91 @@ test('MoyskladApiError', async t => {
         t.equal(err.errors[0].code, err.code)
         t.equal(err.errors[0].error, 'Не указан идентификатор объекта')
         t.equal(err.errors[0].moreInfo, err.moreInfo)
+      }
+    })
+})
+
+test('MoyskladApiError', async t => {
+  t.plan(14)
+
+  const ms = Moysklad({ fetch })
+
+  await ms
+    .POST('entity/product', {
+      name: 'foo-1',
+      supplier: {
+        meta: {
+          type: 'counterparty',
+          href: 'incorrect-href'
+        }
+      }
+    })
+    .catch(err => {
+      if (err instanceof MoyskladApiError) {
+        t.equal(err.name, 'MoyskladApiError')
+        t.equal(
+          err.message,
+          'Некорректный сервер в идентификаторе объекта: incorrect-href (https://dev.moysklad.ru/doc/api/remap/1.2/#error_1059)'
+        )
+        t.equal(err.code, 1059)
+        t.equal(
+          err.moreInfo,
+          'https://dev.moysklad.ru/doc/api/remap/1.2/#error_1059'
+        )
+        t.equal(err.status, 400)
+        t.equal(err.statusText, 'Bad Request')
+        t.equal(err.url, 'https://api.moysklad.ru/api/remap/1.2/entity/product')
+        t.equal(err.errors[0].code, err.code)
+        t.equal(
+          err.errors[0].error,
+          'Некорректный сервер в идентификаторе объекта: incorrect-href'
+        )
+        t.equal(err.errors[0].moreInfo, err.moreInfo)
+        t.equal(
+          err.requestBody,
+          '{"name":"foo-1","supplier":{"meta":{"type":"counterparty","href":"incorrect-href"}}}'
+        )
+        t.equal(err.location.start.line, 1)
+        t.equal(err.location.start.column, 37)
+
+        //#region Prettify error location
+        let json = err.requestBody
+        let location = err.location
+        const parsedJson = jsonMap.parse(err.requestBody)
+        const pos = err.location.start.column - 1
+
+        const mappings = []
+        for (const [p, locs] of Object.entries(parsedJson.pointers)) {
+          for (const [key, loc] of Object.entries(locs)) {
+            mappings.push([[p, key], loc])
+          }
+        }
+
+        let pointerLoc = null
+        for (let i = mappings.length - 1; i >= 0; i--) {
+          const m = mappings[i]
+          if (pos >= m[1].pos) {
+            pointerLoc = m[0]
+            break
+          }
+        }
+
+        if (pointerLoc) {
+          const mappedJson = jsonMap.stringify(parsedJson.data, null, 2)
+          json = mappedJson.json
+          const locationStart =
+            mappedJson.pointers[pointerLoc[0]][pointerLoc[1]]
+          t.ok(locationStart)
+          location = { start: locationStart }
+        }
+
+        console.log(
+          codeFrameColumns(json, location, {
+            message: err.message,
+            forceColor: true
+          })
+        )
+        //#endregion
       }
     })
 })

@@ -2,7 +2,11 @@
 
 const { MoyskladApiError, MoyskladCollectionError } = require('./errors')
 
-module.exports = function getResponseError(responseBody, response) {
+module.exports = function getResponseError(
+  responseBody,
+  response,
+  requestBody
+) {
   if (!responseBody) return null
 
   if (Array.isArray(responseBody)) {
@@ -22,9 +26,14 @@ module.exports = function getResponseError(responseBody, response) {
       .map(errItem => errItem[1])
       .reduce((res, errors) => res.concat(errors), [])
 
-    return new MoyskladCollectionError(errors, errorsIndexes, response)
+    return new MoyskladCollectionError(
+      errors,
+      errorsIndexes,
+      response,
+      requestBody
+    )
   } else if (responseBody.errors) {
-    return new MoyskladApiError(responseBody.errors, response)
+    return new MoyskladApiError(responseBody.errors, response, requestBody)
   }
 
   return null

@@ -25,9 +25,13 @@ module.exports = function buildQuery(query) {
 
       switch (true) {
         case key === 'filter':
-          if (isPlainObject(query.filter)) addPart(buildFilter(query.filter))
-          else if (typeof query.filter === 'string') addPart(query.filter)
-          else {
+          if (isPlainObject(query.filter)) {
+            const filter = buildFilter(query.filter)
+            if (filter !== '') addPart(filter)
+          } else if (typeof query.filter === 'string') {
+            if (query.filter != null && query.filter !== '')
+              addPart(query.filter)
+          } else {
             throw new MoyskladError(
               'Поле filter запроса должно быть строкой или объектом'
             )

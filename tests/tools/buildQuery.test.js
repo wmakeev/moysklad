@@ -104,5 +104,21 @@ test('buildQuery', t => {
     'should throw if query.filter is not string or object'
   )
 
+  t.equals(
+    buildQuery({
+      filter: ''
+    }),
+    '',
+    'should drop empty filter string'
+  )
+
+  t.equals(
+    buildQuery({
+      filter: {}
+    }),
+    '',
+    'should drop empty filter object'
+  )
+
   t.end()
 })
